@@ -17,4 +17,9 @@ public class GreetingController {
         return "greeting_template";
     }
 
+    @GetMapping("/login")
+    public String login(Model model) {
+        return "login";
+    }
+
 }
