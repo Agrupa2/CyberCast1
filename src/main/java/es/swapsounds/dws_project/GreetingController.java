@@ -22,4 +22,9 @@ public class GreetingController {
         return "login";
     }
 
+    @GetMapping("/signup")
+    public String signup(Model model) {
+        return "signup";
+    }
+
 }
