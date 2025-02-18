@@ -24,9 +24,9 @@ public class UserManager {
         return users;
     }
 
-    public User getUserByUsername(String username) {
+    public User getUserByEmail(String email) {
         for (User user : users) {
-            if (user.getUsername().equalsIgnoreCase(username)) {
+            if (user.getEmail().equalsIgnoreCase(email)) {
                 return user;
             }
         }
