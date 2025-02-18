@@ -3,9 +3,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const tl = gsap.timeline({ defaults: { duration: 1, ease: "power2.out" } });
 
     tl.from(".navbar", { y: -50, opacity: 0 }) // Animar barra de navegación
-      .from(".welcome-content h1", { y: 30, opacity: 0 }, "-=0.5") // Título
-      .from(".welcome-content p", { y: 30, opacity: 0 }, "-=0.4") // Párrafo
-      .from(".cta-button", { scale: 0.8, opacity: 0 }, "-=0.3"); // Botón
+      .from(".welcome-content h1", { y: 30, opacity: 50 }, "-=0.5") // Título
+      .from(".welcome-content p", { y: 30, opacity: 50 }, "-=0.4") // Párrafo
+      .from(".cta-button", { scale: 0.8, opacity: 50 }, "-=1.5"); // Botón
 
     // Eventos para botones de navegación
     document.getElementById("loginBtn").addEventListener("click", () => {
