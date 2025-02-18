@@ -19,4 +19,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("contactBtn").addEventListener("click", () => {
         window.location.href = "/contact"; // Redirigir a la página de contacto
     });
+
+    document.getElementById("startBtn").addEventListener("click", () => {
+        window.location.href = "/start"; // Redirigir a la página de start
+    });
 });

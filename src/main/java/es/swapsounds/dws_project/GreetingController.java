@@ -32,6 +32,11 @@ public class GreetingController {
         return "landing-page";
     }
 
+    @GetMapping("/start")
+    public String start(Model model) {
+        return "start";
+    }
+
 
      
 }
