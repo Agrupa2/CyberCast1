@@ -26,5 +26,5 @@ public class GreetingController {
     public String signup(Model model) {
         return "signup";
     }
-
+     
 }
