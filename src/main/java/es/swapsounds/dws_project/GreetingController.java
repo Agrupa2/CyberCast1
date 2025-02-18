@@ -26,5 +26,12 @@ public class GreetingController {
     public String signup(Model model) {
         return "signup";
     }
+
+    @GetMapping("/")
+    public String landingPage(Model model) {
+        return "landing-page";
+    }
+
+
      
 }

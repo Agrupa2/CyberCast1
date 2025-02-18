@@ -1,0 +1,141 @@
+/* Estilos generales */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #001F3F 0%, #3A6D8C 100%);
+    color: #fff;
+    overflow: hidden;
+}
+
+/* Barra de navegación */
+.navbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.6); /* Aumenta la opacidad para mejorar contraste */
+    z-index: 2;
+    box-sizing: border-box;
+    opacity: 0;
+    animation: fadeIn 1s ease-out forwards;
+}
+
+.navbar .logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+}
+
+/* Botones de navegación */
+.nav-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.nav-button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    color: #fff;
+    background-color: transparent;
+    border: 2px solid #fff;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    white-space: nowrap;
+}
+
+.nav-button:hover {
+    background-color: #fff;
+    color: #001F3F;
+}
+
+/* Contenedor principal */
+.welcome-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    background: url('https://wallpaper.forfun.com/fetch/9e/9e25a7657a2a840e926c55d45a8f5250.jpeg?w=1470&r=0.5625') no-repeat center center/cover;
+    position: relative;
+    opacity: 0;
+    animation: fadeIn 1s ease-out forwards;
+}
+
+/* Efecto de superposición */
+.welcome-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7); /* Aumenta la opacidad para mayor visibilidad del texto */
+}
+
+/* Contenido de bienvenida */
+.welcome-content {
+    text-align: center;
+    z-index: 1;
+    max-width: 600px;
+    padding: 20px;
+}
+
+/* Título */
+.welcome-content h1 {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    font-weight: 700;
+    color: rgba(255, 215, 0, 0.9); /* Ajuste de opacidad para mayor legibilidad */
+    text-shadow: 4px 4px 15px rgba(0, 0, 0, 0.8); /* Mayor sombra para resaltar */
+}
+
+/* Texto resaltado */
+.welcome-content .highlight {
+    color: rgba(255, 215, 0, 1);
+}
+
+/* Párrafo */
+.welcome-content p {
+    font-size: 1.3rem;
+    margin-bottom: 30px;
+    line-height: 1.6;
+    opacity: 0.9; /* Mejora la visibilidad del texto */
+    text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.6);
+}
+
+/* Botón de llamada a la acción */
+.cta-button {
+    display: inline-block;
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    color: #fff;
+    background-color: rgba(255, 215, 0, 0.9);
+    border-radius: 50px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+    box-shadow: 0px 0px 15px rgba(255, 215, 0, 0.9);
+}
+
+.cta-button:hover {
+    background-color: #FFA500;
+}
+
+/* Animación de entrada */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
