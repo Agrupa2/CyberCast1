@@ -37,6 +37,10 @@ public class GreetingController {
         return "start";
     }
 
+    @GetMapping("/contact")
+    public String contact(Model model) {
+        return "contact";
+    }
 
      
 }

@@ -1,134 +1,122 @@
-/* Estilos generales */
-body, html {
+* {
     margin: 0;
     padding: 0;
-    height: 100%;
-    font-family: 'Arial', sans-serif;
-    background: #f0f0f0;
-    color: #333;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Barra de navegación */
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 20px;
-    background: rgba(0, 0, 0, 0.8);
+:root {
+    --gradient: linear-gradient(45deg, #ff3366, #ff6b6b, #4834d4, #686de0);
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --border: 1px solid rgba(255, 255, 255, 0.1);
+    --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+
+body {
+    background: #0a0a0a;
     color: white;
+    min-height: 100vh;
+}
+
+/* Navbar */
+.navbar {
     position: fixed;
-    width: 100%;
     top: 0;
     left: 0;
+    width: 100%;
+    padding: 1.2rem 5%;
+    backdrop-filter: blur(12px);
+    background: var(--glass-bg);
+    border-bottom: var(--border);
+    box-shadow: var(--shadow);
+    transition: all 0.4s ease;
     z-index: 1000;
 }
 
-.navbar .logo {
-    font-size: 1.5rem;
-    font-weight: bold;
+.navbar.scrolled {
+    background: rgba(10, 10, 10, 0.95);
 }
 
-.nav-links a {
-    color: white;
-    text-decoration: none;
-    margin-left: 15px;
-    transition: color 0.3s ease;
-}
-
-.nav-links a:hover {
-    color: #FFD700;
-}
-
-/* Sección principal */
-.hero {
-    height: 100vh;
-    background: url('https://source.unsplash.com/1600x900/?nature,landscape') no-repeat center center/cover;
+.navbar-container {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    justify-content: center;
-    text-align: center;
-    position: relative;
-    color: white;
-    padding: 20px;
 }
 
-/* Efecto de oscurecimiento en fondo */
-.hero::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+.logo {
+    font-size: 1.8rem;
+    font-weight: 700;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
-/* Contenido dentro del Hero */
-.hero-content {
-    position: relative;
-    z-index: 1;
-    max-width: 600px;
-}
-
-.hero-content h1 {
-    font-size: 2.8rem;
-    margin-bottom: 10px;
-}
-
-.hero-content p {
-    font-size: 1.2rem;
-    margin-bottom: 20px;
-}
-
-/* Barra de búsqueda */
-.search-box {
+/* Search Bar */
+.search-container {
     display: flex;
     justify-content: center;
-    align-items: center;
-    width: 100%;
+    margin-top: 100px;
 }
 
-.search-box input {
+.search-bar {
+    width: 50%;
     padding: 12px;
-    width: 70%;
+    border-radius: 25px;
     border: none;
-    border-radius: 30px 0 0 30px;
-    font-size: 1rem;
     outline: none;
-}
-
-.search-box button {
-    padding: 12px 20px;
-    background: #FFD700;
-    border: none;
-    border-radius: 0 30px 30px 0;
-    cursor: pointer;
     font-size: 1rem;
-    font-weight: bold;
-    transition: background 0.3s ease;
+    background: var(--glass-bg);
+    box-shadow: var(--shadow);
+    color: white;
 }
 
-.search-box button:hover {
-    background: #FFA500;
-}
-
-/* Contenedor de resultados */
-.results-container {
-    padding: 20px;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 15px;
-    justify-content: center;
-}
-
-.results-container img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
+select {
+    margin-left: 10px;
+    padding: 12px;
     border-radius: 10px;
-    transition: transform 0.3s ease;
+    background: var(--glass-bg);
+    color: white;
+    border: none;
+    outline: none;
+    cursor: pointer;
 }
 
-.results-container img:hover {
-    transform: scale(1.05);
+/* Sound Preview */
+.preview-container {
+    margin-top: 30px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+}
+
+.sound-card {
+    width: 200px;
+    padding: 15px;
+    background: var(--glass-bg);
+    border: var(--border);
+    box-shadow: var(--shadow);
+    border-radius: 12px;
+    text-align: center;
+    transition: 0.3s;
+}
+
+.sound-card:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.sound-card button {
+    margin-top: 10px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: none;
+    background: var(--gradient);
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.sound-card button:hover {
+    opacity: 0.8;
 }
