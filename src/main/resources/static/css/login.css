@@ -3,9 +3,18 @@
 * {
   box-sizing: border-box;
 }
+:root {
+  --gradient: linear-gradient(45deg, #ff3366, #ff6b6b, #4834d4, #686de0);
+  --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  --shadow-btn: rgba(31, 38, 135, 0.37);
+  --shadow-input: rgba(68, 70, 105, 0.34);
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --light-azure: hsl(214, 84%, 56%);
 
+
+}
 body {
-  background: #f6f5f7;
+  background: #0a0a0a;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -18,6 +27,7 @@ body {
 h1 {
   font-weight: bold;
   margin: 0;
+  color: #fff
 }
 
 h2 {
@@ -46,7 +56,7 @@ a {
 button {
   border-radius: 20px;
   border: 1px solid #001f3f;
-  background-color: #001f3f;
+  background-color: var(--shadow-btn);
   color: #ffffff;
   font-size: 12px;
   font-weight: bold;
@@ -58,7 +68,7 @@ button {
 }
 
 button:hover {
-  background-color: #ffffff;
+  background-color: #ff6b6b;
   color: #001f3f;
 }
 
@@ -80,9 +90,11 @@ button.ghost {
   background-color: transparent;
   border-color: #ffffff;
 }
-
+::placeholder {
+  color: gray;
+}
 form {
-  background-color: #ffffff;
+  background-color: var(--glass-bg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -93,17 +105,18 @@ form {
 }
 
 input {
-  background-color: #eee;
-  border: none;
+  background-color: var(--shadow-input);
+  border-radius: 10px;;
+  border-color: var(--shadow-btn);
   padding: 12px 15px;
   margin: 8px 0;
   width: 100%;
 }
 
 .container {
-  background-color: #fff;
+  background-color: #0a0a0a;
   border-radius: 10px;
-  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+  box-shadow: var(--shadow);
   position: relative;
   overflow: hidden;
   width: 768px;
@@ -173,8 +186,7 @@ input {
 
 .overlay {
   background: #ff416c;
-  background: -webkit-linear-gradient(to right, #3a6d8c, #001f3f);
-  background: linear-gradient(to right, #3a6d8c, #001f3f);
+  background: var(--gradient);
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 0 0;
