@@ -76,28 +76,7 @@ select {
   outline: none;
 }
 
-/* Estilo para el select principal */
-#category.fold-out {
-  background-color: var(--glass-bg); /* Color de fondo personalizado (ejemplo: azul oscuro) */
-  color: #ecf0f1; /* Color de la letra (ejemplo: blanco claro) */
-  padding: 12px; /* Mantienes tu padding existente */
-  border-radius: 10px; /* Mantienes tu border-radius */
-  border: none; /* Sin borde */
-  outline: none; /* Sin contorno al hacer focus */
-  cursor: pointer;
-  appearance: none; /* Elimina el estilo nativo del navegador */
-  -webkit-appearance: none; /* Para navegadores Webkit */
-  -moz-appearance: none; /* Para Firefox */
-}
 
-/* Para añadir una flecha personalizada (opcional) */
-#category.fold-out {
-  position: relative;
-  background-image: url('data:image/svg+xml;utf8,<svg fill="%23ecf0f1" height="20" width="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M5 7l5 5 5-5z"/></svg>'); /* Flecha blanca */
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  padding-right: 30px; /* Espacio para la flecha */
-}
 
 /* Estilo para las opciones (funciona en algunos navegadores) */
 #category.fold-out option {
@@ -227,10 +206,10 @@ a {
   border-radius: 12px;
   text-align: center;
   transition: 0.3s;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border);
   padding: 10px;
   margin: 10px;
-  border-radius: 5px;
+  border-radius: 20px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 .sound-card:hover {
@@ -715,4 +694,56 @@ nav.active {
   .sound-card {
     flex: 0 0 100%; /* 1 card per row */
   }
+}
+
+.nav-links {
+  display: flex;
+  gap: 2.5rem;
+  list-style: none;
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  position: relative;
+  padding: 0.5rem 0;
+  transition: all 0.3s ease;
+  font-size: 1.05rem;
+  letter-spacing: 0.3px;
+}
+
+.nav-links a::before {
+  content: "";
+  position: absolute;
+  top: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--gradient);
+  background-size: 300%;
+  transition: width 0.3s ease;
+}
+
+.nav-links a::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  right: 0;
+  width: 0;
+  height: 2px;
+  background: var(--gradient);
+  background-size: 300%;
+  transition: width 0.3s ease;
+}
+
+.nav-links a:hover {
+  color: #fff;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+.nav-links a:hover::before,
+.nav-links a:hover::after {
+  width: 100%;
+  animation: gradient 8s linear infinite;
 }
