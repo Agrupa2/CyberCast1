@@ -10,9 +10,8 @@
   --shadow-input: rgba(68, 70, 105, 0.34);
   --glass-bg: rgba(255, 255, 255, 0.05);
   --light-azure: hsl(214, 84%, 56%);
-
-
 }
+
 body {
   background: #0a0a0a;
   display: flex;
@@ -27,7 +26,7 @@ body {
 h1 {
   font-weight: bold;
   margin: 0;
-  color: #fff
+  color: #fff;
 }
 
 h2 {
@@ -106,11 +105,12 @@ form {
 
 input {
   background-color: var(--shadow-input);
-  border-radius: 10px;;
+  border-radius: 10px;
   border-color: var(--shadow-btn);
   padding: 12px 15px;
   margin: 8px 0;
   width: 100%;
+  color: white;
 }
 
 .container {
