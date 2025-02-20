@@ -569,13 +569,22 @@ nav.active {
 	white-space: nowrap;
 	overflow: hidden;
 	-webkit-animation: digitacao 2s steps(26, end), barra .2s step-end infinite .1s alternate;
+  animation: digitacao 2s steps(26, end), barra .2s step-end infinite .1s alternate;
+
 }
 
 @-webkit-keyframes digitacao { 
-    0% { width: 0; } 
+  0% { width: 0; } 
 }
+@keyframes digitacao { 
+  0% { width: 0; } 
+}
+
 @-webkit-keyframes barra { 
-    50% { border-color: transparent; } 
+  50% { border-color: transparent; } 
+}
+@keyframes barra { 
+  50% { border-color: transparent; } 
 }
 
 @media screen and (max-width: 1200px) {
