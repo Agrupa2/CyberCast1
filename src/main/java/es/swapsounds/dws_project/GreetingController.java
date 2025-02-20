@@ -42,5 +42,8 @@ public class GreetingController {
         return "contact";
     }
 
-     
+    @GetMapping("/comment_section")
+    public String comment_section(Model model) {
+        return "comment_section";
+    }
 }
