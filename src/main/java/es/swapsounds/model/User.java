@@ -10,15 +10,22 @@ public class User {
     private String profilePicturePath;
     private List<Comment> comments;
     private List<Sound> sounds;
+    private int id;
 
-    public User(String username, String email, String password, String profilePicturePath) {
+    
+    public User(String username, String email, String password, String profilePicturePath, int id) {
         this.username = username;
         this.email = email;
         this.password = password;
         this.profilePicturePath = profilePicturePath;
         this.comments = new ArrayList<>();
         this.sounds = new ArrayList<>();
+        this.id = id;
 
+    }
+
+    public User(int i, String string, String string2) {
+        //TODO Auto-generated constructor stub
     }
 
     public String getUsername() {
@@ -48,4 +55,12 @@ public class User {
     public List<Sound> getSounds() {
         return sounds;
     }
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) { 
+        this.id = id; 
+    }
+
 }
