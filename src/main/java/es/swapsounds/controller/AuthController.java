@@ -1,6 +1,5 @@
 package es.swapsounds.controller;
 
-
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Base64;
 
-
 @Controller
 @RequestMapping("/auth") // Rutas base para autenticación
 public class AuthController {
@@ -22,10 +20,10 @@ public class AuthController {
 
     @PostMapping("/signup")
     public String signUp(@RequestParam String username,
-                         @RequestParam String email,
-                         @RequestParam String password,
-                         @RequestParam("profilePicture") MultipartFile profilePicture,
-                         RedirectAttributes redirectAttributes) {
+            @RequestParam String email,
+            @RequestParam String password,
+            @RequestParam("profilePicture") MultipartFile profilePicture,
+            RedirectAttributes redirectAttributes) {
 
         String profilePicBase64 = null;
         if (profilePicture != null && !profilePicture.isEmpty()) {
@@ -36,7 +34,6 @@ public class AuthController {
             }
         }
 
-        
         // Crear usuario y almacenarlo en memoria
         User newUser = new User(username, email, password, profilePicBase64);
         users.add(newUser);
@@ -50,9 +47,9 @@ public class AuthController {
 
     @PostMapping("/login")
     public String login(@RequestParam String email,
-                        @RequestParam String password,
-                        RedirectAttributes redirectAttributes) {
-        
+            @RequestParam String password,
+            RedirectAttributes redirectAttributes) {
+
         // Verificar usuario
         for (User user : users) {
             if (user.getEmail().equals(email) && user.getPassword().equals(password)) {
