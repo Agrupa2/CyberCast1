@@ -1,26 +1,45 @@
-document.addEventListener("DOMContentLoaded", () => {
-    // Línea de tiempo GSAP para animar todo de forma sincronizada
-    const tl = gsap.timeline({ defaults: { duration: 1, ease: "power2.out" } });
+const navbar = document.querySelector('.navbar');
+const mobileNavToggle = document.querySelector('.mobile-nav-toggle');
+const navLinks = document.querySelector('.nav-links');
+const overlay = document.querySelector('.overlay');
+let isMenuOpen = false;
 
-    tl.from(".navbar", { y: -50, opacity: 0 }) // Animar barra de navegación
-      .from(".welcome-content h1", { y: 30, opacity: 50 }, "-=0.5") // Título
-      .from(".welcome-content p", { y: 30, opacity: 50 }, "-=0.4") // Párrafo
-      .from(".cta-button", { scale: 0.8, opacity: 50 }, "-=1.5"); // Botón
+// Scroll effect
+window.addEventListener('scroll', () => {
+    if (window.scrollY > 50) {
+        navbar.classList.add('scrolled');
+    } else {
+        navbar.classList.remove('scrolled');
+    }
+});
 
-    // Eventos para botones de navegación
-    document.getElementById("loginBtn").addEventListener("click", () => {
-        window.location.href = "/login"; // Redirigir a la página de login
+// Toggle mobile menu
+function toggleMenu() {
+    isMenuOpen = !isMenuOpen;
+    mobileNavToggle.classList.toggle('active');
+    navLinks.classList.toggle('active');
+    overlay.classList.toggle('active');
+    document.body.style.overflow = isMenuOpen ? 'hidden' : '';
+}
+
+mobileNavToggle.addEventListener('click', toggleMenu);
+overlay.addEventListener('click', toggleMenu);
+
+// Close mobile menu when clicking a link
+document.querySelectorAll('.nav-links a').forEach(link => {
+    link.addEventListener('click', () => {
+        if (isMenuOpen) toggleMenu();
     });
+});
 
-    document.getElementById("signupBtn").addEventListener("click", () => {
-        window.location.href = "/signup"; // Redirigir a la página de registro
-    });
+// Close menu on escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && isMenuOpen) toggleMenu();
+});
 
-    document.getElementById("contactBtn").addEventListener("click", () => {
-        window.location.href = "/contact"; // Redirigir a la página de contacto
-    });
-
-    document.getElementById("startBtn").addEventListener("click", () => {
-        window.location.href = "/start"; // Redirigir a la página de start
-    });
+// Prevent scroll when menu is open
+window.addEventListener('resize', () => {
+    if (window.innerWidth > 768 && isMenuOpen) {
+        toggleMenu();
+    }
 });

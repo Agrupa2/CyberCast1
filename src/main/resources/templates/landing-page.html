@@ -3,47 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SwapSounds - Bienvenido</title>
+    <title>Landing Page - SwapSounds</title>
     <link rel="stylesheet" href="/css/landing-page.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
 <body>
-    <div class="welcome-container">
-        <!-- Barra de navegación -->
-        <nav class="navbar">
+    <!-- Barra de navegación -->
+    <nav class="navbar">
+        <div class="navbar-container">
             <div class="logo">SwapSounds</div>
-            <div class="nav-buttons">
-                <button id="loginBtn" class="nav-button">Login</button>
-                <button id="signupBtn" class="nav-button">Sign Up</button>
-                <button id="contactBtn" class="nav-button">Contact</button>
-            </div>
-        </nav>
-
-        <!-- Contenido principal -->
-        <div class="welcome-content">
-            <h1 class="fade-in">Wellcome to <span class="highlight">SwapSounds</span></h1>
-            <p class="fade-in-delay">Discover and share music in a unique way. Connect with artists and music lovers around the world.
-
-
-
-
-
-
-
-            </p>
-            <a href="start" class="cta-button fade-in-delay">START</a>
+            <button class="mobile-nav-toggle" aria-label="Toggle navigation">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+            <ul class="nav-links">
+                <li><a href="/signup">Sign Up</a></li>
+                <li><a href="/login">Login</a></li>
+                <li><a href="/start">Start Now</a></li>
+                <li><a href="/contact">Contact</a></li>
+            </ul>
         </div>
-    </div>
+    </nav>
+    <div class="overlay"></div>
+
+    <!-- Sección de bienvenida -->
+    <section id="welcome">
+        <div class="bg-effect bg-effect-1"></div>
+        <div class="section-content">
+            <h1 class="section-title">SWAPSOUNDS</h1>
+            <p class="section-description">Experience the future of sounds</p>
+        </div>
+    </section>
+
+    <!-- Sección de sonidos -->
+    <section id="sounds">
+        <div class="bg-effect bg-effect-2"></div>
+        <div class="section-content">
+            <h1 class="section-title">SOUNDS</h1>
+            <p class="section-description">More than 10000 sounds for you</p>
+        </div>
+    </section>
 
     <!-- Script de JavaScript -->
     <script src="/js/landing-page.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            gsap.from(".navbar", { duration: 1, y: -50, opacity: 0, ease: "power2.out" });
-            gsap.from(".fade-in", { duration: 1.5, y: 30, opacity: 0, delay: 0.5, ease: "power2.out" });
-            gsap.from(".fade-in-delay", { duration: 1.5, y: 30, opacity: 0, delay: 1, ease: "power2.out" });
-        });
-    </script>
 </body>
 </html>
