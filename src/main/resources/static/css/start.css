@@ -111,7 +111,7 @@ li {
 }
 
 .navbar.scrolled {
-  background: rgba(10, 10, 10, 0.95);
+  background: rgba(0, 0, 0, 0.95);
 }
 
 .navbar-container {
@@ -140,7 +140,7 @@ li {
   width: 50%;
   padding: 12px;
   border-radius: 25px;
-  border: none;
+  border: 2px solid var(--light-azure);
   outline: none;
   font-size: 1rem;
   background: var(--glass-bg);
@@ -152,8 +152,11 @@ select {
   margin-left: 10px;
   padding: 12px;
   border-radius: 10px;
-  background: var(--glass-bg);
-  color: white;
+  background: var(--gradient);
+  box-shadow: var(--shadow);
+  color: rgb(0, 0, 0);
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   border: none;
   outline: none;
   cursor: pointer;
@@ -184,6 +187,11 @@ a {
   border-radius: 12px;
   text-align: center;
   transition: 0.3s;
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin: 10px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 .sound-card:hover {
   background: rgba(255, 255, 255, 0.1);
@@ -194,11 +202,13 @@ a {
   border-radius: 15px;
   margin-bottom: 15px;
   overflow: hidden;
+  position: relative;
 }
 .sound-card .card-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 5px;
 }
 .movie-card:hover .card-img {
   transform: scale(1.1);
@@ -209,6 +219,17 @@ a {
   inset: 0;
   opacity: 0;
   backdrop-filter: blur(3px);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transition: opacity 0.3s;
 }
 
 .sound-card:hover .card-overlay {
@@ -259,6 +280,9 @@ a {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%) scale(var(--scale));
+  color: #fff;
+  font-size: 2rem;
+  cursor: pointer;
 }
 
 .sound-card .play ion-icon {
@@ -278,6 +302,8 @@ a {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-size: 1.2rem;
+  margin-bottom: 5px;
 }
 
 .sound-card:hover .card-title {
@@ -289,6 +315,31 @@ a {
   justify-content: space-evenly;
   font-size: var(--font-size-extra-small);
   font-weight: var(--fw5);
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.sound-card .card-body {
+  padding: 10px;
+}
+
+.sound-card button {
+  display: inline-block;
+  padding: 10px 20px;
+  font-size: 1rem;
+  color: #fff;
+  background-color: #007bff;
+  border: 2px solid #007bff;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.sound-card button:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
 }
 
 .container {

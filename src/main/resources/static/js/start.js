@@ -1,30 +1,39 @@
 const sounds = [
     {
         id: 1,
-        title: "Nature Sound",
-        description: "Relaxing forest ambiance",
-        filePath: "/audio/nature.mp3",
-        imagePath: "/images/nature.jpg",
-        category: "Relax",
-        duration: "3:20"
+        title: "El diablo que malditos tenis",
+        description: "He likes the shoes of his homie",
+        filePath: "/audio/el-diablo-que-malditos-tenis.mp3",
+        imagePath: "/images/el-diablo-que-malditos-tenis.png",
+        category: "Meme",
+        duration: "0:04"
     },
     {
         id: 2,
-        title: "Ocean Waves",
-        description: "Soothing ocean waves",
-        filePath: "/audio/ocean.mp3",
-        imagePath: "/images/ocean.jpg",
-        category: "Nature",
-        duration: "4:45"
+        title: "Betis Anthem",
+        description: "Betis Anthem for the fans",
+        filePath: "/audio/betis.mp3",
+        imagePath: "/images/betis.png",
+        category: "Football",
+        duration: "0:07"
     },
     {
         id: 3,
-        title: "Rain Sound",
-        description: "Peaceful rain for sleep",
-        filePath: "/audio/rain.mp3",
-        imagePath: "/images/rain.jpg",
-        category: "Meditation",
-        duration: "5:10"
+        title: "CR7(SIUU)",
+        description: "Cristiano Ronaldo's celebration",
+        filePath: "/audio/CR7.mp3",
+        imagePath: "/images/CR7.jpg",
+        category: "Football",
+        duration: "0:06"
+    },
+    {
+        id: 4,
+        title: "El senor de la noche",
+        description: "When you are in the pick of the party, play this sound",
+        filePath: "/audio/ElSenorDeLaNoche.mp3",
+        imagePath: "/images/ElSenorDeLaNoche.jpg",
+        category: "Party",
+        duration: "0:18"
     }
 ];
 
@@ -46,7 +55,7 @@ function renderSounds(soundList) {
             <div class="card-head">
                 <img src="${sound.imagePath}" alt="${sound.title}" class="card-img">
                 <div class="card-overlay">
-                    <div class="play" onclick="document.getElementById('audio-${sound.id}').play()">
+                    <div class="play" onclick="playSound(${sound.id})">
                         <ion-icon name="play-circle-outline"></ion-icon>
                     </div>
                 </div>
@@ -58,11 +67,20 @@ function renderSounds(soundList) {
                     <span class="duration">${sound.duration} min</span>
                 </div>
                 <audio id="audio-${sound.id}" src="${sound.filePath}" preload="none"></audio>
+                <button onclick="playSound(${sound.id})">Play</button>
             </div>
         `;
         
         container.appendChild(soundCard);
     });
+}
+
+// Función para reproducir sonido
+function playSound(soundId) {
+    const audioElement = document.getElementById(`audio-${soundId}`);
+    if (audioElement) {
+        audioElement.play();
+    }
 }
 
 // 1. Función para cargar sonidos iniciales (muestra 4 sonidos aleatorios)
