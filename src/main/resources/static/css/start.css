@@ -76,6 +76,45 @@ select {
   outline: none;
 }
 
+/* Estilo para el select principal */
+#category.fold-out {
+  background-color: var(--glass-bg); /* Color de fondo personalizado (ejemplo: azul oscuro) */
+  color: #ecf0f1; /* Color de la letra (ejemplo: blanco claro) */
+  padding: 12px; /* Mantienes tu padding existente */
+  border-radius: 10px; /* Mantienes tu border-radius */
+  border: none; /* Sin borde */
+  outline: none; /* Sin contorno al hacer focus */
+  cursor: pointer;
+  appearance: none; /* Elimina el estilo nativo del navegador */
+  -webkit-appearance: none; /* Para navegadores Webkit */
+  -moz-appearance: none; /* Para Firefox */
+}
+
+/* Para añadir una flecha personalizada (opcional) */
+#category.fold-out {
+  position: relative;
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%23ecf0f1" height="20" width="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M5 7l5 5 5-5z"/></svg>'); /* Flecha blanca */
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 30px; /* Espacio para la flecha */
+}
+
+/* Estilo para las opciones (funciona en algunos navegadores) */
+#category.fold-out option {
+  background-color: #34495e; /* Fondo de las opciones (azul más claro) */
+  color: #ecf0f1; /* Color de la letra de las opciones */
+}
+
+/* Hover para el select (opcional) */
+#category.fold-out:hover {
+  background-color: var(--glass-bg); /* Cambio de fondo al pasar el ratón */
+}
+
+/* Focus para el select (opcional) */
+#category.fold-out:focus {
+  box-shadow: 0 0 5px #686de0; /* Sombra al hacer focus */
+}
+
 button {
   color: var(--off-white);
   cursor: pointer;
@@ -170,6 +209,7 @@ a {
   flex-wrap: wrap;
   gap: 20px;
   padding: 20px;
+  margin-bottom: 200px;
 }
 
 .sound-card {
