@@ -1,4 +1,4 @@
-package es.swapsounds.dws_project;
+package es.swapsounds.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,11 +30,6 @@ public class GreetingController {
     @GetMapping("/")
     public String landingPage(Model model) {
         return "landing-page";
-    }
-
-    @GetMapping("/start")
-    public String start(Model model) {
-        return "start";
     }
 
     @GetMapping("/contact")
