@@ -386,7 +386,7 @@ ul .link-item:not(:last-child) {
   display: flex;
 }
 a::hover {
-    color: #ff6b6b
+  color: #ff6b6b;
 }
 /*MEDIA QUERIES*/
 
@@ -559,32 +559,41 @@ nav.active {
   color: #686de0;
   justify-content: center;
   font-weight: bold;
-  border-right: .06em solid #686de0;
+  border-right: 0.06em solid #686de0;
   background: transparent;
   font-size: 1.5em;
-	width: 32ch;
+  width: 32ch;
   margin: 0.5ch;
   padding: 0 1ch;
   display: block;
-	white-space: nowrap;
-	overflow: hidden;
-	-webkit-animation: digitacao 2s steps(26, end), barra .2s step-end infinite .1s alternate;
-  animation: digitacao 2s steps(26, end), barra .2s step-end infinite .1s alternate;
-
+  white-space: nowrap;
+  overflow: hidden;
+  -webkit-animation: digitacao 2s steps(26, end),
+    barra 0.2s step-end infinite 0.1s alternate;
+  animation: digitacao 2s steps(26, end),
+    barra 0.2s step-end infinite 0.1s alternate;
 }
 
-@-webkit-keyframes digitacao { 
-  0% { width: 0; } 
+@-webkit-keyframes digitacao {
+  0% {
+    width: 0;
+  }
 }
-@keyframes digitacao { 
-  0% { width: 0; } 
+@keyframes digitacao {
+  0% {
+    width: 0;
+  }
 }
 
-@-webkit-keyframes barra { 
-  50% { border-color: transparent; } 
+@-webkit-keyframes barra {
+  50% {
+    border-color: transparent;
+  }
 }
-@keyframes barra { 
-  50% { border-color: transparent; } 
+@keyframes barra {
+  50% {
+    border-color: transparent;
+  }
 }
 
 @media screen and (max-width: 1200px) {
