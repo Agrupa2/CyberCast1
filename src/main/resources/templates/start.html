@@ -1,36 +1,101 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sound Library</title>
-    <link rel="stylesheet" href="/static/css/start.css">
+    <link rel="stylesheet" href="/css/start.css">
 </head>
+
 <body>
+    <div class="container">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="navbar-container">
+                <div class="logo">Sound Library</div>
+                <ul class="nav-links">
+                    <li><a href="/login">Login</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                </ul>
+            </div>
+        </nav>
 
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="navbar-container">
-            <div class="logo">Sound Library</div>
+        <!-- Search Bar -->
+        <div class="search-container">
+            <input type="text" id="search" class="search-bar" placeholder="Searching for sounds...">
+            <select class="fold-out" id="category">
+                <option value="all">All Categories</option>
+                <option value="Meme">Meme</option>
+                <option value="Football">Football</option>
+                <option value="Party">Party</option>
+            </select>
         </div>
-    </nav>
 
-    <!-- Search Bar -->
-    <div class="search-container">
-        <input type="text" id="search" class="search-bar" placeholder="Buscar sonidos...">
-        <select id="category">
-            <option value="all">Todas las categorías</option>
-            <option value="goofy sounds">Goofy Sounds</option>
-            <option value="singers">Singers</option>
-            <option value="movies">Movies</option>
-        </select>
+        <!-- Sound Previews -->
+        <div class="sounds-container" id="soundsContainer"> <!-- Los sonidos se insertarán dinámicamente aquí -->
+        </div>
+
+        <script src="/js/start.js"></script>
+        <footer>
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="logo">SwapSounds</div>
+                    <p class="slogan">Experience the future of sounds</p>
+
+                    <div class="social-link">
+                        <a href="#"><ion-icon name="logo-facebook"></ion-icon></a>
+                        <a href="#"><ion-icon name="logo-twitter"></ion-icon></a>
+                        <a href="#"><ion-icon name="logo-instagram"></ion-icon></a>
+                        <a href="#"><ion-icon name="logo-tiktok"></ion-icon></a>
+                        <a href="#"><ion-icon name="logo-youtube"></ion-icon></a>
+                    </div>
+                </div>
+
+                <div class="footer-links">
+                    <ul>
+                        <h4 class="link-heading">SwapSounds</h4>
+
+                        <li class="link-item"><a href="#">About us</a></li>
+                        <li class="link-item"><a href="#">My profile</a></li>
+                        <li class="link-item"><a href="#">Pricing plans</a></li>
+                        <li class="link-item"><a href="#">Contacts</a></li>
+                    </ul>
+
+                    <ul>
+                        <h4 class="link-heading">Browse</h4>
+
+                        <li class="link-item"><a href="#">Categories</a></li>
+                        <li class="link-item"><a href="#">Production Sounds</a></li>
+                        <li class="link-item"><a href="#">Free-to-use</a></li>
+                        <li class="link-item"><a href="#">Favourites</a></li>
+                    </ul>
+
+
+                    <ul>
+                        <h4 class="link-heading">Help</h4>
+
+                        <li class="link-item"><a href="#">Account & Billing</a></li>
+                        <li class="link-item"><a href="#">Plans & Pricing</a></li>
+                        <li class="link-item"><a href="#">Supported Devices</a></li>
+                        <li class="link-item"><a href="#">Accessibility</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-copyright">
+                <div class="copyright">
+                    <p>&copy; Copyright 2025 SwapSounds</p>
+                </div>
+
+                <div class="wrapper">
+                    <a href="#">Privacy policy</a>
+                    <a href="#">Terms and conditions</a>
+                </div>
+            </div>
+
+        </footer>
     </div>
-
-    <!-- Sound Previews -->
-    <div id="preview-container" class="preview-container">
-        <!-- Los sonidos se insertarán dinámicamente aquí -->
-    </div>
-
-    <script src="/static/js/start.js"></script>
 </body>
+
 </html>

@@ -1,11 +1,9 @@
 package es.swapsounds.model;
 
-
 public class Comment {
     private User user;
     private String content;
     private Sound sound;
-
 
     public Comment(User user, String content, Sound sound) {
         this.user = user;
@@ -15,8 +13,16 @@ public class Comment {
     }
 
     // Getters
-    public User getUser() { return user; }
-    public String getContent() { return content; }
-    public Sound getSound() { return sound; }
+    public User getUser() {
+        return user;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public Sound getSound() {
+        return sound;
+    }
 
 }

@@ -1,68 +1,70 @@
 package es.swapsounds.controller;
 
-
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import es.swapsounds.model.User;
+import es.swapsounds.storage.InMemoryStorage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Base64;
-
+import java.util.Optional;
 
 @Controller
-@RequestMapping("/auth") // Rutas base para autenticación
 public class AuthController {
 
-    private static final List<User> users = new ArrayList<>();
+    @Autowired
+    private InMemoryStorage storage;
+
+    @GetMapping("/signup")
+    public String showRegisterForm(Model model) {
+        return "signup"; // Plantilla register.mustache
+    }
 
     @PostMapping("/signup")
-    public String signUp(@RequestParam String username,
-                         @RequestParam String email,
-                         @RequestParam String password,
-                         @RequestParam("profilePicture") MultipartFile profilePicture,
-                         RedirectAttributes redirectAttributes) {
+    public String registerUser(
+            @RequestParam String username,
+            @RequestParam String email,
+            @RequestParam String user_password,
+            @RequestParam(required = false) MultipartFile profile_photo,
+            Model model) throws IOException {
 
-        String profilePicBase64 = null;
-        if (profilePicture != null && !profilePicture.isEmpty()) {
-            try {
-                profilePicBase64 = Base64.getEncoder().encodeToString(profilePicture.getBytes());
-            } catch (IOException e) {
-                return "Error al procesar la imagen";
-            }
+        Optional<User> existingUser = storage.findUserByUsername(username);
+        if (existingUser.isPresent()) {
+            model.addAttribute("error", "Username already exists");
+            return "login";
         }
 
-        
-        // Crear usuario y almacenarlo en memoria
-        User newUser = new User(username, email, password, profilePicBase64);
-        users.add(newUser);
+        String photoPath = null;
+        if (profile_photo != null && !profile_photo.isEmpty()) {
+            photoPath = storage.saveProfilePhoto(username, profile_photo.getOriginalFilename());
+            profile_photo.transferTo(new java.io.File(photoPath));
+        }
 
-        // Mensaje de éxito
-        redirectAttributes.addFlashAttribute("success", "Usuario registrado. Inicia sesión.");
+        User user = new User( username, email, user_password, photoPath, 0);
+        storage.addUser(user);
+        model.addAttribute("success", "User registered successfully! Please login.");
+        return "login";
+    }
 
-        // Redirigir a /login
-        return "redirect:/login";
+    @GetMapping("/login")
+    public String showLoginForm() {
+        return "login"; // Plantilla login.mustache
     }
 
     @PostMapping("/login")
-    public String login(@RequestParam String email,
-                        @RequestParam String password,
-                        RedirectAttributes redirectAttributes) {
-        
-        // Verificar usuario
-        for (User user : users) {
-            if (user.getEmail().equals(email) && user.getPassword().equals(password)) {
-                redirectAttributes.addFlashAttribute("success", "Inicio de sesión exitoso.");
-                return "redirect:/home"; // Redirigir a la página principal
-            }
+    public String loginUser(@RequestParam String username, @RequestParam String user_password, Model model) {
+        Optional<User> user = storage.authenticate(username, user_password);
+        if (user.isPresent()) {
+            model.addAttribute("message", "Login successful! Welcome, " + user.get().getUsername() + "!");
+            model.addAttribute("username", user.get().getUsername()); // Para pasar el username a start.mustache
+            return "start"; // Redirige a la página de sonidos después del login
+        } else {
+            model.addAttribute("error", "Invalid username or password");
+            return "login";
         }
-
-        // Si falla el login
-        redirectAttributes.addFlashAttribute("error", "Credenciales incorrectas.");
-        return "redirect:/login";
     }
 }

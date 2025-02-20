@@ -1,27 +1,53 @@
-@import url('https://fonts.googleapis.com/css?family=Montserrat:400,800');
+@import url("https://fonts.googleapis.com/css?family=Montserrat:400,800");
 
-*, *:before, *:after {
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
+*,
+*:before,
+*:after {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+:root {
+  --gradient: linear-gradient(45deg, #ff3366, #ff6b6b, #4834d4, #686de0);
+  --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  --shadow-btn: rgba(31, 38, 135, 0.37);
+  --shadow-input: rgba(68, 70, 105, 0.34);
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --light-azure: hsl(214, 84%, 56%);
 }
 
 body {
-    font-family: 'Montserrat', sans-serif;
-    color: #384047;
+  background: #0a0a0a;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  font-family: "Montserrat", sans-serif;
+  height: 100vh;
+  margin: -20px 0 50px;
 }
 
 form {
-    max-width: 300px;
-    margin: 10px auto;
-    padding: 10px 20px;
-    background: #f4f7f8;
-    border-radius: 8px;
+  background-color: var(--glass-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 0 50px;
+  height: 100%;
+  text-align: center;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+
 }
 
+
 h1 {
-    margin: 0 0 30px 0;
-    text-align: center;
+  margin: 0 0 30px 0;
+  text-align: center;
+  color: white;
 }
 
 /* Estilos para el input de texto, email, contraseña, etc. */
@@ -38,82 +64,85 @@ input[type="url"],
 input[type="file"],
 textarea,
 select {
-    background: rgba(255,255,255,0.1);
-    border: none;
-    font-size: 16px;
-    height: auto;
-    outline: 0;
-    padding: 15px;
-    width: 100%;
-    background-color: #e8eeef;
-    color: #8a97a0;
-    box-shadow: 0 1px 0 rgba(0,0,0,0.03) inset;
-    margin-bottom: 30px;
+  background-color: var(--shadow-input);
+  border-radius: 10px;;
+  border-color: var(--shadow-btn);
+  padding: 12px 15px;
+  margin: 8px 0;
+  width: 100%;
+  color: white;
 }
 
 input[type="radio"],
 input[type="checkbox"] {
-    margin: 0 4px 8px 0;
+  margin: 0 4px 8px 0;
+}
+small {
+  color: white;
+}
+select {
+  padding: 6px;
+  height: 32px;
+  border-radius: 2px;
 }
 
-select {
-    padding: 6px;
-    height: 32px;
-    border-radius: 2px;
-}
 
 /* Botón normal */
 button {
-    border-radius: 20px;
-    border: 1px solid #001F3F;
-    background-color: #001F3F;
-    color: #FFFFFF;
-    font-size: 12px;
-    font-weight: bold;
-    padding: 12px 45px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    transition: transform 80ms ease-in, background-color 0.3s, color 0.3s, border 0.3s;
-    width: 100%;
-    cursor: pointer;
+  border-radius: 20px;
+  border: 1px solid #001f3f;
+  background-color: var(--shadow-btn);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 12px 45px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: transform 80ms ease-in, background-color 0.3s, color 0.3s,
+    border 0.3s;
+  width: 100%;
+  cursor: pointer;
+  margin-bottom: 20px;
 }
 
 button:hover {
-    background-color: #FFFFFF;
-    color: #001F3F;
+  background-color: #ff6b6b;
+  color: #001f3f;
 }
 
 fieldset {
-    margin-bottom: 30px;
-    border: none;
+  margin-bottom: 30px;
+  border: none;
 }
 
 legend {
-    font-size: 1.4em;
-    margin-bottom: 10px;
+  font-size: 1.4em;
+  margin-bottom: 10px;
+  color: white;
 }
 
 label {
-    display: block;
-    margin-bottom: 8px;
+  display: block;
+  margin-bottom: 8px;
+  color: white;
 }
 
 .number {
-    background-color: #3A6D8C;
-    color: #fff;
-    height: 30px;
-    width: 30px;
-    display: inline-block;
-    font-size: 0.8em;
-    margin-right: 4px;
-    line-height: 30px;
-    text-align: center;
-    text-shadow: 0 1px 0 rgba(255,255,255,0.2);
-    border-radius: 100%;
+  background-color: #ff6b6b;
+  color: #fff;
+  height: 30px;
+  width: 30px;
+  display: inline-block;
+  font-size: 0.8em;
+  margin-right: 4px;
+  line-height: 30px;
+  text-align: center;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.2);
+  border-radius: 100%;
 }
 
 @media screen and (min-width: 480px) {
-    form {
-        max-width: 480px;
-    }
+  form {
+    max-width: 480px;
+  }
 }
