@@ -12,17 +12,17 @@
 <body>
     <div class="row">
         <div class="col-md-12">
-            <form action="/auth/signup" method="post" enctype="multipart/form-data">
+            <form action="/signup" method="post" enctype="multipart/form-data">
                 <h1>Sign Up</h1>
 
                 <fieldset>
                     <legend><span class="number">1</span> Your Basic Info</legend>
 
-                    <label for="name">Name:</label>
-                    <input type="text" id="name" name="user_name" required>
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" required>
 
                     <label for="email">Email:</label>
-                    <input type="email" id="mail" name="user_email" required>
+                    <input type="email" id="email" name="email" required>
 
                     <label for="password">Password:</label>
                     <input type="password" id="password" name="user_password" required>
@@ -35,6 +35,12 @@
 
                 <button type="submit">Sign Up</button>
             </form>
+            {{#error}}
+            <p style="color: red;">{{error}}</p>
+            {{/error}}
+            {{#success}}
+            <p style="color: green;">{{success}}</p>
+            {{/success}}
         </div>
     </div>
 </body>

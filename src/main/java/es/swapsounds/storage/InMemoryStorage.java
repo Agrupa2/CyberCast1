@@ -37,7 +37,7 @@ public class InMemoryStorage {
 
     public Optional<User> authenticate(String email, String password) {
         return users.stream()
-                .filter(u -> u.getEmail().equals(email) && u.getPassword().equals(password))
+                .filter(u -> u.getEmail().equals(email) || u.getUsername().equals(email) && u.getPassword().equals(password))
                 .findFirst();
     }
 
