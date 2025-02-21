@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+</head>
+
+<body>
+    <h1>Bienvenido, <span th:text="${user.username}"></span></h1>
+
+    <div th:if="${isAdmin}">
+        <h2>Administrar Sonidos y Comentarios</h2>
+        <form action="/createSound" method="post" enctype="multipart/form-data">
+            <input type="text" name="soundTitle" placeholder="Título del sonido">
+            <input type="file" name="soundFile">
+            <input type="file" name="imageFile">
+            <button type="submit">Crear Sonido</button>
+        </form>
+    </div>
+
+    <div th:if="${canUploadDownload}">
+        <h2>Subir o Descargar Sonidos</h2>
+        <form action="/upload" method="post" enctype="multipart/form-data">
+            <input type="file" name="soundFile">
+            <input type="file" name="imageFile">
+            <button type="submit">Subir</button>
+        </form>
+        <a href="/download">Descargar Sonidos</a>
+    </div>
+
+    <h2>Mis Sonidos</h2>
+    <div th:each="sound : ${userSounds}">
+        <p th:text="${sound.title}"></p>
+        <form action="/deleteSound" method="post">
+            <input type="hidden" name="soundId" th:value="${sound.id}">
+            <button type="submit">Borrar Sonido</button>
+        </form>
+    </div>
+</body>
+
+</html>

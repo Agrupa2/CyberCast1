@@ -19,6 +19,9 @@
                     <li><a href="/contact">Contact</a></li>
                 </ul>
             </div>
+            <div th:if="${user != null}">
+                <a href="/dashboard"><button>Acceder al Dashboard</button></a>
+            </div>
         </nav>
 
         <!-- Search Bar -->

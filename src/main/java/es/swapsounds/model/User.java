@@ -11,9 +11,9 @@ public class User {
     private List<Comment> comments;
     private List<Sound> sounds;
     private int id;
+    private String role; // Añadir campo de rol
 
-    
-    public User(String username, String email, String password, String profilePicturePath, int id) {
+    public User(String username, String email, String password, String profilePicturePath, int id, String role) {
         this.username = username;
         this.email = email;
         this.password = password;
@@ -21,9 +21,19 @@ public class User {
         this.comments = new ArrayList<>();
         this.sounds = new ArrayList<>();
         this.id = id;
-
+        this.role = role; // Inicializar campo de rol
     }
 
+    // Getters y setters para el campo de rol
+    public String getRole() {
+        return this.role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    // Otros getters y setters
     public String getUsername() {
         return username;
     }
@@ -51,6 +61,7 @@ public class User {
     public List<Sound> getSounds() {
         return sounds;
     }
+
     public int getId() {
         return id;
     }
@@ -59,4 +70,7 @@ public class User {
         this.id = id; 
     }
 
+    public void setSound(Sound sound) {
+        this.sounds.add(sound);
+    }
 }

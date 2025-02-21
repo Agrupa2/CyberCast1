@@ -44,7 +44,7 @@ public class AuthController {
             profile_photo.transferTo(new java.io.File(photoPath));
         }
 
-        User user = new User( username, email, user_password, photoPath, 0);
+        User user = new User( username, email, user_password, photoPath, 0, photoPath);
         storage.addUser(user);
         model.addAttribute("success", "User registered successfully! Please login.");
         return "login";
