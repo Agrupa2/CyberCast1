@@ -10,11 +10,31 @@
   --glass-bg: rgba(255, 255, 255, 0.05);
   --border: 1px solid rgba(255, 255, 255, 0.1);
   --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  --live-indicator-shadow: hsla(0, 79%, 63%, 0.5);
+  --rich-blank-fogra-30: hsl(219, 32%, 10%);
+  --rich-blank-fogra-29: hsl(222, 25%, 10%);
+  --live-indicator: hsl(0, 79%, 63%);
+  --oxford-blue-50: hsla(218, 39%, 14%, 0.8);
+  --oxford-blue: hsl(218, 39%, 14%);
+  --light-azure: hsl(214, 84%, 56%);
+  --off-white: hsl(0, 0%, 88%);
+  --yellow: hsl(45, 100%, 54%);
+  --white: hsl(0, 0%, 100%);
+  --azure: hsl(211, 100%, 50%);
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 body {
   background: #0a0a0a;
+  color: white;
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
 }
 
 .navbar {
@@ -143,6 +163,109 @@ body {
 }
 .mobile-nav-toggle .bar:nth-child(3) {
   top: 24px;
+}
+
+a {
+  text-decoration: none;
+  display: block;
+  color: var(--off-white);
+}
+
+.container {
+  max-width: 1920px;
+  margin: auto;
+}
+
+
+footer {
+  flex-shrink: 0; /* Evita que el footer se comprima */
+  margin-top: 20px;
+  background: var(--glass-bg);
+  padding: 80px var(--padding-x) 40px;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px solid var(--oxford-blue-50);
+  padding-bottom: 80px;
+}
+
+.footer-brand {
+  max-width: 250px;
+  margin-right: 130px;
+}
+
+.footer-logo {
+  width: 100px;
+  margin-bottom: 30px;
+}
+
+.slogan {
+  font-size: var(--font-size-small);
+  line-height: 20px;
+  margin-bottom: 20px;
+}
+
+.social-link a {
+  display: inline-block;
+}
+
+.social-link ion-icon {
+  font-size: 25px;
+  margin-right: 20px;
+}
+
+.footer-links {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 50px;
+  align-items: flex-end;
+}
+
+.link-heading {
+  margin-bottom: 20px;
+}
+
+.link-item {
+  font-size: var(--font-size-small);
+}
+
+ul .link-item:not(:last-child) {
+  margin-bottom: 10px;
+}
+
+.link-item:hover a {
+  color: #ff6b6b;
+}
+
+.footer-copyright {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 40px;
+}
+
+.footer-copyright p,
+.wrapper a {
+  font-size: var(--font-size-small);
+}
+
+.wrapper a:hover {
+  color: #ff6b6b;
+}
+
+.wrapper a:not(:last-child) {
+  margin-right: 50px;
+}
+
+.wrapper {
+  display: flex;
+}
+a::hover {
+  color: #ff6b6b;
 }
 
 @keyframes gradient {
