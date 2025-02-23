@@ -14,8 +14,8 @@ public class InMemoryStorage {
 
     public InMemoryStorage() {
         // Usuarios iniciales para pruebas
-        users.add(new User("user", "user@gmail.com", "user123", "user.jpg", idCounter++));
-        users.add(new User("admin", "admin@gmail.com", "admin123", "admin.jpg", idCounter++));
+        users.add(new User("user", "user@gmail.com", "user123", "user.jpg", idCounter++, null));
+        users.add(new User("admin", "admin@gmail.com", "admin123", "admin.jpg", idCounter++, null));
     }
 
     public void addUser(User user) {
