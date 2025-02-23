@@ -10,9 +10,9 @@ import es.swapsounds.model.Sound;
 public class SoundController {
 
     private final List<Sound> sounds = List.of(
-            new Sound(1, "Nature Sound", "Relaxing forest ambiance", "/audio/nature.mp3", "/images/nature.jpg"),
-            new Sound(2, "Ocean waves", "Soothing ocean waves", "/audio/ocean.mp3", "/images/ocean.jpg"),
-            new Sound(3, "Rain Sound", "Peaceful rain for sleep", "/audio/rain.mp3", "/images/rain.jpg"));
+            new Sound(1, "Betis Anthem", "Relaxing forest ambiance", "/audio/betis.mp3", "/images/betis.png", "Football", "0:07"),
+            new Sound(2, "CR7", "Soothing ocean waves", "/audio/CR7.mp3", "/images/CR7.jpg", "Football", "0:06"),
+            new Sound(3, "El diablo que malditos tenis", "Peaceful rain for sleep", "/audio/el-diablo-que-malditos-tenis.mp3", "images/el-diablo-que-malditos-tenis.png", "Meme", "0:04"));
 
     @GetMapping("/start")
     public String showSounds(Model model) {
