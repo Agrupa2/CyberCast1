@@ -84,11 +84,25 @@ public class InMemoryStorage {
     }
 
     public String saveFile(String username, MultipartFile file, String directory) throws IOException {
-        String uploadDir = "uploads/" + directory + "/";
+        String uploadDir = System.getProperty("user.dir") + "/uploads/" + directory + "/";
         java.io.File dir = new java.io.File(uploadDir);
-        if (!dir.exists()) dir.mkdirs();
-        String filePath = uploadDir + username + "_" + file.getOriginalFilename();
+        
+        if (!dir.exists()) {
+            boolean created = dir.mkdirs();
+            if (!created) {
+                throw new IOException("Failed to create directory: " + uploadDir);
+            }
+        }
+    
+        // Genera un nombre único para el archivo (ej: "user123_imagen.jpg")
+        String fileName = username + "_" + file.getOriginalFilename();
+        String filePath = uploadDir + fileName;
+        
+        // Guarda el archivo físicamente
         file.transferTo(new java.io.File(filePath));
-        return filePath;
+        
+        // Retorna la ruta relativa para la web (ej: "/uploads/sounds/user123_imagen.jpg")
+        return "/uploads/" + directory + "/" + fileName; 
     }
 }
+    
