@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/upload-sound.css" />
     <title>Upload Sound</title>
 </head>
 <body>
@@ -15,6 +16,21 @@
         <div>
             <label for="description">Description:</label>
             <textarea id="description" name="description" required></textarea>
+        </div>
+        <div>
+            <label for="category">Category:</label>
+            <select id="category" name="category" required>
+                <option value="">Select a category</option>
+                <option value="Music">Music</option>
+                <option value="Podcast">Podcast</option>
+                <option value="Ambient">Ambient</option>
+                <option value="Effects">Sound Effects</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+        <div>
+            <label for="duration">Duration (minutes):</label>
+            <input type="number" id="duration" name="duration" step="0.1" min="0.1" required>
         </div>
         <div>
             <label for="audioFile">Audio File:</label>
@@ -34,4 +50,4 @@
     </form>
     <a href="/start">Back to Sounds</a>
 </body>
-</html>-
+</html>
