@@ -14,8 +14,6 @@
         <nav class="navbar">
             <div class="navbar-container">
                 <div class="logo">Download Library</div>
-                <ul class="nav-links">
-                </ul>
             </div>
         </nav>
 
@@ -35,34 +33,27 @@
             {{#sounds}}
             <div class="sound-card">
                 <div class="card-head">
-                    <img src="{{imagePath}}" alt="{{title}}" class="card-img">
+                    <img src="/static/images/{{imagePath}}" alt="{{title}}" class="card-img">
                 </div>
                 <div class="card-body">
-                    <h3 class="card-title"> 
+                    <h3 class="card-title">
                         <!-- Nombre del sonido -->
-                        <a href="javascript:void(0);" onclick="downloadSound({id})">{{title}}</a>
+                        <a href="/sounds/download/{{soundId}}">{{title}}</a>
                     </h3>
                     <div class="card-info">
                         <span class="category">{{category}}</span>
                         <span class="duration">{{duration}} min</span>
                     </div>
-                    <audio id="audio-{{id}}" src="{{filePath}}" preload="none"></audio>
+                    <audio id="audio-{{id}}" src="/static/audio/{{filePath}}" preload="none"></audio>
                     <!-- Botón de descarga -->
-                    <button onclick="downloadSound({id})">Download</button>
+                    <a href="/sounds/download/{{soundId}}" class="download-button">
+                        <button>Download</button>
+                    </a>
                 </div>
             </div>
             {{/sounds}}
         </div>
 
-        <script>
-            // Función para descargar el sonido
-            function downloadSound(soundId) {
-                // Redirigir al usuario a la URL de descarga
-                window.location.href = '/downloadSound/' + soundId;
-            }
-        </script>
-
-        <script src="/js/start.js"></script>
         <footer>
             <div class="footer-content">
                 <div class="footer-brand">

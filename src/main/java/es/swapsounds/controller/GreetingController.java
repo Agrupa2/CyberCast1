@@ -31,4 +31,11 @@ public class GreetingController {
     public String comment_section(Model model) {
         return "comment_section";
     }
+
+    @GetMapping("/download-sound")
+    public String downloadSound(Model model) {
+        return "download-sound";
+    }
+
+
 }
