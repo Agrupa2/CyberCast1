@@ -1,8 +1,10 @@
 package es.swapsounds.controller;
 
-import es.swapsounds.model.Sound;
+
 import es.swapsounds.model.User;
 import es.swapsounds.storage.InMemoryStorage;
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,8 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+
 import java.util.Optional;
 
 @Controller
@@ -57,20 +58,32 @@ public class AuthController {
     public String showLoginForm() {
         return "login"; // Plantilla login.mustache
     }
+ // Asegúrate de importar HttpSession
 
     @PostMapping("/login")
-    public String loginUser(@RequestParam String username, @RequestParam String user_password, Model model) {
+    public String loginUser(
+            @RequestParam String username,
+            @RequestParam String user_password,
+            HttpSession session, // Inyectar HttpSession
+            Model model) {
+
         Optional<User> user = storage.authenticate(username, user_password);
         if (user.isPresent()) {
-            model.addAttribute("message", "Login successful! Welcome, " + user.get().getUsername() + "!");
-            model.addAttribute("username", user.get().getUsername()); // Para pasar el username a start.mustache
-            model.addAttribute("userId", user.get().getUserId()); // Pasar el userId para verificar en SoundController
-            List<Sound> allSounds = storage.getAllSounds();
-            model.addAttribute("sounds", allSounds != null ? allSounds : new ArrayList<>());
-            return "/start"; // Redirige a la página de sonidos después del login
+            // Guardar datos en la sesión
+            session.setAttribute("username", user.get().getUsername());
+            session.setAttribute("userId", user.get().getUserId());
+
+            // Redirigir a /start para evitar reenvío del formulario (POST/REDIRECT/GET)
+            return "redirect:/start";
         } else {
             model.addAttribute("error", "Invalid username or password");
             return "login";
         }
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpSession session) {
+        session.invalidate(); // Eliminar todos los datos de la sesión
+        return "redirect:/login";
     }
 }
