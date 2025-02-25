@@ -1,12 +1,13 @@
 package es.swapsounds.controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -36,8 +37,12 @@ public class SoundController {
     private InMemoryStorage storage;
 
     @GetMapping("/start")
-    public String showSounds(Model model, HttpSession session) {
-        // Obtener datos de la sesión
+    public String showSounds(
+            @RequestParam(name = "query", required = false) String query,
+            @RequestParam(name = "category", defaultValue = "all") String category,
+            HttpSession session,
+            Model model) {
+
         String username = (String) session.getAttribute("username");
         Integer userId = (Integer) session.getAttribute("userId");
 
@@ -47,8 +52,32 @@ public class SoundController {
             model.addAttribute("userId", userId);
         }
 
-        List<Sound> sounds = storage.getAllSounds();
-        model.addAttribute("sounds", sounds != null ? sounds : new ArrayList<>());
+        // Obtener todos los sonidos
+        List<Sound> allSounds = storage.getAllSounds();
+
+        // Filtrar resultados (sintaxis corregida)
+        List<Sound> filteredSounds = allSounds.stream()
+                .filter(sound -> {
+                    boolean matchesCategory = category.equals("all")
+                            || sound.getCategory().equalsIgnoreCase(category);
+
+                    boolean matchesQuery = query == null
+                            || sound.getTitle().toLowerCase().contains(query.toLowerCase());
+
+                    return matchesCategory && matchesQuery;
+                })
+                .collect(Collectors.toList());
+
+        // Preparar modelo para mantener estado del formulario
+        model.addAttribute("sounds", filteredSounds);
+        model.addAttribute("query", query);
+        model.addAttribute("category", category);
+
+        // Marcar categoría seleccionada (versión corregida)
+        model.addAttribute("selectedAll", category.equals("all"));
+        model.addAttribute("selectedMeme", category.equalsIgnoreCase("Meme"));
+        model.addAttribute("selectedFootball", category.equalsIgnoreCase("Football"));
+        model.addAttribute("selectedParty", category.equalsIgnoreCase("Party"));
 
         return "start";
     }
@@ -142,9 +171,10 @@ public class SoundController {
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
                 }
 
-                // Retornar el archivo sin `Content-Disposition` para permitir descarga y reproducción
+                // Retornar el archivo sin `Content-Disposition` para permitir descarga y
+                // reproducción
                 return ResponseEntity.ok()
-                        .header(HttpHeaders.CONTENT_TYPE, "audio/mpeg")  // Tipo de archivo MP3
+                        .header(HttpHeaders.CONTENT_TYPE, "audio/mpeg") // Tipo de archivo MP3
                         .body(resource);
 
             } catch (MalformedURLException e) {
@@ -152,7 +182,26 @@ public class SoundController {
             }
         }
     }
+
+    @GetMapping("/sounds/{id}")
+    public String soundDetails(
+            @PathVariable int id,
+            HttpSession session,
+            Model model) {
+
+        // Verificar sesión si es requerido
+        Integer userId = (Integer) session.getAttribute("userId");
+        String username = (String) session.getAttribute("username");
+
+        Optional<Sound> sound = storage.findSoundById(id);
+
+        if (sound.isPresent()) {
+            model.addAttribute("sound", sound.get());
+            model.addAttribute("isOwner", userId != null && userId == sound.get().getUserId());
+            model.addAttribute("username", username); // Pasar username al template
+            return "sound-details";
+        } else {
+            return "redirect:/start";
+        }
+    }
 }
-
-
-
