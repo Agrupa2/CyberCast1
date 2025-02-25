@@ -38,7 +38,7 @@
                 <div class="card-body">
                     <h3 class="card-title">
                         <!-- Nombre del sonido -->
-                        <a href="/sounds/download/{{soundId}}">{{title}}</a>
+                        <a href="/source/sounds/download/{{soundId}}">{{title}}</a>
                     </h3>
                     <div class="card-info">
                         <span class="category">{{category}}</span>
@@ -46,14 +46,13 @@
                     </div>
                     <audio id="audio-{{id}}" src="/static/audio/{{filePath}}" preload="none"></audio>
                     <!-- Botón de descarga -->
-                    <a href="/sounds/download/{{soundId}}" class="download-button">
+                    <a href="/source/sounds/download/{{soundId}}" class="download-button">
                         <button>Download</button>
                     </a>
                 </div>
             </div>
             {{/sounds}}
         </div>
-
         <footer>
             <div class="footer-content">
                 <div class="footer-brand">
