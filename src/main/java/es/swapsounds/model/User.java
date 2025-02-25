@@ -10,17 +10,17 @@ public class User {
     private String profilePicturePath;
     private List<Comment> comments;
     private List<Sound> sounds;
-    private int id;
+    private int userId;
     private String role; // Añadir campo de rol
 
-    public User(String username, String email, String password, String profilePicturePath, int id, String role) {
+    public User(String username, String email, String password, String profilePicturePath, int userId, String role) {
         this.username = username;
         this.email = email;
         this.password = password;
         this.profilePicturePath = profilePicturePath;
         this.comments = new ArrayList<>();
         this.sounds = new ArrayList<>();
-        this.id = id;
+        this.userId = userId;
         this.role = role; // Inicializar campo de rol
     }
 
@@ -62,12 +62,12 @@ public class User {
         return sounds;
     }
 
-    public int getId() {
-        return id;
+    public int getUserId() {
+        return userId;
     }
 
-    public void setId(int id) { 
-        this.id = id; 
+    public void setId(int userId) { 
+        this.userId = userId; 
     }
 
     public void setSound(Sound sound) {

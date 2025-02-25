@@ -1,22 +1,86 @@
 package es.swapsounds.controller;
 
-import java.util.List;
+import java.io.IOException;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+
 import es.swapsounds.model.Sound;
+import es.swapsounds.model.User;
+import es.swapsounds.storage.InMemoryStorage;
 
 @Controller
 public class SoundController {
 
-    private final List<Sound> sounds = List.of(
-            new Sound(1, "Betis Anthem", "Relaxing forest ambiance", "/audio/betis.mp3", "/images/betis.png", "Football", "0:07"),
-            new Sound(2, "CR7", "Soothing ocean waves", "/audio/CR7.mp3", "/images/CR7.jpg", "Football", "0:06"),
-            new Sound(3, "El diablo que malditos tenis", "Peaceful rain for sleep", "/audio/el-diablo-que-malditos-tenis.mp3", "images/el-diablo-que-malditos-tenis.png", "Meme", "0:04"));
+    @Autowired
+    private InMemoryStorage storage;
 
+    
     @GetMapping("/start")
-    public String showSounds(Model model) {
-        model.addAttribute("sounds", sounds);
-        return "start"; // Renderiza start.html
+    public String showSounds(Model model) {    
+        model.addAttribute("sounds", storage.getAllSounds());
+        return "start";
     }
+
+    @GetMapping("/sounds/upload")
+    public String showUploadForm(@RequestParam(required = false) String username, Model model) {
+    System.out.println("Accediendo a /sounds/upload con username: " + username);
+    if (username == null) {
+        model.addAttribute("error", "You must be logged in to upload sounds.");
+        return "login";
+    }
+
+    Optional<User> user = storage.findUserByUsername(username);
+    if (user.isPresent()) {
+        model.addAttribute("userId", user.get().getUserId());
+        model.addAttribute("username", username);
+        System.out.println("Usuario encontrado: " + username + ", userId: " + user.get().getUserId());
+        return "upload-sound";
+    } else {
+        System.out.println("Usuario no encontrado para username: " + username);
+        model.addAttribute("error", "User not found. Please login again.");
+        return "login";
+    }
+}
+
+@PostMapping("/sounds/upload")
+public String uploadSound(
+        @RequestParam String title,
+        @RequestParam String description,
+        @RequestParam MultipartFile audioFile,
+        @RequestParam MultipartFile imageFile,
+        @RequestParam Integer userId,
+        Model model) throws IOException {
+
+    if (userId == null) {
+        model.addAttribute("error", "You must be logged in to upload sounds.");
+        return "login";
+    }
+
+    Optional<User> user = storage.findUserById(userId);
+    if (!user.isPresent()) {
+        model.addAttribute("error", "User not found. Please login again.");
+        return "login";
+    }
+
+    // Guarda los archivos usando el nombre de usuario
+    String username = user.get().getUsername();
+    String audioPath = storage.saveFile(username, audioFile, "sounds");
+    String imagePath = storage.saveFile(username, imageFile, "images");
+
+    // Crea y guarda el sonido
+    Sound sound = new Sound(0, title, description, audioPath, imagePath, userId);
+    storage.addSound(sound);
+
+    model.addAttribute("success", "Sound uploaded successfully!");
+    model.addAttribute("username", username);
+    model.addAttribute("userId", userId);
+    return "upload-sound";
+}
 }

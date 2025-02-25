@@ -61,7 +61,8 @@ public class AuthController {
         if (user.isPresent()) {
             model.addAttribute("message", "Login successful! Welcome, " + user.get().getUsername() + "!");
             model.addAttribute("username", user.get().getUsername()); // Para pasar el username a start.mustache
-            return "start"; // Redirige a la página de sonidos después del login
+            model.addAttribute("userId", user.get().getUserId()); // Pasar el userId para verificar en SoundController
+            return "redirect:/start"; // Redirige a la página de sonidos después del login
         } else {
             model.addAttribute("error", "Invalid username or password");
             return "login";

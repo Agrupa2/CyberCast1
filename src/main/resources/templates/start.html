@@ -17,6 +17,9 @@
                 <ul class="nav-links">
                     <li><a href="/login">Login</a></li>
                     <li><a href="/contact">Contact</a></li>
+                    {{#username}}
+                    <li><a href="/sounds/upload?username={{username}}">Upload Sound</a></li>
+                    {{/username}}
                 </ul>
             </div>
             <div th:if="${user != null}">
@@ -41,7 +44,7 @@
             <div class="card-head">
                 <img src="{{imagePath}}" alt="{{title}}" class="card-img">
                 <div class="card-overlay">
-                    <div class="play" onclick="playSound({id})">
+                    <div class="play">
                         <ion-icon name="play-circle-outline"></ion-icon>
                     </div>
                 </div>
@@ -53,7 +56,7 @@
                     <span class="duration">{{duration}} min</span>
                 </div>
                 <audio id="audio-{{id}}" src="{{filePath}}" preload="none"></audio>
-                <button onclick="playSound({id})">Play</button>
+                <button>Play</button>
             </div>
         </div>
         {{/sounds}}
@@ -63,7 +66,6 @@
         <!-- <div class="sounds-container" id="soundsContainer">Los sonidos se insertarán dinámicamente aquí -->
         <!-- </div>  -->
 
-        <script src="/js/start.js"></script>
         <footer>
             <div class="footer-content">
                 <div class="footer-brand">
