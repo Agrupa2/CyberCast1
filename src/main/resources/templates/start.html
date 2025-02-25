@@ -15,10 +15,13 @@
             <div class="navbar-container">
                 <div class="logo">Sound Library</div>
                 <ul class="nav-links">
+                    {{^username}} <!-- Muestra esto si NO hay usuario logueado -->
                     <li><a href="/login">Login</a></li>
+                    {{/username}}
                     <li><a href="/contact">Contact</a></li>
                     {{#username}}
                     <li><a href="/sounds/upload?username={{username}}">Upload Sound</a></li>
+                     <li><a href="/logout">Logout</a></li>
                     {{/username}}
                 </ul>
             </div>
