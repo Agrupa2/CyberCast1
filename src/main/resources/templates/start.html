@@ -34,10 +34,34 @@
                 <option value="Party">Party</option>
             </select>
         </div>
+    
+        <div class="sound-grid" id="soundsContainer">
+        {{#sounds}}
+        <div class="sound-card">
+            <div class="card-head">
+                <img src="{{imagePath}}" alt="{{title}}" class="card-img">
+                <div class="card-overlay">
+                    <div class="play" onclick="playSound({id})">
+                        <ion-icon name="play-circle-outline"></ion-icon>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <h3 class="card-title"><a href="/sounds/{{id}}">{{title}}</a></h3>
+                <div class="card-info">
+                    <span class="category">{{category}}</span>
+                    <span class="duration">{{duration}} min</span>
+                </div>
+                <audio id="audio-{{id}}" src="{{filePath}}" preload="none"></audio>
+                <button onclick="playSound({id})">Play</button>
+            </div>
+        </div>
+        {{/sounds}}
+        </div>
 
         <!-- Sound Previews -->
-        <div class="sounds-container" id="soundsContainer"> <!-- Los sonidos se insertarán dinámicamente aquí -->
-        </div>
+        <!-- <div class="sounds-container" id="soundsContainer">Los sonidos se insertarán dinámicamente aquí -->
+        <!-- </div>  -->
 
         <script src="/js/start.js"></script>
         <footer>

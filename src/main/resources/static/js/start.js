@@ -1,4 +1,4 @@
-const sounds = [
+/* const sounds = [
     {
         id: 1,
         title: "El diablo que malditos tenis",
@@ -35,45 +35,23 @@ const sounds = [
         category: "Party",
         duration: "0:18"
     }
-];
+]; */
 
 // Elementos del DOM
 const searchInput = document.getElementById("search");
 const categorySelect = document.getElementById("category");
 
-// Función auxiliar para renderizar sonidos
 function renderSounds(soundList) {
     const container = document.getElementById("soundsContainer");
-    container.innerHTML = ""; // Limpiar contenedor
-    container.classList.add("sound-grid");
+    const template = document.getElementById("sound-template").innerHTML;
+    
+    // Generar el HTML con Mustache
+    const rendered = Mustache.render(template, { sounds: soundList });
 
-    soundList.forEach(sound => {
-        const soundCard = document.createElement("div");
-        soundCard.classList.add("sound-card");
-        
-        soundCard.innerHTML = `
-            <div class="card-head">
-                <img src="${sound.imagePath}" alt="${sound.title}" class="card-img">
-                <div class="card-overlay">
-                    <div class="play" onclick="playSound(${sound.id})">
-                        <ion-icon name="play-circle-outline"></ion-icon>
-                    </div>
-                </div>
-            </div>
-            <div class="card-body">
-                <h3 class="card-title"><a href="/sounds/${sound.id}">${sound.title}</a></h3>
-                <div class="card-info">
-                    <span class="category">${sound.category}</span>
-                    <span class="duration">${sound.duration} min</span>
-                </div>
-                <audio id="audio-${sound.id}" src="${sound.filePath}" preload="none"></audio>
-                <button onclick="playSound(${sound.id})">Play</button>
-            </div>
-        `;
-        
-        container.appendChild(soundCard);
-    });
+    container.innerHTML = rendered; // Insertar en el contenedor
+    container.classList.add("sound-grid");
 }
+
 
 // Función para reproducir sonido
 function playSound(soundId) {
@@ -106,4 +84,43 @@ searchInput.addEventListener("input", searchSounds);
 categorySelect.addEventListener("change", searchSounds);
 
 // Cargar sonidos iniciales al iniciar
-loadInitialSounds();
+loadInitialSounds(); 
+
+
+/* 
+function renderSounds(soundList) {
+    const container = document.getElementById("soundsContainer");
+    container.innerHTML = ""; // Limpiar contenedor antes de renderizar
+    container.classList.add("sound-grid");
+
+    // Definir la plantilla Mustache como una cadena de texto
+    const template = `
+        {{#sounds}}
+        <div class="sound-card">
+            <div class="card-head">
+                <img src="{{imagePath}}" alt="{{title}}" class="card-img">
+                <div class="card-overlay">
+                    <div class="play" onclick="playSound({{id}})">
+                        <ion-icon name="play-circle-outline"></ion-icon>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <h3 class="card-title"><a href="/sounds/{{id}}">{{title}}</a></h3>
+                <div class="card-info">
+                    <span class="category">{{category}}</span>
+                    <span class="duration">{{duration}} min</span>
+                </div>
+                <audio id="audio-{{id}}" src="{{filePath}}" preload="none"></audio>
+                <button onclick="playSound({{id}})">Play</button>
+            </div>
+        </div>
+        {{/sounds}}
+    `;
+
+    // Renderizar con Mustache
+    const rendered = Mustache.render(template, { sounds: soundList });
+
+    // Insertar el HTML generado en el contenedor
+    container.innerHTML = rendered;
+} */

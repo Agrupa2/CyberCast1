@@ -11,24 +11,29 @@ public class Sound {
     private String imagePath;
     private User uploader;
     private List<Comment> comments;
-    private int CategoryId;
+    private String category;
+    private String duration;
 
-    public Sound(String title, String description, String filePath, String imagePath, User uploader, int CategoryId) {
+
+    public Sound(String title, String description, String filePath, String imagePath, User uploader, String Category, String duration) {
         this.title = title;
         this.description = description;
         this.filePath = filePath;
         this.imagePath = imagePath;
         this.uploader = uploader;
         this.comments = new ArrayList<>();
-        this.CategoryId = CategoryId;
+        this.category = Category;
+        this.duration = duration;
     }
 
-    public Sound(int id, String title, String description, String filePath, String imagePath) {
+    public Sound(int id, String title, String description, String filePath, String imagePath, String category, String duration) {
         this.title = title;
         this.id = id;
         this.description = description;
         this.filePath = filePath;
         this.imagePath = imagePath;
+        this.category = category;
+        this.duration = duration;
     }
 
     // Getters
@@ -60,7 +65,11 @@ public class Sound {
         return id;
     }
 
-    public int getCategoryId() {
-        return CategoryId;
+    public String getCategory() {
+        return category;
+    }
+
+    public String getDuration() {
+        return duration;
     }
 }
