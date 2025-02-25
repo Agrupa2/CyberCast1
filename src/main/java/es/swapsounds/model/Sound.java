@@ -50,8 +50,17 @@ public class Sound {
         //TODO Auto-generated constructor stub
     }
 
-    public Sound(int i, String title2, String description2, String audioPath, String imagePath2, Integer userId2) {
-        //TODO Auto-generated constructor stub
+
+    public Sound(int i, String title2, String description2, String audioPath, String imagePath2, Integer userId2,
+            String category2, String duration2) {
+        this.id = i;
+        this.title = title2;
+        this.description = description2;
+        this.filePath = audioPath;
+        this.imagePath = imagePath2;
+        this.userId = userId2;
+        this.category = category2;
+        this.duration = duration2; 
     }
 
     // Getters
