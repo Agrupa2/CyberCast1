@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sound Library</title>
+    <link rel="stylesheet" href="/css/start.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="navbar-container">
+                <div class="logo">Download Library</div>
+                <ul class="nav-links">
+                    <li><a href="/login">Login</a></li>
+                </ul>
+            </div>
+                    </nav>
+
+        <!-- Search Bar -->
+        <div class="search-container">
+            <input type="text" id="search" class="search-bar" placeholder="Searching for sounds...">
+            <select class="fold-out" id="category">
+                <option value="all">All Categories</option>
+                <option value="Meme">Meme</option>
+                <option value="Football">Football</option>
+                <option value="Party">Party</option>
+            </select>
+        </div>
+
+        <!-- Sound Previews -->
+        <div class="sound-grid" id="soundsContainer">
+            {{#sounds}}
+            <div class="sound-card">
+                <div class="card-head">
+                    <img src="{{imagePath}}" alt="{{title}}" class="card-img">
+                    <div class="card-overlay">
+                        <div class="play">
+                            <ion-icon name="play-circle-outline"></ion-icon>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title">
+                        <a href="/download-sound/{{id}}">{{title}}</a>
+                    </h3>
+                    <div class="card-info">
+                        <span class="category">{{category}}</span>
+                        <span class="duration">{{duration}} min</span>
+                    </div>
+                    <audio id="audio-{{id}}" src="{{filePath}}" preload="none"></audio>
+                    {{#user}}
+                    <a href="/download-sound/{{id}}" class="download-button">
+                        <button>Download</button>
+                    </a>
+                    {{/user}}
+                    {{^user}}
+                    <button onclick="/files/get/{fileName}">Download</button>
+                    {{/user}}
+                </div>
+            </div>
+            {{/sounds}}
+        </div>
+
+        <footer>
+            <div class="footer-content">

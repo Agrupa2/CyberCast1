@@ -91,4 +91,11 @@ public class InMemoryStorage {
         file.transferTo(new java.io.File(filePath));
         return filePath;
     }
+
+    public Sound getSoundById(int soundId) {
+        return sounds.stream()
+                .filter(sound -> sound.getId() == soundId)
+                .findFirst()
+                .orElse(null);
+    }
 }

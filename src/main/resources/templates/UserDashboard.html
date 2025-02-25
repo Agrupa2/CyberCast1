@@ -4,46 +4,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="/css/userDashboard.css">
 </head>
 
 <body>
-    <h1>Bienvenido, {{user.username}}</h1>
-
-    {{#isAdmin}}
-    <div>
-        <h2>Administrar Sonidos y Comentarios</h2>
-        <form action="/createSound" method="post" enctype="multipart/form-data">
-            <input type="text" name="soundTitle" placeholder="Título del sonido">
-            <input type="file" name="soundFile">
-            <input type="file" name="imageFile">
-            <button type="submit">Crear Sonido</button>
-        </form>
+    <div class="container">
+        <h1>User Dashboard</h1>
+        <div class="button-container">
+            <a href="/sounds/download"><button>Download Sounds</button></a>
+            <a href="/sounds/upload"><button>Upload Sounds</button></a>
+            <a href="/start"><button>Go Back</button></a>
+        </div>
     </div>
-    {{/isAdmin}}
-
-    {{#canUploadDownload}}
-    <div>
-        <h2>Subir o Descargar Sonidos</h2>
-        <form action="/upload" method="post" enctype="multipart/form-data">
-            <input type="file" name="soundFile">
-            <input type="file" name="imageFile">
-            <button type="submit">Subir</button>
-        </form>
-        <a href="/downloadSounds">Descargar Sonidos</a>
-    </div>
-    {{/canUploadDownload}}
-
-    <h2>Mis Sonidos</h2>
-    {{#userSounds}}
-    <div>
-        <p>{{title}}</p>
-        <form action="/deleteSound" method="post">
-            <input type="hidden" name="soundId" value="{{id}}">
-            <button type="submit">Borrar Sonido</button>
-        </form>
-    </div>
-    {{/userSounds}}
 </body>
 
 </html>
