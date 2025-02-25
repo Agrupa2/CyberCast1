@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{{sound.title}}</title>
+    <link rel="stylesheet" href="/css/sound-details.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="logo">Sound Library</div>
+            <ul class="nav-links">
+                {{^username}} <!-- Muestra esto si NO hay usuario logueado -->
+                <li><a href="/login">Login</a></li>
+                {{/username}}
+                <li><a href="/contact">Contact</a></li>
+                {{#username}}
+                <li><a href="/sounds/upload?username={{username}}">Upload Sound</a></li>
+                 <li><a href="/logout">Logout</a></li>
+                {{/username}}
+            </ul>
+        </div>
+        <div th:if="${user != null}">
+            <a href="/dashboard"><button>Acceder al Dashboard</button></a>
+        </div>
+    </nav>
+
+    <div class="sound-container">
+        <div class="sound-header">
+            <h1>{{sound.title}}</h1>
+            <div class="sound-meta">
+                <span class="category">{{sound.category}}</span>
+                <span class="duration">{{sound.duration}} min</span>
+            </div>
+        </div>
+
+        <img src="{{sound.imagePath}}" alt="{{sound.title}}" class="sound-image">
+
+        <div class="sound-player">
+            <audio controls style="width: 100%">
+                <source src="{{sound.filePath}}" type="audio/mpeg">
+                Tu navegador no soporta audio HTML5.
+            </audio>
+        </div>
+
+        <div class="sound-description">
+            <h3>Descripción</h3>
+            <p>{{sound.description}}</p>
+        </div>
+
+        {{#isOwner}}
+        <div class="sound-actions">
+            <button>Editar</button>
+            <button>Eliminar</button>
+        </div>
+        {{/isOwner}}
+
+        <a href="/start">Volver a todos los sonidos</a>
+    </div>
+
+</body>
+</html>
