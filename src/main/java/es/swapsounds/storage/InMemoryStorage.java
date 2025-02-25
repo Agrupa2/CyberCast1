@@ -60,7 +60,7 @@ public class InMemoryStorage {
     }
 
     public List<Sound> getAllSounds() {
-        return new ArrayList<>(sounds);
+        return new ArrayList<>(sounds != null ? sounds : new ArrayList<>());
     }
 
     public Optional<Sound> findSoundById(int id) {

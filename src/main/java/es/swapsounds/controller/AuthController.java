@@ -1,5 +1,6 @@
 package es.swapsounds.controller;
 
+import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
 import es.swapsounds.storage.InMemoryStorage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -62,7 +65,9 @@ public class AuthController {
             model.addAttribute("message", "Login successful! Welcome, " + user.get().getUsername() + "!");
             model.addAttribute("username", user.get().getUsername()); // Para pasar el username a start.mustache
             model.addAttribute("userId", user.get().getUserId()); // Pasar el userId para verificar en SoundController
-            return "redirect:/start"; // Redirige a la página de sonidos después del login
+            List<Sound> allSounds = storage.getAllSounds();
+            model.addAttribute("sounds", allSounds != null ? allSounds : new ArrayList<>());
+            return "/start"; // Redirige a la página de sonidos después del login
         } else {
             model.addAttribute("error", "Invalid username or password");
             return "login";

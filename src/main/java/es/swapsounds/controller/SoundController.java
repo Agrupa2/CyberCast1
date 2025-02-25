@@ -23,7 +23,26 @@ public class SoundController {
 
     
     @GetMapping("/start")
-    public String showSounds(Model model) {    
+    public String showSounds(Model model) {
+        // Verificamos y pasamos username, userId, y message si existen
+        String username = (String) model.getAttribute("username");
+        if (username != null) {
+            System.out.println("Usuario logueado: " + username);
+            model.addAttribute("message", "Welcome, " + username + "!"); // Opcional, solo si quieres mantener el
+                                                                         // mensaje
+            Optional<User> user = storage.findUserByUsername(username);
+            if (user.isPresent()) {
+                model.addAttribute("userId", user.get().getUserId());
+                model.addAttribute("username", username); // Pasar username explícitamente para usuarios logueados
+            } else {
+                System.out.println("Usuario no encontrado para username: " + username);
+                model.addAttribute("username", null); // Limpiar si no se encuentra
+                model.addAttribute("userId", null);
+            }
+        } else {
+            System.out.println("Usuario no logueado.");
+        }
+
         model.addAttribute("sounds", storage.getAllSounds());
         return "start";
     }
