@@ -14,11 +14,8 @@
         <nav class="navbar">
             <div class="navbar-container">
                 <div class="logo">Download Library</div>
-                <ul class="nav-links">
-                    <li><a href="/login">Login</a></li>
-                </ul>
             </div>
-                    </nav>
+        </nav>
 
         <!-- Search Bar -->
         <div class="search-container">
@@ -36,30 +33,22 @@
             {{#sounds}}
             <div class="sound-card">
                 <div class="card-head">
-                    <img src="{{imagePath}}" alt="{{title}}" class="card-img">
-                    <div class="card-overlay">
-                        <div class="play">
-                            <ion-icon name="play-circle-outline"></ion-icon>
-                        </div>
-                    </div>
+                    <img src="/static/images/{{imagePath}}" alt="{{title}}" class="card-img">
                 </div>
                 <div class="card-body">
                     <h3 class="card-title">
-                        <a href="/download-sound/{{id}}">{{title}}</a>
+                        <!-- Nombre del sonido -->
+                        <a href="/sounds/download/{{soundId}}">{{title}}</a>
                     </h3>
                     <div class="card-info">
                         <span class="category">{{category}}</span>
                         <span class="duration">{{duration}} min</span>
                     </div>
-                    <audio id="audio-{{id}}" src="{{filePath}}" preload="none"></audio>
-                    {{#user}}
-                    <a href="/download-sound/{{id}}" class="download-button">
+                    <audio id="audio-{{id}}" src="/static/audio/{{filePath}}" preload="none"></audio>
+                    <!-- Botón de descarga -->
+                    <a href="/sounds/download/{{soundId}}" class="download-button">
                         <button>Download</button>
                     </a>
-                    {{/user}}
-                    {{^user}}
-                    <button onclick="/files/get/{fileName}">Download</button>
-                    {{/user}}
                 </div>
             </div>
             {{/sounds}}
@@ -67,3 +56,13 @@
 
         <footer>
             <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="logo">SwapSounds</div>
+                    <p class="slogan">Experience the future of sounds</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+</body>
+
+</html>

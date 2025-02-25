@@ -3,6 +3,7 @@ package es.swapsounds.controller;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
 import es.swapsounds.service.UserSoundService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -95,7 +96,6 @@ public class UserController {
 
       return "redirect:/dashboard";
    }
-
    private User getCurrentUser() {
       // Implementa la lógica para obtener el usuario actual
       return null;
