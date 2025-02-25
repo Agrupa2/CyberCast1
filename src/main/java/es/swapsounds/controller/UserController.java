@@ -68,14 +68,6 @@ public class UserController {
          String imageFileName = imageFile.getOriginalFilename();
          File imageDest = new File("path/to/save/images/" + imageFileName);
          imageFile.transferTo(imageDest);
-
-         // Crear y guardar el nuevo sonido
-         Sound sound = new Sound();
-         sound.setTitle(soundTitle);
-         sound.setFilePath("/resource/static/audio/" + soundFileName);
-         sound.setImagePath("/resource/static/images/" + imageFileName);
-         sound.setUserId(user.getId());
-         UserSoundService.saveSound(sound,user);
       }
 
       return "redirect:/start";
