@@ -104,11 +104,6 @@ public class InMemoryStorage {
         // Retorna la ruta relativa para la web (ej: "/uploads/sounds/user123_imagen.jpg")
         return "/uploads/" + directory + "/" + fileName; 
     }
-<<<<<<< HEAD
-}
-    
-=======
-
     public Sound getSoundById(int soundId) {
         return sounds.stream()
                 .filter(sound -> sound.getId() == soundId)
@@ -116,4 +111,5 @@ public class InMemoryStorage {
                 .orElse(null);
     }
 }
->>>>>>> a43fe4d21fed99d0e4b6911aefec1824851ff366
+    
+
