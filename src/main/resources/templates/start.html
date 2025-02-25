@@ -31,15 +31,21 @@
         </nav>
 
         <!-- Search Bar -->
-        <div class="search-container">
-            <input type="text" id="search" class="search-bar" placeholder="Searching for sounds...">
-            <select class="fold-out" id="category">
-                <option value="all">All Categories</option>
-                <option value="Meme">Meme</option>
-                <option value="Football">Football</option>
-                <option value="Party">Party</option>
+        <!-- En tu plantilla (start.mustache o donde esté la barra) -->
+        <form action="/start" method="GET" class="search-container">
+            <input type="text" name="query" class="search-bar" placeholder="Searching for sounds..."
+                value="{{#query}}{{query}}{{/query}}"> <!-- Mantener valor después de búsqueda -->
+        
+            <select name="category" class="fold-out" onchange="this.form.submit()"> <!-- Enviar al cambiar categoría -->
+                <option value="all" {{#selectedAll}}selected{{/selectedAll}}>All Categories</option>
+                <option value="Meme" {{#selectedMeme}}selected{{/selectedMeme}}>Meme</option>
+                <option value="Football" {{#selectedFootball}}selected{{/selectedFootball}}>Football</option>
+                <option value="Party" {{#selectedParty}}selected{{/selectedParty}}>Party</option>
             </select>
-        </div>
+        
+            <!-- Botón oculto para enviar con Enter -->
+            <button type="submit" hidden></button>
+        </form>
     
         <div class="sound-grid" id="soundsContainer">
         {{#sounds}}
@@ -58,8 +64,12 @@
                     <span class="category">{{category}}</span>
                     <span class="duration">{{duration}} min</span>
                 </div>
-                <audio id="audio-{{id}}" src="{{filePath}}" preload="none"></audio>
-                <button>Play</button>
+                <div class="audio-container">
+                    <audio controls class="custom-audio">
+                        <source src="{{filePath}}" type="audio/mpeg">
+                        Tu navegador no soporta el elemento de audio.
+                    </audio>
+                </div>
             </div>
         </div>
         {{/sounds}}

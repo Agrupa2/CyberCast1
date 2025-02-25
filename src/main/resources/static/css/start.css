@@ -195,7 +195,7 @@ a {
 }
 
 .sound-card {
-  flex: 0 0 calc(15% - 10px); /* 4 cards per row, accounting for gap */
+  flex: 0 0 calc(25% - 10px); /* 4 cards per row, accounting for gap */
   min-width: 200px;
   max-width: 300px;
   width: 200px;
@@ -229,7 +229,7 @@ a {
   object-fit: cover;
   border-radius: 5px;
 }
-.movie-card:hover .card-img {
+.sound-card:hover .card-img {
   transform: scale(1.1);
 }
 
@@ -746,4 +746,41 @@ nav.active {
 .nav-links a:hover::after {
   width: 100%;
   animation: gradient 8s linear infinite;
+}
+
+.audio-container {
+  width: 100%;
+  height: 10%;
+  background: gray;
+  border-radius: 8px;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.custom-audio {
+  width: 100%;
+  height: 40px;
+}
+
+/* Estilos para navegadores WebKit (Chrome, Safari) */
+.custom-audio::-webkit-media-controls-panel {
+  background: gray;
+  border-radius: 8px;
+}
+
+.custom-audio::-webkit-media-controls-play-button {
+  background-color: #4834d4;
+  border-radius: 50%;
+}
+
+.custom-audio::-webkit-media-controls-timeline {
+  background-color: gray;
+  border-radius: 2px;
+  margin: 0 10px;
+}
+
+.custom-audio::-webkit-media-controls-current-time-display,
+.custom-audio::-webkit-media-controls-time-remaining-display {
+  color: #333;
+  font-size: 0.8em;
 }
