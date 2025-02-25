@@ -32,7 +32,7 @@ public class UserController {
             model.addAttribute("isAdmin", true);
          } else {
             model.addAttribute("canUploadDownload", true);
-            List<Sound> userSounds = userSoundService.getSoundsByUser(user.getId());
+            List<Sound> userSounds = userSoundService.getSoundsByUser(user.getUserId());
             model.addAttribute("userSounds", userSounds);
          }
       }
@@ -74,7 +74,7 @@ public class UserController {
          sound.setTitle(soundTitle);
          sound.setFilePath("/resource/static/audio/" + soundFileName);
          sound.setImagePath("/resource/static/images/" + imageFileName);
-         sound.setUserId(user.getId());
+         sound.setId(user.getUserId());
          UserSoundService.saveSound(sound,user);
       }
 
@@ -88,7 +88,7 @@ public class UserController {
       if (user != null) {
          Sound sound = UserSoundService.getSoundById(soundId);
 
-         if (sound != null && (sound.getId() == user.getId() || "admin".equals(user.getRole()))) {
+         if (sound != null && (sound.getId() == user.getUserId() || "admin".equals(user.getRole()))) {
             UserSoundService.deleteSound(soundId);
          }
       }
