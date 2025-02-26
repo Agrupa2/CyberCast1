@@ -6,6 +6,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sound Library</title>
     <link rel="stylesheet" href="/css/start.css">
+    <style>
+        /* Ocultar los controles nativos del reproductor de audio */
+        .custom-audio {
+            display: none; /* Oculta el reproductor nativo */
+        }
+
+        /* Estilos para los controles personalizados */
+        .audio-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .play-pause-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .progress-bar {
+            flex-grow: 1;
+            height: 5px;
+            background: #ddd;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .progress {
+            height: 100%;
+            background: #007bff;
+            width: 0;
+        }
+    </style>
 </head>
 
 <body>
@@ -19,19 +56,15 @@
                     <li><a href="/login">Login</a></li>
                     {{/username}}
                     <li><a href="/contact">Contact</a></li>
-                    {{#username}}
+                    {{#username}} <!-- Muestra esto si hay usuario logueado -->
                     <li><a href="/sounds/upload?username={{username}}">Upload Sound</a></li>
-                     <li><a href="/logout">Logout</a></li>
+                    <li><a href="/logout">Logout</a></li>
                     {{/username}}
                 </ul>
-            </div>
-            <div th:if="${user != null}">
-                <a href="/dashboard"><button>Acceder al Dashboard</button></a>
             </div>
         </nav>
 
         <!-- Search Bar -->
-        <!-- En tu plantilla (start.mustache o donde esté la barra) -->
         <form action="/start" method="GET" class="search-container">
             <input type="text" name="query" class="search-bar" placeholder="Searching for sounds..."
                 value="{{#query}}{{query}}{{/query}}"> <!-- Mantener valor después de búsqueda -->
@@ -47,38 +80,47 @@
             <button type="submit" hidden></button>
         </form>
     
+        <!-- Sound Grid -->
         <div class="sound-grid" id="soundsContainer">
-        {{#sounds}}
-        <div class="sound-card">
-            <div class="card-head">
-                <img src="{{imagePath}}" alt="{{title}}" class="card-img">
-                <div class="card-overlay">
-                    <div class="play">
-                        <ion-icon name="play-circle-outline"></ion-icon>
+            {{#sounds}} <!-- Iterar sobre la lista de sonidos -->
+            <div class="sound-card">
+                <div class="card-head">
+                    <img src="{{imagePath}}" alt="{{title}}" class="card-img">
+                    <div class="card-overlay">
+                        <div class="play">
+                            <ion-icon name="play-circle-outline"></ion-icon>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title"><a href="/sounds/{{id}}">{{title}}</a></h3>
+                    <div class="card-info">
+                        <span class="category">{{category}}</span>
+                        <span class="duration">{{duration}} min</span>
+                    </div>
+                    <div class="audio-container">
+                        <!-- Reproductor de audio oculto -->
+                        <audio class="custom-audio">
+                            <source src="{{filePath}}" type="audio/mpeg">
+                            Tu navegador no soporta el elemento de audio.
+                        </audio>
+                        <!-- Controles personalizados -->
+                        <div class="audio-controls">
+                            <button class="play-pause-btn">▶️</button>
+                            <div class="progress-bar">
+                                <div class="progress"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="card-body">
-                <h3 class="card-title"><a href="/sounds/{{id}}">{{title}}</a></h3>
-                <div class="card-info">
-                    <span class="category">{{category}}</span>
-                    <span class="duration">{{duration}} min</span>
-                </div>
-                <div class="audio-container">
-                    <audio controls class="custom-audio">
-                        <source src="{{filePath}}" type="audio/mpeg">
-                        Tu navegador no soporta el elemento de audio.
-                    </audio>
-                </div>
-            </div>
-        </div>
-        {{/sounds}}
+            {{/sounds}}
+            {{^sounds}} <!-- Si no hay sonidos -->
+            <p>No se encontraron sonidos.</p>
+            {{/sounds}}
         </div>
 
-        <!-- Sound Previews -->
-        <!-- <div class="sounds-container" id="soundsContainer">Los sonidos se insertarán dinámicamente aquí -->
-        <!-- </div>  -->
-
+        <!-- Footer -->
         <footer>
             <div class="footer-content">
                 <div class="footer-brand">
@@ -97,7 +139,6 @@
                 <div class="footer-links">
                     <ul>
                         <h4 class="link-heading">SwapSounds</h4>
-
                         <li class="link-item"><a href="#">About us</a></li>
                         <li class="link-item"><a href="#">My profile</a></li>
                         <li class="link-item"><a href="#">Pricing plans</a></li>
@@ -106,17 +147,14 @@
 
                     <ul>
                         <h4 class="link-heading">Browse</h4>
-
                         <li class="link-item"><a href="#">Categories</a></li>
                         <li class="link-item"><a href="#">Production Sounds</a></li>
                         <li class="link-item"><a href="#">Free-to-use</a></li>
                         <li class="link-item"><a href="#">Favourites</a></li>
                     </ul>
 
-
                     <ul>
                         <h4 class="link-heading">Help</h4>
-
                         <li class="link-item"><a href="#">Account & Billing</a></li>
                         <li class="link-item"><a href="#">Plans & Pricing</a></li>
                         <li class="link-item"><a href="#">Supported Devices</a></li>
@@ -135,9 +173,50 @@
                     <a href="#">Terms and conditions</a>
                 </div>
             </div>
-
         </footer>
     </div>
+
+    <script>
+        // Script para manejar los controles personalizados
+        document.querySelectorAll('.sound-card').forEach(card => {
+            const audio = card.querySelector('audio');
+            const playPauseBtn = card.querySelector('.play-pause-btn');
+            const progressBar = card.querySelector('.progress-bar');
+            const progress = card.querySelector('.progress');
+
+            // Reproducir o pausar el audio
+            playPauseBtn.addEventListener('click', () => {
+                if (audio.paused) {
+                    audio.play();
+                    playPauseBtn.textContent = '⏸️';
+                } else {
+                    audio.pause();
+                    playPauseBtn.textContent = '▶️';
+                }
+            });
+
+            // Actualizar la barra de progreso
+            audio.addEventListener('timeupdate', () => {
+                const percent = (audio.currentTime / audio.duration) * 100;
+                progress.style.width = percent + '%';
+            });
+
+            // Saltar a una parte específica del audio
+            progressBar.addEventListener('click', (e) => {
+                const rect = progressBar.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                const percent = (clickX / rect.width);
+                audio.currentTime = percent * audio.duration;
+            });
+        });
+
+        // Deshabilitar el menú contextual en los elementos de audio
+        document.addEventListener('contextmenu', function (e) {
+            if (e.target.tagName === 'AUDIO') {
+                e.preventDefault();
+            }
+        });
+    </script>
 </body>
 
 </html>
