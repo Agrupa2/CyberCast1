@@ -1,28 +1,17 @@
 package es.swapsounds.controller;
 
 import java.io.IOException;
-
-import java.net.MalformedURLException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import es.swapsounds.model.Sound;
@@ -142,45 +131,55 @@ public class SoundController {
         return "upload-sound";
     }
 
-    @RestController
-    @RequestMapping("/sounds")
-    public static class SoundRestController {
+    @GetMapping("/sounds/download")
+    public String showDownloadSounds(
+            @RequestParam(name = "query", required = false) String query,
+            @RequestParam(name = "category", defaultValue = "all") String category,
+            HttpSession session,
+            Model model) {
 
-        private final InMemoryStorage storage;
+        // Obtener el nombre de usuario y el ID del usuario desde la sesión
+        String username = (String) session.getAttribute("username");
+        Integer userId = (Integer) session.getAttribute("userId");
 
-        public SoundRestController(InMemoryStorage storage) {
-            this.storage = storage;
+        // Si el usuario está logueado, agregar sus datos al modelo
+        if (username != null && userId != null) {
+            model.addAttribute("message", "Welcome, " + username + "!");
+            model.addAttribute("username", username);
+            model.addAttribute("userId", userId);
         }
 
-        @GetMapping("/download/{soundId}")
-        public ResponseEntity<Resource> downloadSound(@PathVariable int soundId) {
-            // Buscar el sonido en la base de datos en memoria
-            Optional<Sound> soundOptional = storage.findSoundById(soundId);
+        // Obtener todos los sonidos
+        List<Sound> allSounds = storage.getAllSounds();
 
-            if (!soundOptional.isPresent()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-            }
+        // Filtrar los sonidos según la consulta y la categoría
+        List<Sound> filteredSounds = allSounds.stream()
+                .filter(sound -> {
+                    boolean matchesCategory = category.equals("all")
+                            || sound.getCategory().equalsIgnoreCase(category);
 
-            Sound sound = soundOptional.get();
-            Path soundPath = Paths.get(sound.getFilePath()).normalize();
+                    boolean matchesQuery = query == null
+                            || sound.getTitle().toLowerCase().contains(query.toLowerCase());
 
-            try {
-                Resource resource = new UrlResource(soundPath.toUri());
+                    return matchesCategory && matchesQuery;
+                })
+                .collect(Collectors.toList());
 
-                if (!resource.exists() || !resource.isReadable()) {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-                }
+        // Agregar los sonidos filtrados al modelo
+        model.addAttribute("sounds", filteredSounds);
 
-                // Retornar el archivo sin `Content-Disposition` para permitir descarga y
-                // reproducción
-                return ResponseEntity.ok()
-                        .header(HttpHeaders.CONTENT_TYPE, "audio/mpeg") // Tipo de archivo MP3
-                        .body(resource);
+        // Mantener el estado del formulario de búsqueda
+        model.addAttribute("query", query);
+        model.addAttribute("category", category);
 
-            } catch (MalformedURLException e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-            }
-        }
+        // Marcar la categoría seleccionada
+        model.addAttribute("selectedAll", category.equals("all"));
+        model.addAttribute("selectedMeme", category.equalsIgnoreCase("Meme"));
+        model.addAttribute("selectedFootball", category.equalsIgnoreCase("Football"));
+        model.addAttribute("selectedParty", category.equalsIgnoreCase("Party"));
+
+        // Retornar la plantilla de la página de descargas
+        return "download-sound"; // Nombre de la plantilla (download-sound.html o download-sound.mustache)
     }
 
     @GetMapping("/sounds/{id}")
