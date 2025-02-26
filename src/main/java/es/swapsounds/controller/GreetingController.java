@@ -6,16 +6,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class GreetingController {
-    @GetMapping("/test")
-    public String test(Model model) {
-        model.addAttribute("message", "Bienvenidos a SwapSounds");
-        return "greeting_template";
-    }
-
-    @GetMapping("/hola")
-    public String hola(Model model) {
-        return "greeting_template";
-    }
 
     @GetMapping("/")
     public String landingPage(Model model) {
@@ -31,11 +21,5 @@ public class GreetingController {
     public String comment_section(Model model) {
         return "comment_section";
     }
-
-    @GetMapping("/download-sound")
-    public String downloadSound(Model model) {
-        return "download-sound";
-    }
-
 
 }
