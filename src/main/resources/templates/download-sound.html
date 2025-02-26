@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sound Library</title>
+    <title>Descargar Sonidos</title>
     <link rel="stylesheet" href="/css/start.css">
 </head>
 
@@ -13,53 +13,74 @@
         <!-- Navbar -->
         <nav class="navbar">
             <div class="navbar-container">
-                <div class="logo">Download Library</div>
+                <div class="logo">Sound Library</div>
+                <ul class="nav-links">
+                    {{^username}} <!-- Muestra esto si NO hay usuario logueado -->
+                    <li><a href="/login">Login</a></li>
+                    {{/username}}
+                    <li><a href="/contact">Contact</a></li>
+                    {{#username}} <!-- Muestra esto si hay usuario logueado -->
+                    <li><a href="/sounds/upload?username={{username}}">Upload Sound</a></li>
+                    <li><a href="/logout">Logout</a></li>
+                    {{/username}}
+                </ul>
             </div>
         </nav>
 
         <!-- Search Bar -->
-        <div class="search-container">
-            <input type="text" id="search" class="search-bar" placeholder="Searching for sounds...">
-            <select class="fold-out" id="category">
-                <option value="all">All Categories</option>
-                <option value="Meme">Meme</option>
-                <option value="Football">Football</option>
-                <option value="Party">Party</option>
+        <form action="/download-sound" method="GET" class="search-container">
+            <input type="text" name="query" class="search-bar" placeholder="Searching for sounds..."
+                value="{{#query}}{{query}}{{/query}}"> <!-- Mantener valor después de búsqueda -->
+        
+            <select name="category" class="fold-out" onchange="this.form.submit()"> <!-- Enviar al cambiar categoría -->
+                <option value="all" {{#selectedAll}}selected{{/selectedAll}}>All Categories</option>
+                <option value="Meme" {{#selectedMeme}}selected{{/selectedMeme}}>Meme</option>
+                <option value="Football" {{#selectedFootball}}selected{{/selectedFootball}}>Football</option>
+                <option value="Party" {{#selectedParty}}selected{{/selectedParty}}>Party</option>
             </select>
-        </div>
+        
+            <!-- Botón oculto para enviar con Enter -->
+            <button type="submit" hidden></button>
+        </form>
 
-        <!-- Sound Previews -->
+        <!-- Sound Grid -->
         <div class="sound-grid" id="soundsContainer">
-            {{#sounds}}
+            {{#sounds}} <!-- Iterar sobre la lista de sonidos -->
             <div class="sound-card">
                 <div class="card-head">
-                    <img src="/static/images/{{imagePath}}" alt="{{title}}" class="card-img">
+                    <img src="{{imagePath}}" alt="{{title}}" class="card-img">
+                    <div class="card-overlay">
+                        <div class="play">
+                            <ion-icon name="play-circle-outline"></ion-icon>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body">
-                    <h3 class="card-title">
-                        <!-- Nombre del sonido -->
-                        <a href="/source/sounds/download/{{soundId}}">{{title}}</a>
-                    </h3>
+                    <h3 class="card-title"><a href="/sounds/{{id}}">{{title}}</a></h3>
                     <div class="card-info">
                         <span class="category">{{category}}</span>
                         <span class="duration">{{duration}} min</span>
                     </div>
-                    <audio id="audio-{{id}}" src="/static/audio/{{filePath}}" preload="none"></audio>
-                    <!-- Botón de descarga -->
-                    <a href="/source/sounds/download/{{soundId}}" class="download-button">
-                        <button>Download</button>
-                    </a>
+                    <div class="audio-container">
+                        <audio controls class="custom-audio">
+                            <source src="{{filePath}}" type="audio/mpeg">
+                            Tu navegador no soporta el elemento de audio.
+                        </audio>
+                    </div>
                 </div>
             </div>
             {{/sounds}}
+            {{^sounds}} <!-- Si no hay sonidos -->
+            <p>No se encontraron sonidos.</p>
+            {{/sounds}}
         </div>
+
+        <!-- Footer -->
         <footer>
             <div class="footer-content">
                 <div class="footer-brand">
                     <div class="logo">SwapSounds</div>
                     <p class="slogan">Experience the future of sounds</p>
-                </div>
-            </div>
         </footer>
     </div>
 </body>
