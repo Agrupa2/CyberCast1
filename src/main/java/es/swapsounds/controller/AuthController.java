@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 
@@ -29,30 +30,51 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public String registerUser(
-            @RequestParam String username,
-            @RequestParam String email,
-            @RequestParam String user_password,
-            @RequestParam(required = false) MultipartFile profile_photo,
-            Model model) throws IOException {
+public String registerUser(
+        @RequestParam String username,
+        @RequestParam String email,
+        @RequestParam String user_password,
+        @RequestParam(required = false) MultipartFile profile_photo,
+        HttpSession session,
+        RedirectAttributes redirectAttributes) throws IOException {
 
-        Optional<User> existingUser = storage.findUserByUsername(username);
-        if (existingUser.isPresent()) {
-            model.addAttribute("error", "Username already exists");
-            return "login";
-        }
-
-        String photoPath = null;
-        if (profile_photo != null && !profile_photo.isEmpty()) {
-            photoPath = storage.saveProfilePhoto(username, profile_photo.getOriginalFilename());
-            profile_photo.transferTo(new java.io.File(photoPath));
-        }
-
-        User user = new User( username, email, user_password, photoPath, 0, photoPath);
-        storage.addUser(user);
-        model.addAttribute("success", "User registered successfully! Please login.");
-        return "login";
+    // Validación de usuario existente
+    if (storage.findUserByUsername(username).isPresent()) {
+        redirectAttributes.addFlashAttribute("error", "El nombre de usuario ya existe");
+        return "redirect:/signup";
     }
+
+    // Generar nombre seguro para la imagen
+    String photoPath = null;
+    if (profile_photo != null && !profile_photo.isEmpty()) {
+        try {
+            photoPath = storage.saveFile(username, profile_photo, "profiles");
+        } catch (IOException e) {
+            redirectAttributes.addFlashAttribute("error", "Error al subir la imagen de perfil");
+            return "redirect:/signup";
+        }
+    } else {
+        // Asignar avatar por defecto
+        photoPath = "/uploads/profiles/default-avatar.png";
+    }
+
+    // Crear usuario con parámetros correctos
+    User user = new User(username, email, user_password, photoPath);
+
+    storage.addUser(user);
+    
+    // Autologin después del registro
+    session.setAttribute("userId", user.getUserId());
+    session.setAttribute("username", username);
+
+    if (user_password.length() < 8) {
+        redirectAttributes.addFlashAttribute("error", "La contraseña debe tener al menos 8 caracteres");
+        return "redirect:/signup";
+    }
+    
+    redirectAttributes.addFlashAttribute("success", "¡Registro exitoso!");
+    return "redirect:/start";
+}
 
     @GetMapping("/login")
     public String showLoginForm() {
