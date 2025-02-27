@@ -69,6 +69,7 @@ public class InMemoryStorage {
                 .findFirst();
     }
 
+
     public Optional<User> findUserById(int userId) {
         return users.stream()
                 .filter(u -> u.getUserId() == userId)
@@ -110,6 +111,10 @@ public class InMemoryStorage {
                 .findFirst()
                 .orElse(null);
     }
-}
-    
 
+    public void updateSound(Sound updatedSound) {
+        // Implementación específica de tu almacenamiento
+        sounds.removeIf(s -> s.getId() == updatedSound.getId());
+        sounds.add(updatedSound);
+    }
+}
