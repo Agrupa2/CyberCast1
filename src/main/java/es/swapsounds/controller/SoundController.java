@@ -194,6 +194,7 @@ public class SoundController {
 
         Optional<Sound> sound = storage.findSoundById(id);
 
+
         if (sound.isPresent()) {
             model.addAttribute("sound", sound.get());
             model.addAttribute("isOwner", userId != null && userId == sound.get().getUserId());
@@ -203,4 +204,47 @@ public class SoundController {
             return "redirect:/start";
         }
     }
+
+    @PostMapping("/sounds/{id}/edit")
+    public String editSound(
+            @PathVariable int id,
+            @RequestParam String title,
+            @RequestParam String description,
+            @RequestParam String category,
+            @RequestParam(required = false) MultipartFile audioFile,
+            @RequestParam(required = false) MultipartFile imageFile,
+            HttpSession session,
+            Model model) throws IOException {
+
+        Integer userId = (Integer) session.getAttribute("userId");
+        Optional<Sound> originalSound = storage.findSoundById(id);
+
+        if (userId == null || !originalSound.isPresent() || originalSound.get().getUserId() != userId) {
+            model.addAttribute("error", "No tienes permisos para editar este sonido");
+            return "redirect:/sounds/" + id;
+        }
+
+        Sound sound = originalSound.get();
+        String username = (String) session.getAttribute("username");
+
+        // Actualizar campos básicos
+        sound.setTitle(title);
+        sound.setDescription(description);
+        sound.setCategory(category);
+
+        // Manejar archivo de audio
+        if (!audioFile.isEmpty()) {
+            String newAudioPath = storage.saveFile(username, audioFile, "sounds");
+            sound.setFilePath(newAudioPath);
+        }
+
+        // Manejar archivo de imagen
+        if (!imageFile.isEmpty()) {
+            String newImagePath = storage.saveFile(username, imageFile, "images");
+            sound.setImagePath(newImagePath);
+        }
+
+        storage.updateSound(sound);
+        return "redirect:/sounds/" + id;
+}
 }
