@@ -8,20 +8,20 @@
 <body>
     <nav class="navbar">
         <div class="navbar-container">
-            <div class="logo">Sound Library</div>
+            <div class="logo">
+                <a href="/start">Sound Library</a>
+            </div>
             <ul class="nav-links">
                 {{^username}} <!-- Muestra esto si NO hay usuario logueado -->
                 <li><a href="/login">Login</a></li>
                 {{/username}}
                 <li><a href="/contact">Contact</a></li>
                 {{#username}}
+                <li><a href="/dashboard">Acceder al Dashboard</a></li>
                 <li><a href="/sounds/upload?username={{username}}">Upload Sound</a></li>
-                 <li><a href="/logout">Logout</a></li>
+                <li><a href="/logout">Logout</a></li>
                 {{/username}}
             </ul>
-        </div>
-        <div th:if="${user != null}">
-            <a href="/dashboard"><button>Acceder al Dashboard</button></a>
         </div>
     </nav>
 
@@ -50,8 +50,42 @@
 
         {{#isOwner}}
         <div class="sound-actions">
-            <button>Editar</button>
-            <button>Eliminar</button>
+            <details>
+                <summary>Editar Sonido</summary>
+                <form action="/sounds/{{sound.id}}/edit" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label>Título:</label>
+                        <input type="text" name="title" value="{{sound.title}}" required>
+                    </div>
+        
+                    <div class="form-group">
+                        <label>Descripción:</label>
+                        <textarea name="description">{{sound.description}}</textarea>
+                    </div>
+        
+                    <div class="form-group">
+                        <label>Categoría:</label>
+                        <select name="category" class="fold-out"> <!-- Enviar al cambiar categoría -->
+                            <option value="all">All Categories</option>
+                            <option value="Meme">Meme</option>
+                            <option value="Football">Football</option>
+                            <option value="Party">Party</option>
+                        </select>
+                    </div>
+        
+                    <div class="form-group">
+                        <label>Nuevo archivo de audio (opcional):</label>
+                        <input type="file" name="audioFile" accept="audio/*">
+                    </div>
+        
+                    <div class="form-group">
+                        <label>Nueva imagen (opcional):</label>
+                        <input type="file" name="imageFile" accept="image/*">
+                    </div>
+        
+                    <button type="submit">Guardar Cambios</button>
+                </form>
+            </details>
         </div>
         {{/isOwner}}
 
