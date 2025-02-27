@@ -27,6 +27,26 @@
 
     <div class="sound-container">
         <div class="sound-header">
+            <div class="user-profile">
+                {{#uploader}}
+                    <div class="avatar-container">
+                        {{#profileImagePath}}
+                            <img src="{{profileImagePath}}" 
+                                 alt="Perfil de {{username}}" 
+                                 class="profile-avatar">
+                        {{/profileImagePath}}
+                        {{^profileImagePath}}
+                            <div class="default-avatar">
+                                {{userInitial}}
+                            </div>
+                        {{/profileImagePath}}
+                    </div>
+                    <div class="user-info">
+                        <span class="subido-por">Subido por:</span>
+                        <h3 class="username">{{username}}</h3>
+                    </div>
+                {{/uploader}}
+            </div>
             <h1>{{sound.title}}</h1>
             <div class="sound-meta">
                 <span class="category">{{sound.category}}</span>

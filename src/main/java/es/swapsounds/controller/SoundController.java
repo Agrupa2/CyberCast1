@@ -187,23 +187,50 @@ public class SoundController {
             @PathVariable int id,
             HttpSession session,
             Model model) {
-
+    
         // Verificar sesión si es requerido
         Integer userId = (Integer) session.getAttribute("userId");
         String username = (String) session.getAttribute("username");
-
-        Optional<Sound> sound = storage.findSoundById(id);
-
-
-        if (sound.isPresent()) {
-            model.addAttribute("sound", sound.get());
-            model.addAttribute("isOwner", userId != null && userId == sound.get().getUserId());
-            model.addAttribute("username", username); // Pasar username al template
-            return "sound-details";
-        } else {
+    
+        Optional<Sound> soundOpt = storage.findSoundById(id);
+        if (!soundOpt.isPresent()) {
             return "redirect:/start";
         }
+    
+        Sound sound = soundOpt.get();
+        Optional<User> uploader = storage.findUserById(sound.getUserId());
+    
+        String userInitial = "?"; // Valor por defecto
+        String profileImagePath = null; // Inicializamos en null
+    
+        if (uploader.isPresent()) {
+            User user = uploader.get();
+            
+            // Asignamos profileImagePath desde el usuario
+            profileImagePath = user.getProfilePicturePath();
+            
+            if (profileImagePath == null) {
+                userInitial = user.getUsername().length() > 0
+                        ? user.getUsername().substring(0, 1).toUpperCase()
+                        : "?";
+            }
+            
+            model.addAttribute("uploader", user);
+        } else {
+            model.addAttribute("uploader", null);
+        }
+    
+        // Pasar los valores al modelo
+        model.addAttribute("userInitial", userInitial);
+        model.addAttribute("profileImagePath", profileImagePath); // Añadir profileImagePath al modelo
+        model.addAttribute("sound", sound);
+        model.addAttribute("username", username); // Pasar username al template
+        model.addAttribute("isOwner", userId != null && userId == soundOpt.get().getUserId());
+    
+        return "sound-details";
     }
+    
+
 
     @PostMapping("/sounds/{id}/edit")
     public String editSound(
