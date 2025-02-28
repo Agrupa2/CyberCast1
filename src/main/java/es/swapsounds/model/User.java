@@ -24,6 +24,13 @@ public class User {
         this.role = role; // Inicializar campo de rol
     }
 
+    public User(String username2, String email2, String user_password, String photoPath) {
+        this.username = username2;
+        this.email = email2;
+        this.password = user_password;
+        this.profilePicturePath = photoPath;
+    }
+
     // Getters y setters para el campo de rol
     public String getRole() {
         return this.role;
@@ -47,7 +54,7 @@ public class User {
     }
 
     public String getProfilePicturePath() {
-        return profilePicturePath;
+        return profilePicturePath != null ? profilePicturePath : "/uploads/profiles/default-avatar.png";
     }
 
     public void setProfilePicturePath(String profilePicturePath) {

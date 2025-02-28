@@ -8,9 +8,11 @@ public class MvcConfig implements WebMvcConfigurer {
     
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // Mapea la ruta "/uploads/**" a la carpeta física "uploads/"
         registry
             .addResourceHandler("/uploads/**")
-            .addResourceLocations("file:uploads/");
+            .addResourceLocations(
+                "file:uploads/",
+                "classpath:/static/default-avatars/"
+            );
     }
 }

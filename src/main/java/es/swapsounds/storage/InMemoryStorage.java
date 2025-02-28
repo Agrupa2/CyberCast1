@@ -6,6 +6,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -69,18 +72,22 @@ public class InMemoryStorage {
                 .findFirst();
     }
 
+
     public Optional<User> findUserById(int userId) {
         return users.stream()
                 .filter(u -> u.getUserId() == userId)
                 .findFirst();
     }
 
-    public String saveProfilePhoto(String username, String fileName) {
-        // Simulación: guarda la ruta en el sistema de archivos (por ejemplo, /uploads/)
+    public String saveProfileImage(MultipartFile file, String username) throws IOException {
         String uploadDir = "uploads/profiles/";
-        java.io.File dir = new java.io.File(uploadDir);
-        if (!dir.exists()) dir.mkdirs();
-        return uploadDir + username + "_" + fileName; // Ejemplo: uploads/profiles/user_profile.jpg
+        Files.createDirectories(Paths.get(uploadDir));
+
+        String fileName = username + "_" + System.currentTimeMillis() + ".jpg";
+        Path filePath = Paths.get(uploadDir + fileName);
+
+        file.transferTo(filePath);
+        return "/uploads/profiles/" + fileName;
     }
 
     public String saveFile(String username, MultipartFile file, String directory) throws IOException {
@@ -110,6 +117,10 @@ public class InMemoryStorage {
                 .findFirst()
                 .orElse(null);
     }
-}
-    
 
+    public void updateSound(Sound updatedSound) {
+        // Implementación específica de tu almacenamiento
+        sounds.removeIf(s -> s.getId() == updatedSound.getId());
+        sounds.add(updatedSound);
+    }
+}
