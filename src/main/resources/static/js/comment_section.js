@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // Verificar si existen slides
     if (document.querySelectorAll('.swiper-slide').length === 0) {
         console.error("No hay slides en .swiper-wrapper");
-        return;
+        return; 
     }
 
     // Inicializar Swiper
