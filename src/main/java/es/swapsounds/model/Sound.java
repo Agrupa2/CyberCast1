@@ -1,7 +1,9 @@
 package es.swapsounds.model;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
 
 public class Sound {
     private int id;
@@ -13,6 +15,7 @@ public class Sound {
     private List<Comment> comments;
     private String category;
     private String duration;
+    private LocalDateTime uploadDate; // Nuevo atributo
 
 
     public Sound(String title, String description, String filePath, String imagePath, int userId, String Category, String duration) {
@@ -24,6 +27,7 @@ public class Sound {
         this.comments = new ArrayList<>();
         this.category = Category;
         this.duration = duration;
+        this.uploadDate = LocalDateTime.now();
     }
 
     public Sound(int id, String title, String description, String filePath, String imagePath, String category, int userId) {
@@ -34,6 +38,7 @@ public class Sound {
         this.imagePath = imagePath;
         this.category = category;
         this.userId = userId;
+        this.uploadDate = LocalDateTime.now();
     }
 
     public Sound(int id, String title, String description, String filePath, String imagePath, String category, String duration) {
@@ -44,6 +49,7 @@ public class Sound {
         this.imagePath = imagePath;
         this.category = category;
         this.duration = duration;
+        this.uploadDate = LocalDateTime.now();
     }
 
     public Sound() {
@@ -60,6 +66,7 @@ public class Sound {
         this.userId = userId2;
         this.category = category2;
         this.duration = duration2; 
+        this.uploadDate = LocalDateTime.now();
     }
 
     // Getters
@@ -133,5 +140,13 @@ public class Sound {
 
     public void setDuration(String duration) {
         this.duration = duration;
+    }
+
+    public LocalDateTime getUploadDate() {
+        return uploadDate;
+    }
+
+    public void setUploadDate(LocalDateTime uploadDate) {
+        this.uploadDate = uploadDate;
     }
 }
