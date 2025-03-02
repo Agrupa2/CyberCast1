@@ -10,8 +10,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class InMemoryStorage {
@@ -21,8 +23,8 @@ public class InMemoryStorage {
 
     public InMemoryStorage() {
         // Usuarios iniciales para pruebas
-        users.add(new User("user", "user@gmail.com", "user123", "user.jpg", idCounter++, null));
-        users.add(new User("admin", "admin@gmail.com", "admin123", "admin.jpg", idCounter++, null));
+        users.add(new User("user", "user@gmail.com", "user123", null, idCounter++, null));
+        users.add(new User("admin", "admin@gmail.com", "admin123", null, idCounter++, null));
 
         sounds.add(new Sound(idCounter++, "Betis Anthem", "Relaxing forest ambiance", "/audio/betis.mp3", "/images/betis.png", "Football", "0:07"));
         sounds.add(new Sound(idCounter++, "CR7", "Soothing ocean waves", "/audio/CR7.mp3", "/images/CR7.jpg", "Football", "0:06"));
@@ -122,5 +124,12 @@ public class InMemoryStorage {
         // Implementación específica de tu almacenamiento
         sounds.removeIf(s -> s.getId() == updatedSound.getId());
         sounds.add(updatedSound);
+    }
+
+    public List<Sound> getSoundsByUserId(int userId) {
+        return sounds.stream()
+                .filter(sound -> sound.getUserId() == userId)
+                .sorted(Comparator.comparing(Sound::getUploadDate).reversed())
+                .collect(Collectors.toList());
     }
 }
