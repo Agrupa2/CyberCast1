@@ -12,11 +12,6 @@ public class GreetingController {
         return "landing-page";
     }
 
-    @GetMapping("/contact")
-    public String contact(Model model) {
-        return "contact";
-    }
-
     @GetMapping("/comment_section")
     public String comment_section(Model model) {
         return "comment_section";
