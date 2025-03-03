@@ -3,12 +3,12 @@ package es.swapsounds.model;
 import java.time.LocalDateTime;
 
 public class Comment {
-    private String id; // sirve para poder identificar un comentario.
-    private User user; // usuario que pone el comentario
-    private String content; // contenido del comentario
-    private Sound sound; // sonido al que se refiere el comentario --> no se si habrá que usarlo
-    private LocalDateTime created; // Fecha de creación
-    private LocalDateTime modified; // Fecha de modificación (si se edita)
+    private String id; // comment identification
+    private User user; // user uploader of the comment
+    private String content; // comment content
+    private Sound sound; // sound to which the comment is related
+    private LocalDateTime created; // comment upload date
+    private LocalDateTime modified; // comment modification date
 
     public Comment(String id, String content, User user) {
         this.id = id;
@@ -55,7 +55,6 @@ public class Comment {
         return modified;
     }
 
-    // Setters (solo para campos modificables)
     public void setContent(String content) {
         this.content = content;
     }
@@ -65,6 +64,6 @@ public class Comment {
     }
 
     public int getAuthorId() {
-        return this.user.getUserId(); // Asume que User tiene getUserId()
+        return this.user.getUserId();
     }
 }

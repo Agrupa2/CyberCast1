@@ -11,7 +11,7 @@ public class User {
     private List<Comment> comments;
     private List<Sound> sounds;
     private int userId;
-    private String role; // Añadir campo de rol
+    private String role;
 
     public User(String username, String email, String password, String profilePicturePath, int userId, String role) {
         this.username = username;
@@ -21,7 +21,7 @@ public class User {
         this.comments = new ArrayList<>();
         this.sounds = new ArrayList<>();
         this.userId = userId;
-        this.role = role; // Inicializar campo de rol
+        this.role = role;
     }
 
     public User(String username2, String email2, String user_password, String photoPath) {
@@ -31,7 +31,6 @@ public class User {
         this.profilePicturePath = photoPath;
     }
 
-    // Getters y setters para el campo de rol
     public String getRole() {
         return this.role;
     }
@@ -54,7 +53,14 @@ public class User {
     }
 
     public String getProfilePicturePath() {
-        return profilePicturePath != null ? profilePicturePath : "/uploads/profiles/default-avatar.png";
+        return profilePicturePath != null ? profilePicturePath : "/uploads/profiles/default-avatar.png"; // If the user
+                                                                                                         // profile
+                                                                                                         // image is
+                                                                                                         // set to null,
+                                                                                                         // use the
+                                                                                                         // default
+                                                                                                         // profile
+                                                                                                         // image
     }
 
     public void setProfilePicturePath(String profilePicturePath) {

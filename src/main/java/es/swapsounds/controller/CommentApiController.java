@@ -25,27 +25,26 @@ public class CommentApiController {
 
     @PostMapping("/sounds/{soundId}/comments")
     public String addComment(
-            @PathVariable int soundId, // <-- Usar Long en lugar de int
+            @PathVariable int soundId,
             @RequestParam String content,
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
-        // Validar usuario
+        // Logged user validation
         Integer userId = (Integer) session.getAttribute("userId");
         if (userId == null) {
             return "redirect:/login";
         }
 
-        // Obtener usuario desde el repositorio (no usar username)
+        // Obtaining the user form InMemoryStorage
         User currentUser = storage.findUserById(userId)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        // Crear y guardar comentario
+        // Creating comment
         Comment comment = commentRepository.addComment(
                 soundId,
                 content,
-                currentUser // Pasar el objeto User completo
-        );
+                currentUser);
 
         redirectAttributes.addFlashAttribute("message", "Comentario publicado!");
         return "redirect:/sounds/" + soundId;
@@ -58,7 +57,7 @@ public class CommentApiController {
             @RequestParam String content,
             HttpSession session) {
 
-        // Validar usuario
+        // User validation
         Integer userId = (Integer) session.getAttribute("userId");
         if (userId == null) {
             return "redirect:/login";
@@ -67,13 +66,12 @@ public class CommentApiController {
         User currentUser = storage.findUserById(userId)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        // Actualizar comentario
+        // Updating the comment with the user input
         boolean success = commentRepository.editComment(
                 soundId,
                 commentId,
                 content,
-                currentUser // Pasar User completo para validación
-        );
+                currentUser);
 
         return "redirect:/sounds/" + soundId;
     }

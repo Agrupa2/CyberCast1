@@ -13,7 +13,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 @Repository
 public class CommentRepository {
-    // Mapa: soundId -> Lista de comentarios
+    // Map: soundId -> Comment List
     private final Map<Integer, List<Comment>> commentsBySoundId = new ConcurrentHashMap<>();
 
     public Comment addComment(int soundId, String content, User user) {
@@ -29,7 +29,6 @@ public class CommentRepository {
         return comment;
     }
 
-    // Resto de métodos con Long
     public List<Comment> getCommentsBySoundId(int soundId) {
         return commentsBySoundId.getOrDefault(soundId, Collections.emptyList());
     }

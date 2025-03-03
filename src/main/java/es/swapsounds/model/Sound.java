@@ -14,7 +14,7 @@ public class Sound {
     private List<Comment> comments;
     private String category;
     private String duration;
-    private LocalDateTime uploadDate; // Nuevo atributo
+    private LocalDateTime uploadDate;
 
     public Sound(String title, String description, String filePath, String imagePath, int userId, String Category,
             String duration) {
@@ -69,7 +69,6 @@ public class Sound {
         this.uploadDate = LocalDateTime.now();
     }
 
-    // Getters
     public String getTitle() {
         return title;
     }
