@@ -19,7 +19,7 @@
                 {{/username}}
                 <li><a href="/contact">Contact</a></li>
                 {{#username}}
-                <li><a href="/dashboard">Acceder al Dashboard</a></li>
+                <li><a href="/delete-sound">Delete Sound</a></li>
                 <li><a href="/sounds/upload?username={{username}}">Upload Sound</a></li>
                 <li><a href="/logout">Logout</a></li>
                 {{/username}}
@@ -107,9 +107,10 @@
                 </form>
             </details>
         </div>
-        {{/isOwner}}
+    </div>
+    {{/isOwner}}
 
-        <a href="/start">Volver a todos los sonidos</a>
+    <a href="/start">Volver a todos los sonidos</a>
     </div>
 
 </body>
