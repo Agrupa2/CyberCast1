@@ -132,4 +132,44 @@ public class InMemoryStorage {
                 .sorted(Comparator.comparing(Sound::getUploadDate).reversed())
                 .collect(Collectors.toList());
     }
+
+    // Añade estos métodos en la clase InMemoryStorage
+
+    public void deleteUser(int userId) {
+        // Eliminar usuario
+        users.removeIf(u -> u.getUserId() == userId);
+        
+        // Eliminar sus sonidos
+        List<Sound> userSounds = sounds.stream()
+            .filter(s -> s.getUserId() == userId)
+            .collect(Collectors.toList());
+            
+        userSounds.forEach(sound -> {
+            // Eliminar archivos físicos
+            try {
+                Path audioPath = Paths.get("uploads" + sound.getFilePath().replace("/uploads/", "/"));
+                Files.deleteIfExists(audioPath);
+                
+                Path imagePath = Paths.get("uploads" + sound.getImagePath().replace("/uploads/", "/"));
+                Files.deleteIfExists(imagePath);
+            } catch (IOException e) {
+                System.err.println("Error eliminando archivos: " + e.getMessage());
+            }
+        });
+        sounds.removeAll(userSounds);
+        
+        // Eliminar imagen de perfil
+        users.stream()
+            .filter(u -> u.getUserId() == userId)
+            .findFirst()
+            .ifPresent(u -> {
+                if (u.getProfilePicturePath() != null && !u.getProfilePicturePath().contains("default")) {
+                    try {
+                        Files.deleteIfExists(Paths.get("uploads" + u.getProfilePicturePath().replace("/uploads/", "/")));
+                    } catch (IOException e) {
+                        System.err.println("Error eliminando avatar: " + e.getMessage());
+                    }
+                }
+            });
+    }
 }
