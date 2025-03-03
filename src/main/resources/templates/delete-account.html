@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Eliminar Cuenta - SwapSounds</title>
+    <link rel="stylesheet" href="/css/delete-account.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="logo">Sound Library</div>
+            <ul class="nav-links">
+                {{^username}} <!-- Muestra esto si NO hay usuario logueado -->
+                <li><a href="/login">Login</a></li>
+                {{/username}}
+                <li><a href="/contact">Contact</a></li>
+                {{#username}} <!-- Muestra esto si hay usuario logueado -->
+                <li><a href="/sounds/upload?username={{username}}">Upload Sound</a></li>
+                <li><a href="/sounds/download">Download Sound</a></li>
+                <li><a href="/logout">Logout</a></li>
+                {{/username}}
+            </ul>
+        </div>
+    </nav>
+
+    <div class="delete-container">
+        <h1 class="warning-header">⚠️ Eliminación de Cuenta Permanente</h1>
+        
+        <div class="warning-content">
+            <p>Hola <strong>{{username}}</strong>, esta acción:</p>
+            <ul>
+                <li>❌ Eliminará todos tus sonidos subidos</li>
+                <li>❌ Borrará tu imagen de perfil</li>
+                <li>❌ Eliminará permanentemente tu cuenta</li>
+            </ul>
+            
+            <p class="final-warning">Esta acción no se puede deshacer.</p>
+        </div>
+
+        <form class="confirmation-form" action="/delete-account" method="post">
+            <input type="text" 
+                   class="confirmation-input"
+                   name="confirmation" 
+                   placeholder="Escribe 'ELIMINAR CUENTA'" 
+                   required
+                   pattern="ELIMINAR CUENTA">
+            
+            <button type="submit" class="btn-destruct">
+                Confirmar Eliminación Total
+            </button>
+        </form>
+
+        <a href="/start" class="back-link">↩ Volver al inicio</a>
+    </div>
+</body>
+</html>
