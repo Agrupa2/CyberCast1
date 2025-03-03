@@ -14,13 +14,19 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import es.swapsounds.dto.CommentView;
+import es.swapsounds.model.Comment;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
+import es.swapsounds.storage.CommentRepository;
 import es.swapsounds.storage.InMemoryStorage;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class SoundController {
+
+    @Autowired
+    private CommentRepository commentRepository;
 
     @Autowired
     private InMemoryStorage storage;
@@ -182,59 +188,72 @@ public class SoundController {
         return "download-sound"; // Nombre de la plantilla (download-sound.html o download-sound.mustache)
     }
 
-    @GetMapping("/sounds/{id}")
+    @GetMapping("/sounds/{soundId}")
     public String soundDetails(
-            @PathVariable int id,
+            @PathVariable int soundId,
             HttpSession session,
             Model model) {
-    
+
         // Verificar sesión si es requerido
         Integer userId = (Integer) session.getAttribute("userId");
         String username = (String) session.getAttribute("username");
-    
-        Optional<Sound> soundOpt = storage.findSoundById(id);
+
+        Optional<Sound> soundOpt = storage.findSoundById(soundId);
         if (!soundOpt.isPresent()) {
             return "redirect:/start";
         }
-    
+
         Sound sound = soundOpt.get();
         Optional<User> uploader = storage.findUserById(sound.getUserId());
-    
+
         String userInitial = "?"; // Valor por defecto
         String profileImagePath = null; // Inicializamos en null
-    
+
         if (uploader.isPresent()) {
             User user = uploader.get();
-            
+
             // Asignamos profileImagePath desde el usuario
             profileImagePath = user.getProfilePicturePath();
-            
+
             if (profileImagePath == null) {
                 userInitial = user.getUsername().length() > 0
                         ? user.getUsername().substring(0, 1).toUpperCase()
                         : "?";
             }
-            
+
             model.addAttribute("uploader", user);
         } else {
             model.addAttribute("uploader", null);
         }
-    
+
+        List<Comment> comments = commentRepository.getCommentsBySoundId(soundId);
+
+        // Determinar si el usuario actual es dueño de cada comentario
+        Integer currentUserId = (Integer) session.getAttribute("userId");
+        List<CommentView> commentViews = comments.stream()
+                .map(comment -> {
+                    boolean isOwner = currentUserId != null &&
+                            comment.getUser().getUserId() == currentUserId;
+                    return new CommentView(comment, isOwner);
+                })
+                .collect(Collectors.toList());
+
+        model.addAttribute("comments", commentViews);
+
         // Pasar los valores al modelo
+
         model.addAttribute("userInitial", userInitial);
         model.addAttribute("profileImagePath", profileImagePath); // Añadir profileImagePath al modelo
         model.addAttribute("sound", sound);
         model.addAttribute("username", username); // Pasar username al template
         model.addAttribute("isOwner", userId != null && userId == soundOpt.get().getUserId());
-    
+
         return "sound-details";
     }
-    
 
-
-    @PostMapping("/sounds/{id}/edit")
+    @PostMapping("/sounds/{soundId}/edit")
     public String editSound(
-            @PathVariable int id,
+            @PathVariable int soundId,
             @RequestParam String title,
             @RequestParam String description,
             @RequestParam String category,
@@ -244,11 +263,11 @@ public class SoundController {
             Model model) throws IOException {
 
         Integer userId = (Integer) session.getAttribute("userId");
-        Optional<Sound> originalSound = storage.findSoundById(id);
+        Optional<Sound> originalSound = storage.findSoundById(soundId);
 
         if (userId == null || !originalSound.isPresent() || originalSound.get().getUserId() != userId) {
             model.addAttribute("error", "No tienes permisos para editar este sonido");
-            return "redirect:/sounds/" + id;
+            return "redirect:/sounds/" + soundId;
         }
 
         Sound sound = originalSound.get();
@@ -272,6 +291,6 @@ public class SoundController {
         }
 
         storage.updateSound(sound);
-        return "redirect:/sounds/" + id;
-}
+        return "redirect:/sounds/" + soundId;
+    }
 }
