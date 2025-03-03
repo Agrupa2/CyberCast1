@@ -177,4 +177,32 @@ public class InMemoryStorage {
                 }
             });
     }
+
+    public void deleteSound(int soundId) {
+        Optional<Sound> soundOptional = sounds.stream()
+                .filter(s -> s.getId() == soundId)
+                .findFirst();
+    
+        if (soundOptional.isPresent()) {
+            Sound sound = soundOptional.get();
+            
+            // Eliminar archivos físicos
+            try {
+                if (sound.getFilePath() != null) {
+                    Path audioPath = Paths.get("uploads" + sound.getFilePath().replace("/uploads/", "/"));
+                    Files.deleteIfExists(audioPath);
+                }
+                if (sound.getImagePath() != null) {
+                    Path imagePath = Paths.get("uploads" + sound.getImagePath().replace("/uploads/", "/"));
+                    Files.deleteIfExists(imagePath);
+                }
+            } catch (IOException e) {
+                System.err.println("Error eliminando archivos de sonido: " + e.getMessage());
+            }
+    
+            // Eliminar de la lista de sonidos
+            sounds.remove(sound);
+        }
+    }
+    
 }
