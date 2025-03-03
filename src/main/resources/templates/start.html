@@ -9,7 +9,8 @@
     <style>
         /* Ocultar los controles nativos del reproductor de audio */
         .custom-audio {
-            display: none; /* Oculta el reproductor nativo */
+            display: none;
+            /* Oculta el reproductor nativo */
         }
 
         /* Estilos para los controles personalizados */
@@ -70,18 +71,18 @@
         <form action="/start" method="GET" class="search-container">
             <input type="text" name="query" class="search-bar" placeholder="Searching for sounds..."
                 value="{{#query}}{{query}}{{/query}}"> <!-- Mantener valor después de búsqueda -->
-        
+
             <select name="category" class="fold-out" onchange="this.form.submit()"> <!-- Enviar al cambiar categoría -->
                 <option value="all" {{#selectedAll}}selected{{/selectedAll}}>All Categories</option>
                 <option value="Meme" {{#selectedMeme}}selected{{/selectedMeme}}>Meme</option>
                 <option value="Football" {{#selectedFootball}}selected{{/selectedFootball}}>Football</option>
                 <option value="Party" {{#selectedParty}}selected{{/selectedParty}}>Party</option>
             </select>
-        
+
             <!-- Botón oculto para enviar con Enter -->
             <button type="submit" hidden></button>
         </form>
-    
+
         <!-- Sound Grid -->
         <div class="sound-grid" id="soundsContainer">
             {{#sounds}} <!-- Iterar sobre la lista de sonidos -->

@@ -73,8 +73,8 @@ public class User {
         return userId;
     }
 
-    public void setId(int userId) { 
-        this.userId = userId; 
+    public void setId(int userId) {
+        this.userId = userId;
     }
 
     public void setSound(Sound sound) {
