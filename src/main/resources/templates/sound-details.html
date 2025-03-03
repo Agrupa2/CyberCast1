@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>{{sound.title}}</title>
     <link rel="stylesheet" href="/css/sound-details.css">
 </head>
+
 <body>
     <nav class="navbar">
         <div class="navbar-container">
@@ -29,22 +31,20 @@
         <div class="sound-header">
             <div class="user-profile">
                 {{#uploader}}
-                    <div class="avatar-container">
-                        {{#profileImagePath}}
-                            <img src="{{profileImagePath}}" 
-                                 alt="Perfil de {{username}}" 
-                                 class="profile-avatar">
-                        {{/profileImagePath}}
-                        {{^profileImagePath}}
-                            <div class="default-avatar">
-                                {{userInitial}}
-                            </div>
-                        {{/profileImagePath}}
+                <div class="avatar-container">
+                    {{#profileImagePath}}
+                    <img src="{{profileImagePath}}" alt="Perfil de {{username}}" class="profile-avatar">
+                    {{/profileImagePath}}
+                    {{^profileImagePath}}
+                    <div class="default-avatar">
+                        {{userInitial}}
                     </div>
-                    <div class="user-info">
-                        <span class="subido-por">Subido por:</span>
-                        <h3 class="username">{{username}}</h3>
-                    </div>
+                    {{/profileImagePath}}
+                </div>
+                <div class="user-info">
+                    <span class="subido-por">Subido por:</span>
+                    <h3 class="username">{{username}}</h3>
+                </div>
                 {{/uploader}}
             </div>
             <h1>{{sound.title}}</h1>
@@ -77,12 +77,12 @@
                         <label>Título:</label>
                         <input type="text" name="title" value="{{sound.title}}" required>
                     </div>
-        
+
                     <div class="form-group">
                         <label>Descripción:</label>
                         <textarea name="description">{{sound.description}}</textarea>
                     </div>
-        
+
                     <div class="form-group">
                         <label>Categoría:</label>
                         <select name="category" class="fold-out"> <!-- Enviar al cambiar categoría -->
@@ -92,17 +92,17 @@
                             <option value="Party">Party</option>
                         </select>
                     </div>
-        
+
                     <div class="form-group">
                         <label>Nuevo archivo de audio (opcional):</label>
                         <input type="file" name="audioFile" accept="audio/*">
                     </div>
-        
+
                     <div class="form-group">
                         <label>Nueva imagen (opcional):</label>
                         <input type="file" name="imageFile" accept="image/*">
                     </div>
-        
+
                     <button type="submit">Guardar Cambios</button>
                 </form>
             </details>
@@ -113,4 +113,5 @@
     </div>
 
 </body>
+
 </html>

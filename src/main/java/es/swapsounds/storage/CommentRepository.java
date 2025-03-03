@@ -1,5 +1,6 @@
 //para almacenar los comentarios de los sonidos
 package es.swapsounds.storage;
+
 import org.springframework.stereotype.Repository;
 
 import es.swapsounds.model.Comment;
@@ -17,14 +18,14 @@ public class CommentRepository {
 
     public Comment addComment(Long soundId, String content, User user) {
         Comment comment = new Comment(
-            UUID.randomUUID().toString(),
-            content,
-            user // Autor obtenido de la autenticación
+                UUID.randomUUID().toString(),
+                content,
+                user // Autor obtenido de la autenticación
         );
 
         commentsBySoundId
-            .computeIfAbsent(soundId, k -> new CopyOnWriteArrayList<>())
-            .add(comment);
+                .computeIfAbsent(soundId, k -> new CopyOnWriteArrayList<>())
+                .add(comment);
 
         return comment;
     }
@@ -37,26 +38,22 @@ public class CommentRepository {
     }
 
     public boolean editComment(Long soundId, String commentId, String newContent, User user) {
-    return commentsBySoundId.getOrDefault(soundId, Collections.emptyList())
-        .stream()
-        .filter(comment -> 
-            comment.getId().equals(commentId) && 
-            comment.getUser().equals(user)
-        )
-        .findFirst()
-        .map(comment -> {
-            comment.setContent(newContent);
-            comment.setModified(LocalDateTime.now());
-            return true;
-        })
-        .orElse(false);
+        return commentsBySoundId.getOrDefault(soundId, Collections.emptyList())
+                .stream()
+                .filter(comment -> comment.getId().equals(commentId) &&
+                        comment.getUser().equals(user))
+                .findFirst()
+                .map(comment -> {
+                    comment.setContent(newContent);
+                    comment.setModified(LocalDateTime.now());
+                    return true;
+                })
+                .orElse(false);
     }
 
     public boolean deleteComment(Long soundId, String commentId, User user) {
         return commentsBySoundId.getOrDefault(soundId, Collections.emptyList())
-            .removeIf(comment -> 
-                comment.getId().equals(commentId) && 
-                comment.getUser().equals(user)
-            );
+                .removeIf(comment -> comment.getId().equals(commentId) &&
+                        comment.getUser().equals(user));
     }
 }

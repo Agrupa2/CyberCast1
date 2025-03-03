@@ -14,8 +14,8 @@ public class Sound {
     private String category;
     private String duration;
 
-
-    public Sound(String title, String description, String filePath, String imagePath, int userId, String Category, String duration) {
+    public Sound(String title, String description, String filePath, String imagePath, int userId, String Category,
+            String duration) {
         this.title = title;
         this.description = description;
         this.filePath = filePath;
@@ -26,7 +26,8 @@ public class Sound {
         this.duration = duration;
     }
 
-    public Sound(int id, String title, String description, String filePath, String imagePath, String category, int userId) {
+    public Sound(int id, String title, String description, String filePath, String imagePath, String category,
+            int userId) {
         this.title = title;
         this.id = id;
         this.description = description;
@@ -36,7 +37,8 @@ public class Sound {
         this.userId = userId;
     }
 
-    public Sound(int id, String title, String description, String filePath, String imagePath, String category, String duration) {
+    public Sound(int id, String title, String description, String filePath, String imagePath, String category,
+            String duration) {
         this.title = title;
         this.id = id;
         this.description = description;
@@ -49,7 +51,6 @@ public class Sound {
     public Sound() {
     }
 
-
     public Sound(int i, String title2, String description2, String audioPath, String imagePath2, Integer userId2,
             String category2, String duration2) {
         this.id = i;
@@ -59,7 +60,7 @@ public class Sound {
         this.imagePath = imagePath2;
         this.userId = userId2;
         this.category = category2;
-        this.duration = duration2; 
+        this.duration = duration2;
     }
 
     // Getters

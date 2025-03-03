@@ -54,9 +54,9 @@ public class UserController {
 
    @PostMapping("/upload")
    public String uploadSound(@RequestParam("soundFile") MultipartFile soundFile,
-                             @RequestParam("imageFile") MultipartFile imageFile,
-                             @RequestParam("soundTitle") String soundTitle,
-                             Model model) throws IOException {
+         @RequestParam("imageFile") MultipartFile imageFile,
+         @RequestParam("soundTitle") String soundTitle,
+         Model model) throws IOException {
       User user = getCurrentUser(); // Método para obtener el usuario actual
 
       if (user != null) {
@@ -76,7 +76,7 @@ public class UserController {
          sound.setFilePath("/resource/static/audio/" + soundFileName);
          sound.setImagePath("/resource/static/images/" + imageFileName);
          sound.setId(user.getUserId());
-         UserSoundService.saveSound(sound,user);
+         UserSoundService.saveSound(sound, user);
       }
 
       return "redirect:/start";
@@ -96,6 +96,7 @@ public class UserController {
 
       return "redirect:/dashboard";
    }
+
    private User getCurrentUser() {
       // Implementa la lógica para obtener el usuario actual
       return null;
