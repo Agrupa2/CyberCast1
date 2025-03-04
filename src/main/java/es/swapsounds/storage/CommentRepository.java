@@ -47,14 +47,20 @@ public class CommentRepository {
                 .orElse(false);
     }
 
-    public boolean deleteComment(int soundId, String commentId, User user) {
-        return commentsBySoundId.getOrDefault(soundId, Collections.emptyList())
-                .removeIf(comment -> comment.getId().equals(commentId) &&
-                        comment.getUser().equals(user));
+    public boolean deleteComment(String commentId) {
+        return commentsBySoundId.values().stream()
+            .anyMatch(comments -> comments.removeIf(c -> c.getId().equals(commentId)));
     }
 
     public void deleteCommentsByUserId(int userId) {
         commentsBySoundId.values()
                 .forEach(comments -> comments.removeIf(comment -> comment.getUser().getUserId() == userId));
+    }
+
+    public Optional<Comment> findCommentById(String commentId) {
+        return commentsBySoundId.values().stream() // Recorre todas las listas de comentarios
+            .flatMap(List::stream) // Convierte las listas en un solo stream
+            .filter(comment -> comment.getId().equals(commentId)) // Filtra por ID
+            .findFirst(); // Devuelve el primer comentario que coincida
     }
 }
