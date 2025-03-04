@@ -3,6 +3,7 @@ package es.swapsounds.controller;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
 import es.swapsounds.service.UserSoundService;
+import es.swapsounds.storage.CommentRepository;
 import es.swapsounds.storage.InMemoryStorage;
 import jakarta.servlet.http.HttpSession;
 
@@ -21,6 +22,9 @@ import java.util.List;
 
 @Controller
 public class UserController {
+
+   @Autowired
+   private CommentRepository commentRepository;
 
    @Autowired
    private UserSoundService userSoundService;
@@ -109,34 +113,37 @@ public class UserController {
    }
 
    @GetMapping("/delete-account")
-    public String showDeletePage(HttpSession session, Model model) {
-        Integer userId = (Integer) session.getAttribute("userId");
-        if (userId == null) return "redirect:/login";
-        
-        model.addAttribute("username", session.getAttribute("username"));
-        return "delete-account"; 
-    }
+   public String showDeletePage(HttpSession session, Model model) {
+      Integer userId = (Integer) session.getAttribute("userId");
+      if (userId == null)
+         return "redirect:/login";
 
-    // Procesar eliminación
-    @PostMapping("/delete-account")
-    public String processDelete(
-        @RequestParam String confirmation,
-        HttpSession session,
-        RedirectAttributes ra) {
-        
-        Integer userId = (Integer) session.getAttribute("userId");
-        if (userId == null) return "redirect:/login";
+      model.addAttribute("username", session.getAttribute("username"));
+      return "delete-account";
+   }
 
-        if (!"ELIMINAR CUENTA".equals(confirmation.trim())) {
-            ra.addFlashAttribute("error", "Debes escribir exactamente 'ELIMINAR CUENTA'");
-            return "redirect:/delete-account";
-        }
+   // Procesar eliminación
+   @PostMapping("/delete-account")
+   public String processDelete(
+         @RequestParam String confirmation,
+         HttpSession session,
+         RedirectAttributes ra) {
 
-        storage.deleteUser(userId);
-        session.invalidate();
-        
-        ra.addFlashAttribute("success", "¡Cuenta eliminada permanentemente!");
-        return "redirect:/";
-    }
+      Integer userId = (Integer) session.getAttribute("userId");
+      if (userId == null)
+         return "redirect:/login";
+
+      if (!"ELIMINAR CUENTA".equals(confirmation.trim())) {
+         ra.addFlashAttribute("error", "Debes escribir exactamente 'ELIMINAR CUENTA'");
+         return "redirect:/delete-account";
+      }
+
+      commentRepository.deleteCommentsByUserId(userId);
+      storage.deleteUser(userId);
+      session.invalidate();
+
+      ra.addFlashAttribute("success", "¡Cuenta eliminada permanentemente!");
+      return "redirect:/";
+   }
 
 }

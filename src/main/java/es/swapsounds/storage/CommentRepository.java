@@ -14,14 +14,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Repository
 public class CommentRepository {
     // Mapa: soundId -> Lista de comentarios
-    private final Map<Long, List<Comment>> commentsBySoundId = new ConcurrentHashMap<>();
+    private final Map<Integer, List<Comment>> commentsBySoundId = new ConcurrentHashMap<>();
 
-    public Comment addComment(Long soundId, String content, User user) {
+    public Comment addComment(int soundId, String content, User user) {
         Comment comment = new Comment(
                 UUID.randomUUID().toString(),
                 content,
-                user // Autor obtenido de la autenticación
-        );
+                user);
 
         commentsBySoundId
                 .computeIfAbsent(soundId, k -> new CopyOnWriteArrayList<>())
@@ -30,14 +29,12 @@ public class CommentRepository {
         return comment;
     }
 
-    // Resto de métodos (getComments, updateComment, deleteComment)
-    // ...
-
-    public List<Comment> getComments(Long soundId) {
+    // Resto de métodos con Long
+    public List<Comment> getCommentsBySoundId(int soundId) {
         return commentsBySoundId.getOrDefault(soundId, Collections.emptyList());
     }
 
-    public boolean editComment(Long soundId, String commentId, String newContent, User user) {
+    public boolean editComment(int soundId, String commentId, String newContent, User user) {
         return commentsBySoundId.getOrDefault(soundId, Collections.emptyList())
                 .stream()
                 .filter(comment -> comment.getId().equals(commentId) &&
@@ -51,9 +48,14 @@ public class CommentRepository {
                 .orElse(false);
     }
 
-    public boolean deleteComment(Long soundId, String commentId, User user) {
+    public boolean deleteComment(int soundId, String commentId, User user) {
         return commentsBySoundId.getOrDefault(soundId, Collections.emptyList())
                 .removeIf(comment -> comment.getId().equals(commentId) &&
                         comment.getUser().equals(user));
+    }
+
+    public void deleteCommentsByUserId(int userId) {
+        commentsBySoundId.values()
+                .forEach(comments -> comments.removeIf(comment -> comment.getUser().getUserId() == userId));
     }
 }

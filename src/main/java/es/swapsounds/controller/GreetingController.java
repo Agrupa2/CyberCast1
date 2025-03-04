@@ -1,8 +1,10 @@
 package es.swapsounds.controller;
 
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+
 
 @Controller
 public class GreetingController {
@@ -12,9 +14,9 @@ public class GreetingController {
         return "landing-page";
     }
 
-    @GetMapping("/comment_section")
-    public String comment_section(Model model) {
-        return "comment_section";
+    @GetMapping("/contact")
+    public String contact(Model model) {
+        return "contact";
     }
-
+    
 }

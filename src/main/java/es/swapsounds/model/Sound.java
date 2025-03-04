@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class Sound {
     private int id;
     private String title;
@@ -66,7 +65,8 @@ public class Sound {
         this.imagePath = imagePath2;
         this.userId = userId2;
         this.category = category2;
-        this.duration = duration2; 
+        this.duration = duration2;
+        this.uploadDate = LocalDateTime.now();
     }
 
     // Getters

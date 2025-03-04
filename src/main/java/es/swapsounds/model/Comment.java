@@ -10,14 +10,6 @@ public class Comment {
     private LocalDateTime created; // Fecha de creación
     private LocalDateTime modified; // Fecha de modificación (si se edita)
 
-    /*
-     * public Comment(User user, String content, Sound sound) {
-     * this.user = user;
-     * this.content = content;
-     * this.sound = sound;
-     * }
-     */
-
     public Comment(String id, String content, User user) {
         this.id = id;
         this.content = content;
@@ -39,12 +31,24 @@ public class Comment {
         return sound;
     }
 
+    public void setSound(Sound sound) {
+        this.sound = sound;
+    }
+
     public String getId() {
         return id;
     }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public LocalDateTime getCreated() {
         return created;
+    }
+
+    public void setCreated(LocalDateTime created) {
+        this.created = created;
     }
 
     public LocalDateTime getModified() {
@@ -58,5 +62,9 @@ public class Comment {
 
     public void setModified(LocalDateTime modified) {
         this.modified = modified;
+    }
+
+    public int getAuthorId() {
+        return this.user.getUserId(); // Asume que User tiene getUserId()
     }
 }

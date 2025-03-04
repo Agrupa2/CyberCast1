@@ -67,12 +67,11 @@
             <h3>Descripción</h3>
             <p>{{sound.description}}</p>
         </div>
-
         {{#isOwner}}
         <div class="sound-actions">
             <details>
                 <summary>Editar Sonido</summary>
-                <form action="/sounds/{{sound.id}}/edit" method="post" enctype="multipart/form-data">
+                <form action="/sounds/{{soundId}}/edit" method="post" enctype="multipart/form-data">
                     <div class="form-group">
                         <label>Título:</label>
                         <input type="text" name="title" value="{{sound.title}}" required>
@@ -110,7 +109,7 @@
     </div>
     {{/isOwner}}
 
-    <a href="/start">Volver a todos los sonidos</a>
+        <a href="/start">Volver a todos los sonidos</a>
     </div>
 
 </body>
