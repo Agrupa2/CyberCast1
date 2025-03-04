@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import es.swapsounds.dto.CommentView;
 import es.swapsounds.model.Comment;
@@ -178,7 +179,7 @@ public class SoundController {
         model.addAttribute("query", query);
         model.addAttribute("category", category);
 
-        // Keepinh the selected category
+        // Keeping the selected category
         model.addAttribute("selectedAll", category.equals("all"));
         model.addAttribute("selectedMeme", category.equalsIgnoreCase("Meme"));
         model.addAttribute("selectedFootball", category.equalsIgnoreCase("Football"));
@@ -289,4 +290,48 @@ public class SoundController {
         storage.updateSound(sound);
         return "redirect:/sounds/" + soundId;
     }
+
+        @PostMapping("/sounds/{id}/delete")
+    public String deleteSound(
+            @PathVariable int id, // ID del sonido a eliminar
+            HttpSession session, // Sesión del usuario
+            RedirectAttributes redirectAttributes) { // Para enviar mensajes de retroalimentación
+
+        // Obtener el ID del usuario actual desde la sesión
+        Integer userId = (Integer) session.getAttribute("userId");
+
+        // Verificar si el usuario está autenticado
+        if (userId == null) {
+            redirectAttributes.addFlashAttribute("error", "Debes iniciar sesión para eliminar un sonido.");
+            return "redirect:/login"; // Redirigir al login si no está autenticado
+        }
+
+        // Buscar el sonido por su ID
+        Optional<Sound> soundOptional = storage.findSoundById(id);
+
+        // Verificar si el sonido existe
+        if (!soundOptional.isPresent()) {
+            redirectAttributes.addFlashAttribute("error", "El sonido no existe.");
+            return "redirect:/dashboard"; // Redirigir al dashboard si el sonido no existe
+        }
+
+        Sound sound = soundOptional.get();
+
+        // Verificar permisos: el usuario debe ser el propietario o un administrador
+        boolean isOwner = sound.getUserId() == userId;
+        boolean isAdmin = "admin".equals(session.getAttribute("role"));
+
+        if (!isOwner && !isAdmin) {
+            redirectAttributes.addFlashAttribute("error", "No tienes permisos para eliminar este sonido.");
+            return "redirect:/sounds/" + id; // Redirigir a la página del sonido si no tiene permisos
+        }
+
+        // Eliminar el sonido
+        storage.deleteSound(id);
+        redirectAttributes.addFlashAttribute("success", "El sonido se ha eliminado correctamente.");
+
+        return "redirect:/dashboard"; // Redirigir al dashboard después de eliminar
+    }
 }
+
+

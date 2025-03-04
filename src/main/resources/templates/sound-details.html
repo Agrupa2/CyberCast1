@@ -17,7 +17,8 @@
                 {{^username}} <!-- This will appear if there isn´t a user logged in -->
                 <li><a href="/login">Login</a></li>
                 {{/username}}
-                {{#username}} <!-- This will appear if there is a user logged in -->
+                <li><a href="/contact">Contact</a></li>
+                {{#username}}
                 <li><a href="/dashboard">Acceder al Dashboard</a></li>
                 <li><a href="/sounds/upload?username={{username}}">Upload Sound</a></li>
                 <li><a href="/logout">Logout</a></li>
@@ -108,16 +109,13 @@
                 </form>
             </details>
         </div>
-        {{/isOwner}}
-
-        <a class="back-link" href="/start">Volver a todos los sonidos</a>
     </div>
 
     <!-- SECCIÓN DE COMENTARIOS -->
     <div class="comments-section">
         <h2>Comentarios</h2>
 
-        <!-- Comment form (only for logged in users) -->
+        <!-- Formulario para comentar (solo usuarios logueados) -->
         {{#username}}
         <form class="comment-form" action="/sounds/{{soundId}}/comments" method="POST">
             <textarea name="content" placeholder="Escribe un comentario..." required></textarea>
@@ -125,7 +123,7 @@
         </form>
         {{/username}}
 
-        <!-- Comment list -->
+        <!-- Lista de comentarios -->
         <div class="comments-list">
             {{#comments}}
             <div class="comment">
@@ -136,7 +134,7 @@
                 <p class="comment-content">{{content}}</p>
                 <small class="comment-date">{{created}}</small>
 
-                <!-- Edit/Delete buttons (comment owner only) -->
+                <!-- Botones de editar/eliminar (solo dueño del comentario) -->
                 {{#isCommentOwner}}
                 <div class="comment-actions">
                     <details class="dropdown">
