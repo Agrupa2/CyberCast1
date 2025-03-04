@@ -77,31 +77,32 @@ public class CommentApiController {
     }
 
     @PostMapping("/sounds/{soundId}/comments/{commentId}/delete")
-public String deleteComment(
-        @PathVariable int soundId,
-        @PathVariable String commentId,
-        HttpSession session,
-        RedirectAttributes redirectAttributes) {
+    public String deleteComment(
+            @PathVariable int soundId,
+            @PathVariable String commentId,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
 
-    // 1. Validar usuario logueado
-    Integer currentUserId = (Integer) session.getAttribute("userId");
-    if (currentUserId == null) return "redirect:/login";
+        // Validate logged users
+        Integer currentUserId = (Integer) session.getAttribute("userId");
+        if (currentUserId == null)
+            return "redirect:/login";
 
-    // 2. Buscar el comentario
-    Comment comment = commentRepository.findCommentById(commentId)
-        .orElseThrow(() -> new RuntimeException("Comentario no encontrado"));
+        // Search for the comment
+        Comment comment = commentRepository.findCommentById(commentId)
+                .orElseThrow(() -> new RuntimeException("Comentario no encontrado"));
 
-    // 3. Validar propiedad (ID del autor vs ID de sesión)
-    if (comment.getAuthorId() != currentUserId) {
-        redirectAttributes.addFlashAttribute("error", "No tienes permiso");
+        // ID author and session validation
+        if (comment.getAuthorId() != currentUserId) {
+            redirectAttributes.addFlashAttribute("error", "No tienes permiso");
+            return "redirect:/sounds/" + soundId;
+        }
+
+        // Deleting comment
+        commentRepository.deleteComment(commentId);
+
+        redirectAttributes.addFlashAttribute("success", "Comentario eliminado");
         return "redirect:/sounds/" + soundId;
     }
-
-    // 4. Eliminar
-    commentRepository.deleteComment(commentId);
-    
-    redirectAttributes.addFlashAttribute("success", "Comentario eliminado");
-    return "redirect:/sounds/" + soundId;
-}
 
 }
