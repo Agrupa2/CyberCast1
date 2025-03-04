@@ -31,7 +31,7 @@ public class InMemoryStorage {
         sounds.add(new Sound(idCounter++, "CR7", "Soothing ocean waves", "/audio/CR7.mp3", "/images/CR7.jpg",
                 "Football", "0:06"));
         sounds.add(new Sound(idCounter++, "El diablo que malditos tenis", "Peaceful rain for sleep",
-                "/audio/el-diablo-que-malditos-tenis.mp3", "images/el-diablo-que-malditos-tenis.png", "Meme", "0:04"));
+                "/audio/el-diablo-que-malditos-tenis.mp3", "/images/el-diablo-que-malditos-tenis.png", "Meme", "0:04"));
 
     }
 
