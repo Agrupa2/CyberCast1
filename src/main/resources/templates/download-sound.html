@@ -18,7 +18,6 @@
                     {{^username}} <!-- Shows this if there is no user logged in -->
                     <li><a href="/login">Login</a></li>
                     {{/username}}
-                    <li><a href="/contact">Contact</a></li>
                     {{#username}} <!-- If a user is logged in it shows this new options -->
                     <li><a href="/sounds/upload?username={{username}}">Upload Sound</a></li>
                     <li><a href="/logout">Logout</a></li>
