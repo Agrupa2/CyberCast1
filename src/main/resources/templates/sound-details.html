@@ -14,11 +14,11 @@
                 <a href="/start">Sound Library</a>
             </div>
             <ul class="nav-links">
-                {{^username}} <!-- Muestra esto si NO hay usuario logueado -->
+                {{^username}} <!-- This will appear if there isn´t a user logged in -->
                 <li><a href="/login">Login</a></li>
                 {{/username}}
                 <li><a href="/contact">Contact</a></li>
-                {{#username}}
+                {{#username}} <!-- This will appear if there is a user logged in -->
                 <li><a href="/dashboard">Acceder al Dashboard</a></li>
                 <li><a href="/sounds/upload?username={{username}}">Upload Sound</a></li>
                 <li><a href="/logout">Logout</a></li>
@@ -26,6 +26,8 @@
             </ul>
         </div>
     </nav>
+
+    <!-- this shows the sound details -->
 
     <div class="sound-container">
         <div class="sound-header">
@@ -67,6 +69,7 @@
             <h3>Descripción</h3>
             <p>{{sound.description}}</p>
         </div>
+        <!-- This will allow the owner of the sound to edit it-->
         {{#isOwner}}
         <div class="sound-actions">
             <details>
@@ -115,7 +118,7 @@
     <div class="comments-section">
         <h2>Comentarios</h2>
 
-        <!-- Formulario para comentar (solo usuarios logueados) -->
+        <!-- Comment form (only for logged in users) -->
         {{#username}}
         <form class="comment-form" action="/sounds/{{soundId}}/comments" method="POST">
             <textarea name="content" placeholder="Escribe un comentario..." required></textarea>
@@ -123,7 +126,7 @@
         </form>
         {{/username}}
 
-        <!-- Lista de comentarios -->
+        <!-- Comment list -->
         <div class="comments-list">
             {{#comments}}
             <div class="comment">
@@ -134,7 +137,7 @@
                 <p class="comment-content">{{content}}</p>
                 <small class="comment-date">{{created}}</small>
 
-                <!-- Botones de editar/eliminar (solo dueño del comentario) -->
+                <!-- Edit/Delete buttons (comment owner only) -->
                 {{#isCommentOwner}}
                 <div class="comment-actions">
                     <details class="dropdown">

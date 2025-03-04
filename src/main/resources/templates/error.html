@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <title>Error {{status}}</title>
     <style>
-        /* Estilos básicos */
+        /* Basic styles */
         body {
             margin: 0;
             font-family: Arial, sans-serif;
             background-image: url("https://sport.jotdown.es/wp-content/uploads/2023/11/7P8A5333.jpg");
-            background-size: cover; /* Cubre toda la pantalla */
-            background-position: center; /* Centra la imagen */
-            background-repeat: no-repeat; /* Evita que se repita */
-            height: 100vh; /* Ocupa solo la altura visible de la pantalla */
+            background-size: cover; 
+            background-position: center; 
+            background-repeat: no-repeat; 
+            height: 100vh; 
             display: flex;
             justify-content: center;
             align-items: center;
@@ -20,27 +20,27 @@
             color: white;
         }
 
-        /* Contenedor del mensaje */
+        
         .error-container {
-            background: rgba(0, 0, 0, 0.7); /* Fondo semitransparente */
+            background: rgba(0, 0, 0, 0.7); 
             padding: 20px;
             border-radius: 10px;
-            max-width: 90%; /* Ajusta el ancho máximo para dispositivos pequeños */
+            max-width: 90%; 
         }
 
-        /* Título */
+        
         h1 {
             font-size: 2rem;
             margin-bottom: 1rem;
         }
 
-        /* Texto */
+        
         p {
             font-size: 1rem;
             margin-bottom: 1.5rem;
         }
 
-        /* Enlace */
+        
         a {
             color: white;
             text-decoration: none;
@@ -50,13 +50,13 @@
             transition: background-color 0.3s ease;
         }
 
-        /* Efecto hover para el enlace */
+        
         a:hover {
             background: rgba(255, 255, 255, 0.2);
         }
     </style>
 </head>
-<body>
+<body> <!-- This is the error page -->
     <div class="error-container">
     <h1>Oops! Something went wrong.</h1>
     <p>Error Code: <strong>{{status}}</strong></p>
