@@ -25,7 +25,7 @@ public class AuthController {
 
     @GetMapping("/signup")
     public String showRegisterForm(Model model) {
-        return "signup"; // Plantilla register.mustache
+        return "signup";
     }
 
     @PostMapping("/signup")
@@ -37,13 +37,13 @@ public class AuthController {
             HttpSession session,
             RedirectAttributes redirectAttributes) throws IOException {
 
-        // Validación de usuario existente
+        // Validates if the username already exists
         if (storage.findUserByUsername(username).isPresent()) {
             redirectAttributes.addFlashAttribute("error", "El nombre de usuario ya existe");
             return "redirect:/signup";
         }
 
-        // Generar nombre seguro para la imagen
+        // Check if the user uploaded a profile photo
         String photoPath = null;
         if (profile_photo != null && !profile_photo.isEmpty()) {
             try {
@@ -53,11 +53,10 @@ public class AuthController {
                 return "redirect:/signup";
             }
         } else {
-            // Asignar avatar por defecto
+            // Asign default profile photo
             photoPath = "/uploads/profiles/default-avatar.png";
         }
 
-        // Crear usuario con parámetros correctos
         User user = new User(username, email, user_password, photoPath);
 
         storage.addUser(user);
@@ -77,24 +76,23 @@ public class AuthController {
 
     @GetMapping("/login")
     public String showLoginForm() {
-        return "login"; // Plantilla login.mustache
+        return "login";
     }
-    // Asegúrate de importar HttpSession
 
     @PostMapping("/login")
     public String loginUser(
             @RequestParam String username,
             @RequestParam String user_password,
-            HttpSession session, // Inyectar HttpSession
+            HttpSession session, // Adding HttpSession as a parameter
             Model model) {
 
         Optional<User> user = storage.authenticate(username, user_password);
         if (user.isPresent()) {
-            // Guardar datos en la sesión
+            // Obtain the user's username and userId
             session.setAttribute("username", user.get().getUsername());
             session.setAttribute("userId", user.get().getUserId());
 
-            // Redirigir a /start para evitar reenvío del formulario (POST/REDIRECT/GET)
+            // Redirect tp start after successful login
             return "redirect:/start";
         } else {
             model.addAttribute("error", "Invalid username or password");
@@ -104,7 +102,7 @@ public class AuthController {
 
     @GetMapping("/logout")
     public String logout(HttpSession session) {
-        session.invalidate(); // Eliminar todos los datos de la sesión
+        session.invalidate(); // Deleting the user session with it's session data
         return "redirect:/login";
     }
 }

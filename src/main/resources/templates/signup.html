@@ -14,7 +14,7 @@
         <div class="col-md-12">
             <form action="/signup" method="post" enctype="multipart/form-data">
                 <h1>Sign Up</h1>
-
+                <!-- This will show de different fields to enter your information-->
                 <fieldset>
                     <legend><span class="number">1</span> Your Basic Info</legend>
 
@@ -36,10 +36,10 @@
                 <button type="submit">Sign Up</button>
             </form>
             {{#error}}
-            <p style="color: red; text-align: center; margin: 10px;">{{error}}</p>
+            <p style="color: red; text-align: center; margin: 10px;">{{error}}</p> <!-- Shows the error message -->
             {{/error}}
             {{#success}}
-            <p style="color: green; text-align: center; margin: 10px;">{{success}}</p>
+            <p style="color: green; text-align: center; margin: 10px;">{{success}}</p> <!-- Shows the success message -->
             {{/success}}
         </div>
     </div>

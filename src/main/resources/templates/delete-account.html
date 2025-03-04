@@ -5,16 +5,15 @@
     <title>Eliminar Cuenta - SwapSounds</title>
     <link rel="stylesheet" href="/css/delete-account.css">
 </head>
-<body>
+<body> 
     <nav class="navbar">
         <div class="navbar-container">
             <div class="logo">Sound Library</div>
             <ul class="nav-links">
-                {{^username}} <!-- Muestra esto si NO hay usuario logueado -->
+                {{^username}} <!-- Shows this if there is no user logged in -->
                 <li><a href="/login">Login</a></li>
                 {{/username}}
-                <li><a href="/contact">Contact</a></li>
-                {{#username}} <!-- Muestra esto si hay usuario logueado -->
+                {{#username}} <!-- If a user is logged in it shows this new options -->
                 <li><a href="/sounds/upload?username={{username}}">Upload Sound</a></li>
                 <li><a href="/sounds/download">Download Sound</a></li>
                 <li><a href="/logout">Logout</a></li>
@@ -23,7 +22,7 @@
         </div>
     </nav>
 
-    <div class="delete-container">
+    <div class="delete-container"> <!-- This is the new content for the delete-account page -->
         <h1 class="warning-header">⚠️ Eliminación de Cuenta Permanente</h1>
         
         <div class="warning-content">
@@ -37,7 +36,7 @@
             <p class="final-warning">Esta acción no se puede deshacer.</p>
         </div>
 
-        <form class="confirmation-form" action="/delete-account" method="post">
+        <form class="confirmation-form" action="/delete-account" method="post"> <!--if you write 'ELIMINAR CUENTA' you will delete the account-->
             <input type="text" 
                    class="confirmation-input"
                    name="confirmation" 
@@ -50,7 +49,7 @@
             </button>
         </form>
 
-        <a href="/start" class="back-link">↩ Volver al inicio</a>
+        <a href="/start" class="back-link">↩ Volver al inicio</a> <!-- This link will take you back to the start page after deleting the account -->
     </div>
 </body>
 </html>

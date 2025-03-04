@@ -22,7 +22,7 @@ public class InMemoryStorage {
     private int idCounter = 1;
 
     public InMemoryStorage() {
-        // Usuarios iniciales para pruebas
+        // Locally generated users for testing
         users.add(new User("user", "user@gmail.com", "user123", null, idCounter++, null));
         users.add(new User("admin", "admin@gmail.com", "admin123", null, idCounter++, null));
 
@@ -31,7 +31,7 @@ public class InMemoryStorage {
         sounds.add(new Sound(idCounter++, "CR7", "Soothing ocean waves", "/audio/CR7.mp3", "/images/CR7.jpg",
                 "Football", "0:06"));
         sounds.add(new Sound(idCounter++, "El diablo que malditos tenis", "Peaceful rain for sleep",
-                "/audio/el-diablo-que-malditos-tenis.mp3", "images/el-diablo-que-malditos-tenis.png", "Meme", "0:04"));
+                "/audio/el-diablo-que-malditos-tenis.mp3", "/images/el-diablo-que-malditos-tenis.png", "Meme", "0:04"));
 
     }
 
@@ -106,15 +106,14 @@ public class InMemoryStorage {
             }
         }
 
-        // Genera un nombre único para el archivo (ej: "user123_imagen.jpg")
+        // Generates an unique file name
         String fileName = username + "_" + file.getOriginalFilename();
         String filePath = uploadDir + fileName;
 
-        // Guarda el archivo físicamente
+        // Stores the file locally
         file.transferTo(new java.io.File(filePath));
 
-        // Retorna la ruta relativa para la web (ej:
-        // "/uploads/sounds/user123_imagen.jpg")
+        // Retourns the path to the file
         return "/uploads/" + directory + "/" + fileName;
     }
 
@@ -126,7 +125,6 @@ public class InMemoryStorage {
     }
 
     public void updateSound(Sound updatedSound) {
-        // Implementación específica de tu almacenamiento
         sounds.removeIf(s -> s.getId() == updatedSound.getId());
         sounds.add(updatedSound);
     }
@@ -138,19 +136,17 @@ public class InMemoryStorage {
                 .collect(Collectors.toList());
     }
 
-    // Añade estos métodos en la clase InMemoryStorage
-
     public void deleteUser(int userId) {
-        // Eliminar usuario
+        // Deletes the user from the list
         users.removeIf(u -> u.getUserId() == userId);
 
-        // Eliminar sus sonidos
+        // Deleting all the sounds of the user
         List<Sound> userSounds = sounds.stream()
                 .filter(s -> s.getUserId() == userId)
                 .collect(Collectors.toList());
 
         userSounds.forEach(sound -> {
-            // Eliminar archivos físicos
+            // Deletes the files stored locally
             try {
                 Path audioPath = Paths.get("uploads" + sound.getFilePath().replace("/uploads/", "/"));
                 Files.deleteIfExists(audioPath);
@@ -163,7 +159,7 @@ public class InMemoryStorage {
         });
         sounds.removeAll(userSounds);
 
-        // Eliminar imagen de perfil
+        // Profile Image deletion
         users.stream()
                 .filter(u -> u.getUserId() == userId)
                 .findFirst()

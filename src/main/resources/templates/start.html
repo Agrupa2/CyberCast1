@@ -7,13 +7,10 @@
     <title>Sound Library</title>
     <link rel="stylesheet" href="/css/start.css">
     <style>
-        /* Ocultar los controles nativos del reproductor de audio */
         .custom-audio {
             display: none;
-            /* Oculta el reproductor nativo */
         }
 
-        /* Estilos para los controles personalizados */
         .audio-controls {
             display: flex;
             align-items: center;
@@ -53,11 +50,10 @@
             <div class="navbar-container">
                 <div class="logo">Sound Library</div>
                 <ul class="nav-links">
-                    {{^username}} <!-- Muestra esto si NO hay usuario logueado -->
+                    {{^username}} <!-- Shows this if there is no user logged in -->
                     <li><a href="/login">Login</a></li>
                     {{/username}}
-                    <li><a href="/contact">Contact</a></li>
-                    {{#username}} <!-- Muestra esto si hay usuario logueado -->
+                    {{#username}} <!-- Shows this if there is a user logged in -->
                     <li><a href="/sounds/upload?username={{username}}">Upload Sound</a></li>
                     <li><a href="/sounds/download">Download Sound</a></li>
                     <li><a href="/delete-account">Delete Account</a></li>
@@ -70,22 +66,22 @@
         <!-- Search Bar -->
         <form action="/start" method="GET" class="search-container">
             <input type="text" name="query" class="search-bar" placeholder="Searching for sounds..."
-                value="{{#query}}{{query}}{{/query}}"> <!-- Mantener valor después de búsqueda -->
+                value="{{#query}}{{query}}{{/query}}"> <!-- Maintain the value after searching -->
 
-            <select name="category" class="fold-out" onchange="this.form.submit()"> <!-- Enviar al cambiar categoría -->
+            <select name="category" class="fold-out" onchange="this.form.submit()"> <!-- Send when changing category -->
                 <option value="all" {{#selectedAll}}selected{{/selectedAll}}>All Categories</option>
                 <option value="Meme" {{#selectedMeme}}selected{{/selectedMeme}}>Meme</option>
                 <option value="Football" {{#selectedFootball}}selected{{/selectedFootball}}>Football</option>
                 <option value="Party" {{#selectedParty}}selected{{/selectedParty}}>Party</option>
             </select>
 
-            <!-- Botón oculto para enviar con Enter -->
+            <!-- Hiden Button to submit with Enter -->
             <button type="submit" hidden></button>
         </form>
 
         <!-- Sound Grid -->
         <div class="sound-grid" id="soundsContainer">
-            {{#sounds}} <!-- Iterar sobre la lista de sonidos -->
+            {{#sounds}} <!-- Shows the different characteristics of the sounds -->
             <div class="sound-card">
                 <div class="card-head">
                     <img src="{{imagePath}}" alt="{{title}}" class="card-img">
@@ -102,12 +98,12 @@
                         <span class="duration">{{duration}} min</span>
                     </div>
                     <div class="audio-container">
-                        <!-- Reproductor de audio oculto -->
+                        <!-- Hiden audio media player -->
                         <audio class="custom-audio">
                             <source src="{{filePath}}" type="audio/mpeg">
                             Tu navegador no soporta el elemento de audio.
                         </audio>
-                        <!-- Controles personalizados -->
+                        <!-- Custom controls -->
                         <div class="audio-controls">
                             <button class="play-pause-btn">▶️</button>
                             <div class="progress-bar">
@@ -118,7 +114,7 @@
                 </div>
             </div>
             {{/sounds}}
-            {{^sounds}} <!-- Si no hay sonidos -->
+            {{^sounds}} <!-- If there is no sounds -->
             <p>No se encontraron sonidos.</p>
             {{/sounds}}
         </div>
@@ -180,14 +176,14 @@
     </div>
 
     <script>
-        // Script para manejar los controles personalizados
+        // Script to handle custom controls
         document.querySelectorAll('.sound-card').forEach(card => {
             const audio = card.querySelector('audio');
             const playPauseBtn = card.querySelector('.play-pause-btn');
             const progressBar = card.querySelector('.progress-bar');
             const progress = card.querySelector('.progress');
 
-            // Reproducir o pausar el audio
+            // Play or pause audio
             playPauseBtn.addEventListener('click', () => {
                 if (audio.paused) {
                     audio.play();
@@ -198,13 +194,13 @@
                 }
             });
 
-            // Actualizar la barra de progreso
+            // Update progress bar
             audio.addEventListener('timeupdate', () => {
                 const percent = (audio.currentTime / audio.duration) * 100;
                 progress.style.width = percent + '%';
             });
 
-            // Saltar a una parte específica del audio
+            // Jump to a specific part of the audio
             progressBar.addEventListener('click', (e) => {
                 const rect = progressBar.getBoundingClientRect();
                 const clickX = e.clientX - rect.left;
@@ -213,7 +209,7 @@
             });
         });
 
-        // Deshabilitar el menú contextual en los elementos de audio
+        // Disable context menu on audio elements
         document.addEventListener('contextmenu', function (e) {
             if (e.target.tagName === 'AUDIO') {
                 e.preventDefault();

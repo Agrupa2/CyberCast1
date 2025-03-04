@@ -48,10 +48,10 @@ public class SoundController {
             model.addAttribute("userId", userId);
         }
 
-        // Obtener todos los sonidos
+        // Obtaining everyt single sound locally stored
         List<Sound> allSounds = storage.getAllSounds();
 
-        // Filtrar resultados (sintaxis corregida)
+        // Applying filters for the search bar
         List<Sound> filteredSounds = allSounds.stream()
                 .filter(sound -> {
                     boolean matchesCategory = category.equals("all")
@@ -64,12 +64,12 @@ public class SoundController {
                 })
                 .collect(Collectors.toList());
 
-        // Preparar modelo para mantener estado del formulario
+        // Preparomg the model with the user selection
         model.addAttribute("sounds", filteredSounds);
         model.addAttribute("query", query);
         model.addAttribute("category", category);
 
-        // Marcar categoría seleccionada (versión corregida)
+        // Applying the selected category
         model.addAttribute("selectedAll", category.equals("all"));
         model.addAttribute("selectedMeme", category.equalsIgnoreCase("Meme"));
         model.addAttribute("selectedFootball", category.equalsIgnoreCase("Football"));
@@ -107,28 +107,28 @@ public class SoundController {
             @RequestParam String duration,
             @RequestParam MultipartFile audioFile,
             @RequestParam MultipartFile imageFile,
-            HttpSession session, // Usar la sesión para obtener el userId
+            HttpSession session, // Using HttpSession in order to get UserId
             Model model) throws IOException {
 
         Integer userId = (Integer) session.getAttribute("userId");
         if (userId == null) {
             model.addAttribute("error", "You must be logged in to upload sounds.");
-            return "redirect:/login"; // Redirigir al login si no hay sesión
+            return "redirect:/login"; // If the user is not logged in, redirect to the login page
         }
 
         Optional<User> user = storage.findUserById(userId);
         if (!user.isPresent()) {
             model.addAttribute("error", "User not found. Please login again.");
-            session.invalidate(); // Eliminar la sesión corrupta
+            session.invalidate(); // Deleting invalid session
             return "redirect:/login";
         }
 
-        // Guarda los archivos usando el nombre de usuario
+        // Storing files using username
         String username = user.get().getUsername();
         String audioPath = storage.saveFile(username, audioFile, "sounds");
         String imagePath = storage.saveFile(username, imageFile, "images");
 
-        // Crea y guarda el sonido
+        // Creating and stroring the sound
         Sound sound = new Sound(0, title, description, audioPath, imagePath, userId, category, duration);
         storage.addSound(sound);
 
@@ -145,21 +145,21 @@ public class SoundController {
             HttpSession session,
             Model model) {
 
-        // Obtener el nombre de usuario y el ID del usuario desde la sesión
+        // Obtainint username and userId from session
         String username = (String) session.getAttribute("username");
         Integer userId = (Integer) session.getAttribute("userId");
 
-        // Si el usuario está logueado, agregar sus datos al modelo
+        // If the user is logged, it adds ths info to the model
         if (username != null && userId != null) {
             model.addAttribute("message", "Welcome, " + username + "!");
             model.addAttribute("username", username);
             model.addAttribute("userId", userId);
         }
 
-        // Obtener todos los sonidos
+        // Obtaining every sound
         List<Sound> allSounds = storage.getAllSounds();
 
-        // Filtrar los sonidos según la consulta y la categoría
+        // Filtering sounds by the user search or category selected
         List<Sound> filteredSounds = allSounds.stream()
                 .filter(sound -> {
                     boolean matchesCategory = category.equals("all")
@@ -172,21 +172,20 @@ public class SoundController {
                 })
                 .collect(Collectors.toList());
 
-        // Agregar los sonidos filtrados al modelo
+        // Adding the filtered sounds to the model
         model.addAttribute("sounds", filteredSounds);
 
-        // Mantener el estado del formulario de búsqueda
+        // Keeping the search and category selected by the user
         model.addAttribute("query", query);
         model.addAttribute("category", category);
 
-        // Marcar la categoría seleccionada
+        // Keeping the selected category
         model.addAttribute("selectedAll", category.equals("all"));
         model.addAttribute("selectedMeme", category.equalsIgnoreCase("Meme"));
         model.addAttribute("selectedFootball", category.equalsIgnoreCase("Football"));
         model.addAttribute("selectedParty", category.equalsIgnoreCase("Party"));
 
-        // Retornar la plantilla de la página de descargas
-        return "download-sound"; // Nombre de la plantilla (download-sound.html o download-sound.mustache)
+        return "download-sound";
     }
 
     @GetMapping("/sounds/{soundId}")
@@ -195,7 +194,7 @@ public class SoundController {
             HttpSession session,
             Model model) {
 
-        // Verificar sesión si es requerido
+        // Obtaining userId and username from the session
         Integer userId = (Integer) session.getAttribute("userId");
         String username = (String) session.getAttribute("username");
 
@@ -207,13 +206,13 @@ public class SoundController {
         Sound sound = soundOpt.get();
         Optional<User> uploader = storage.findUserById(sound.getUserId());
 
-        String userInitial = "?"; // Valor por defecto
-        String profileImagePath = null; // Inicializamos en null
+        String userInitial = "?"; // default value
+        String profileImagePath = null; // default profileImagePath set to null
 
         if (uploader.isPresent()) {
             User user = uploader.get();
 
-            // Asignamos profileImagePath desde el usuario
+            // Assigning to profileImagePath the profile picture of the user
             profileImagePath = user.getProfilePicturePath();
 
             if (profileImagePath == null) {
@@ -229,7 +228,7 @@ public class SoundController {
 
         List<Comment> comments = commentRepository.getCommentsBySoundId(soundId);
 
-        // Determinar si el usuario actual es dueño de cada comentario
+        // Checking if the user is the owner of the sound
         Integer currentUserId = (Integer) session.getAttribute("userId");
         List<CommentView> commentViews = comments.stream()
                 .map(comment -> {
@@ -240,9 +239,6 @@ public class SoundController {
                 .collect(Collectors.toList());
 
         model.addAttribute("comments", commentViews);
-
-        // Pasar los valores al modelo
-
         model.addAttribute("userInitial", userInitial);
         model.addAttribute("profileImagePath", profileImagePath); // Añadir profileImagePath al modelo
         model.addAttribute("sound", sound);
@@ -274,18 +270,18 @@ public class SoundController {
         Sound sound = originalSound.get();
         String username = (String) session.getAttribute("username");
 
-        // Actualizar campos básicos
+        // Updating the sound with the new values
         sound.setTitle(title);
         sound.setDescription(description);
         sound.setCategory(category);
 
-        // Manejar archivo de audio
+        // Dealing with new audio file uploaded in the edition form
         if (!audioFile.isEmpty()) {
             String newAudioPath = storage.saveFile(username, audioFile, "sounds");
             sound.setFilePath(newAudioPath);
         }
 
-        // Manejar archivo de imagen
+        // Dealing with new image file uploaded in the edition form
         if (!imageFile.isEmpty()) {
             String newImagePath = storage.saveFile(username, imageFile, "images");
             sound.setImagePath(newImagePath);

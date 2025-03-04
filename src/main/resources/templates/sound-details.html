@@ -14,18 +14,20 @@
                 <a href="/start">Sound Library</a>
             </div>
             <ul class="nav-links">
-                {{^username}} <!-- Muestra esto si NO hay usuario logueado -->
+                {{^username}} <!-- This will appear if there isn´t a user logged in -->
                 <li><a href="/login">Login</a></li>
                 {{/username}}
                 <li><a href="/contact">Contact</a></li>
                 {{#username}}
-                <li><a href="/delete-sound">Delete Sound</a></li>
+                <li><a href="/dashboard">Acceder al Dashboard</a></li>
                 <li><a href="/sounds/upload?username={{username}}">Upload Sound</a></li>
                 <li><a href="/logout">Logout</a></li>
                 {{/username}}
             </ul>
         </div>
     </nav>
+
+    <!-- this shows the sound details -->
 
     <div class="sound-container">
         <div class="sound-header">
@@ -67,6 +69,7 @@
             <h3>Descripción</h3>
             <p>{{sound.description}}</p>
         </div>
+        <!-- This will allow the owner of the sound to edit it-->
         {{#isOwner}}
         <div class="sound-actions">
             <details>
@@ -107,9 +110,57 @@
             </details>
         </div>
     </div>
-    {{/isOwner}}
 
-        <a href="/start">Volver a todos los sonidos</a>
+    <!-- SECCIÓN DE COMENTARIOS -->
+    <div class="comments-section">
+        <h2>Comentarios</h2>
+
+        <!-- Formulario para comentar (solo usuarios logueados) -->
+        {{#username}}
+        <form class="comment-form" action="/sounds/{{soundId}}/comments" method="POST">
+            <textarea name="content" placeholder="Escribe un comentario..." required></textarea>
+            <button type="submit">Publicar comentario</button>
+        </form>
+        {{/username}}
+
+        <!-- Lista de comentarios -->
+        <div class="comments-list">
+            {{#comments}}
+            <div class="comment">
+                <div class="comment-author">
+                    <img src="{{user.profilePicturePath}}" alt="{{user.username}}" class="comment-avatar">
+                    <span>{{user.username}}</span>
+                </div>
+                <p class="comment-content">{{content}}</p>
+                <small class="comment-date">{{created}}</small>
+
+                <!-- Botones de editar/eliminar (solo dueño del comentario) -->
+                {{#isCommentOwner}}
+                <div class="comment-actions">
+                    <details class="dropdown">
+                        <summary class="dropdown-toggle">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 18a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm-7 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm14 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4z" />
+                            </svg>
+                        </summary>
+                        <div class="dropdown-content">
+                            <form action="/sounds/{{soundId}}/comments/{{id}}/edit" method="POST">
+                                <input type="hidden" name="_method" value="PUT">
+                                <textarea name="content">{{content}}</textarea>
+                                <button type="submit">Guardar</button>
+                            </form>
+                            <form action="/sounds/{{soundId}}/comments/{{id}}/delete" method="POST">
+                                <input type="hidden" name="_method" value="DELETE">
+                                <button type="submit" class="danger">Eliminar</button>
+                            </form>
+                        </div>
+                    </details>
+                </div>
+                {{/isCommentOwner}}
+            </div>
+            {{/comments}}
+        </div>
     </div>
 
 </body>

@@ -8,7 +8,7 @@
     <title>Upload Sound</title>
 </head>
 
-<body>
+<body> <!-- This shows the different field to fill to upload a sound -->
     <h1>Upload a New Sound</h1>
     <form action="/sounds/upload" method="post" enctype="multipart/form-data">
         <div>
@@ -44,10 +44,10 @@
         </div>
         <button type="submit">Upload Sound</button>
         {{#error}}
-        <p style="color: red;">{{error}}</p>
+        <p style="color: red;">{{error}}</p> <!-- Shows the error message -->
         {{/error}}
         {{#success}}
-        <p style="color: green;">{{success}}</p>
+        <p style="color: green;">{{success}}</p> <!-- Shows the success message -->
         {{/success}}
     </form>
     <a href="/start">Back to Sounds</a>
