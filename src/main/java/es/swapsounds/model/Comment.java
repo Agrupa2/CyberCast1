@@ -9,6 +9,9 @@ public class Comment {
     private Sound sound; // sound to which the comment is related
     private LocalDateTime created; // comment upload date
     private LocalDateTime modified; // comment modification date
+    private int soundId;
+    private String soundTitle;
+
 
     public Comment(String id, String content, User user) {
         this.id = id;
@@ -16,6 +19,9 @@ public class Comment {
         this.user = user;
         this.created = LocalDateTime.now();
         this.modified = null;
+    }
+
+    public Comment() {
     }
 
     // Getters
@@ -65,5 +71,21 @@ public class Comment {
 
     public int getAuthorId() {
         return this.user.getUserId();
+    }
+
+    public int getSoundId() {
+        return soundId;
+    }
+
+    public void setSoundId(int soundId) {
+        this.soundId = soundId;
+    }
+
+    public String getSoundTitle() {
+        return soundTitle;
+    }
+
+    public void setSoundTitle(String soundTitle) {
+        this.soundTitle = soundTitle;
     }
 }
