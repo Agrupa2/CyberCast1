@@ -332,6 +332,56 @@ public class SoundController {
 
         return "redirect:/dashboard"; // Redirigir al dashboard después de eliminar
     }
+
+    @GetMapping("/sounds/delete")
+    public String showDeleteSounds(
+            @RequestParam(name = "query", required = false) String query,
+            @RequestParam(name = "category", defaultValue = "all") String category,
+            HttpSession session,
+            Model model) {
+
+        // Obtainint username and userId from session
+        String username = (String) session.getAttribute("username");
+        Integer userId = (Integer) session.getAttribute("userId");
+
+        // If the user is logged, it adds ths info to the model
+        if (username != null && userId != null) {
+            model.addAttribute("message", "Welcome, " + username + "!");
+            model.addAttribute("username", username);
+            model.addAttribute("userId", userId);
+        }
+
+        // Obtaining every sound
+        List<Sound> allSounds = storage.getAllSounds();
+
+        // Filtering sounds by the user search or category selected
+        List<Sound> filteredSounds = allSounds.stream()
+                .filter(sound -> {
+                    boolean matchesCategory = category.equals("all")
+                            || sound.getCategory().equalsIgnoreCase(category);
+
+                    boolean matchesQuery = query == null
+                            || sound.getTitle().toLowerCase().contains(query.toLowerCase());
+
+                    return matchesCategory && matchesQuery;
+                })
+                .collect(Collectors.toList());
+
+        // Adding the filtered sounds to the model
+        model.addAttribute("sounds", filteredSounds);
+
+        // Keeping the search and category selected by the user
+        model.addAttribute("query", query);
+        model.addAttribute("category", category);
+
+        // Keeping the selected category
+        model.addAttribute("selectedAll", category.equals("all"));
+        model.addAttribute("selectedMeme", category.equalsIgnoreCase("Meme"));
+        model.addAttribute("selectedFootball", category.equalsIgnoreCase("Football"));
+        model.addAttribute("selectedParty", category.equalsIgnoreCase("Party"));
+
+        return "delete-sound";
+    }
 }
 
 
