@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="/css/start.css">
     <style>
         .custom-audio {
-            display: none; /* Oculta el reproductor de audio predeterminado */
+            display: none; /*Hidding the button*/
         }
 
         .audio-controls {
@@ -64,10 +64,10 @@
             <div class="navbar-container">
                 <div class="logo">Sound Library</div>
                 <ul class="nav-links">
-                    {{^username}} <!-- Muestra esto si no hay un usuario logueado -->
+                    {{^username}} <!-- Shows if the user is logged or not -->
                     <li><a href="/login">Login</a></li>
                     {{/username}}
-                    {{#username}} <!-- Si hay un usuario logueado, muestra estas opciones -->
+                    {{#username}} <!-- If there is no logged user, the shows the options -->
                     <li><a href="/sounds/upload?username={{username}}">Upload Sound</a></li>
                     <li><a href="/logout">Logout</a></li>
                     {{/username}}
@@ -75,25 +75,25 @@
             </div>
         </nav>
 
-        <!-- Barra de búsqueda -->
+        <!-- Search Bar -->
         <form action="/delete-sound" method="GET" class="search-container">
             <input type="text" name="query" class="search-bar" placeholder="Buscar sonidos para borrar..."
-                value="{{#query}}{{query}}{{/query}}"> <!-- Mantiene el valor después de la búsqueda -->
+                value="{{#query}}{{query}}{{/query}}"> <!-- Keeps the value of the search -->
 
-            <select name="category" class="fold-out" onchange="this.form.submit()"> <!-- Envía el formulario al cambiar la categoría -->
+            <select name="category" class="fold-out" onchange="this.form.submit()"> <!-- Sends the formulary to the search -->
                 <option value="all" {{#selectedAll}}selected{{/selectedAll}}>Todas las categorías</option>
                 <option value="Meme" {{#selectedMeme}}selected{{/selectedMeme}}>Meme</option>
                 <option value="Football" {{#selectedFootball}}selected{{/selectedFootball}}>Fútbol</option>
                 <option value="Party" {{#selectedParty}}selected{{/selectedParty}}>Fiesta</option>
             </select>
 
-            <!-- Botón oculto para enviar el formulario con Enter -->
+            <!-- Hidden button to send the request -->
             <button type="submit" hidden></button>
         </form>
 
-        <!-- Grid de sonidos -->
+        <!-- Shows all the sounds -->
         <div class="sound-grid" id="soundsContainer">
-            {{#sounds}} <!-- Muestra las características de los sonidos -->
+            {{#sounds}} <!-- Shows the atributes of the sounds -->
             <div class="sound-card">
                 <div class="card-head">
                     <img src="{{imagePath}}" alt="{{title}}" class="card-img">
@@ -109,7 +109,7 @@
                         <span class="category">{{category}}</span>
                         <span class="duration">{{duration}} min</span>
                     </div>
-                    <!-- Controles personalizados de audio -->
+                    <!-- Personal control of the sound repro -->
                     <div class="audio-container">
                         <audio class="custom-audio" id="audio-{{id}}">
                             <source src="{{filePath}}" type="audio/mpeg">
@@ -121,13 +121,13 @@
                                 <div class="progress"></div>
                             </div>
                         </div>
-                        <!-- Botón para borrar el sonido -->
+                        <!-- Delete button -->
                         <button onclick="deleteSound('{{id}}')" class="delete-button">Borrar Sonido</button>
                     </div>
                 </div>
             </div>
             {{/sounds}}
-            {{^sounds}} <!-- Si no hay sonidos, muestra este mensaje -->
+            {{^sounds}} <!-- If there is no sounds, shows the message  -->
             <p>No se encontraron sonidos.</p>
             {{/sounds}}
         </div>
@@ -144,14 +144,14 @@
     </div>
 
     <script>
-        // Script para manejar los controles personalizados de audio
+        // Script for the controller of the sound reproduction
         document.querySelectorAll('.sound-card').forEach(card => {
             const audio = card.querySelector('audio');
             const playPauseBtn = card.querySelector('.play-pause-btn');
             const progressBar = card.querySelector('.progress-bar');
             const progress = card.querySelector('.progress');
 
-            // Reproducir o pausar el audio
+            // Repro or pause the audio
             playPauseBtn.addEventListener('click', () => {
                 if (audio.paused) {
                     audio.play();
@@ -162,13 +162,13 @@
                 }
             });
 
-            // Actualizar la barra de progreso
+            // Update the progress bar
             audio.addEventListener('timeupdate', () => {
                 const percent = (audio.currentTime / audio.duration) * 100;
                 progress.style.width = percent + '%';
             });
 
-            // Saltar a una parte específica del audio
+            // Update the audio time when clicking on the progress bar
             progressBar.addEventListener('click', (e) => {
                 const rect = progressBar.getBoundingClientRect();
                 const clickX = e.clientX - rect.left;
@@ -177,7 +177,7 @@
             });
         });
 
-        // Función para borrar el sonido
+        // Function to delete a sound
         function deleteSound(soundId) {
             if (confirm('¿Estás seguro de que quieres borrar este sonido?')) {
                 fetch(`/sounds/${soundId}`, {
@@ -186,7 +186,7 @@
                 .then(response => response.json())
                 .then(data => {
                     alert(data.message);
-                    location.reload(); // Recargar la página para reflejar los cambios
+                    location.reload(); // Reload the page to update the sounds
                 })
                 .catch(error => console.error('Error:', error));
             }

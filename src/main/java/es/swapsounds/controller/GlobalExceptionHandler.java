@@ -12,7 +12,7 @@ public class GlobalExceptionHandler {
     public ModelAndView handleException(Exception ex, Model model) {
         ModelAndView mav = new ModelAndView("error");
         mav.addObject("status", 404);
-        mav.addObject("error", "Internal Server Error");
+        mav.addObject("error", "Not Found");
         mav.addObject("message", ex.getMessage());
         return mav;
     }
