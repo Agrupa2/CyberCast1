@@ -10,22 +10,30 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 @Repository
 public class CommentRepository {
     // Map: soundId -> Comment List
     private final Map<Integer, List<Comment>> commentsBySoundId = new ConcurrentHashMap<>();
 
-    public Comment addComment(int soundId, String content, User user) {
+    public Comment addComment(int soundId, String soundTitle, String content, User user) {
         Comment comment = new Comment(
-                UUID.randomUUID().toString(),
-                content,
-                user);
-
+            UUID.randomUUID().toString(), // ID único
+            content, // Contenido del comentario
+            user // Usuario que comenta
+        );
+    
+        // Añadir información del sonido al comentario
+        comment.setSoundId(soundId);
+        comment.setSoundTitle(soundTitle);
+        comment.setCreated(LocalDateTime.now()); // Fecha de creación
+    
+        // Almacenar el comentario
         commentsBySoundId
-                .computeIfAbsent(soundId, k -> new CopyOnWriteArrayList<>())
-                .add(comment);
-
+            .computeIfAbsent(soundId, k -> new CopyOnWriteArrayList<>())
+            .add(comment);
+    
         return comment;
     }
 
@@ -63,4 +71,11 @@ public class CommentRepository {
             .filter(comment -> comment.getId().equals(commentId)) // Filtra por ID
             .findFirst(); // Devuelve el primer comentario que coincida
     }
+
+    public List<Comment> getCommentsByUserId(int userId) {
+    return commentsBySoundId.values().stream()
+        .flatMap(List::stream)
+        .filter(comment -> comment.getAuthorId() == userId)
+        .collect(Collectors.toList());
+}
 }

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import es.swapsounds.model.Comment;
-
+import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
 import es.swapsounds.storage.CommentRepository;
 import es.swapsounds.storage.InMemoryStorage;
@@ -30,23 +30,29 @@ public class CommentApiController {
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
-        // Logged user validation
+        // Obtener el usuario actual
         Integer userId = (Integer) session.getAttribute("userId");
-        if (userId == null) {
+        if (userId == null)
             return "redirect:/login";
-        }
 
-        // Obtaining the user form InMemoryStorage
         User currentUser = storage.findUserById(userId)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        // Creating comment
+        // Obtener el sonido
+        Sound sound = storage.getSoundById(soundId);
+        if (sound == null) {
+            redirectAttributes.addFlashAttribute("error", "Sonido no encontrado");
+            return "redirect:/start";
+        }
+
+        // Crear y guardar el comentario
         Comment comment = commentRepository.addComment(
                 soundId,
+                sound.getTitle(), // Pasar el título del sonido
                 content,
                 currentUser);
 
-        redirectAttributes.addFlashAttribute("message", "Comentario publicado!");
+        redirectAttributes.addFlashAttribute("success", "Comentario publicado");
         return "redirect:/sounds/" + soundId;
     }
 

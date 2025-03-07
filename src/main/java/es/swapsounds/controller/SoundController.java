@@ -79,7 +79,9 @@ public class SoundController {
     }
 
     @GetMapping("/sounds/upload")
-    public String showUploadForm(@RequestParam(required = false) String username, Model model) {
+    public String showUploadForm(HttpSession session, Model model) {
+
+        String username = (String) session.getAttribute("username");
         System.out.println("Accediendo a /sounds/upload con username: " + username);
         if (username == null) {
             model.addAttribute("error", "You must be logged in to upload sounds.");
@@ -98,6 +100,7 @@ public class SoundController {
             return "login";
         }
     }
+
 
     @PostMapping("/sounds/upload")
     public String uploadSound(

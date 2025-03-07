@@ -201,5 +201,19 @@ public class InMemoryStorage {
             sounds.remove(sound);
         }
     }
+
+    public void updateUsername(int userId, String newUsername) {
+        users.stream()
+                .filter(u -> u.getUserId() == userId)
+                .findFirst()
+                .ifPresent(u -> u.setUsername(newUsername));
+    }
+
+    public void updateProfilePicture(int userId, String imagePath) {
+        users.stream()
+                .filter(u -> u.getUserId() == userId)
+                .findFirst()
+                .ifPresent(u -> u.setProfilePicturePath(imagePath));
+    }
     
 }
