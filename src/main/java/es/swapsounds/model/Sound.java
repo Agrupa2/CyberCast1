@@ -12,61 +12,58 @@ public class Sound {
     private String imagePath;
     private int userId;
     private List<Comment> comments;
-    private String category;
+    private List<Category> categories;
     private String duration;
     private LocalDateTime uploadDate;
 
-    public Sound(String title, String description, String filePath, String imagePath, int userId, String Category,
-            String duration) {
+    public Sound(String title, String description, String filePath, String imagePath, int userId, String duration) {
         this.title = title;
         this.description = description;
         this.filePath = filePath;
         this.imagePath = imagePath;
         this.userId = userId;
         this.comments = new ArrayList<>();
-        this.category = Category;
         this.duration = duration;
         this.uploadDate = LocalDateTime.now();
+        this.categories = new ArrayList<>();
     }
 
-    public Sound(int id, String title, String description, String filePath, String imagePath, String category,
-            int userId) {
+    public Sound(int id, String title, String description, String filePath, String imagePath, int userId) {
         this.title = title;
         this.id = id;
         this.description = description;
         this.filePath = filePath;
         this.imagePath = imagePath;
-        this.category = category;
         this.userId = userId;
         this.uploadDate = LocalDateTime.now();
+        this.categories = new ArrayList<>();
     }
 
-    public Sound(int id, String title, String description, String filePath, String imagePath, String category,
-            String duration) {
+    public Sound(int id, String title, String description, String filePath, String imagePath, String duration) {
         this.title = title;
         this.id = id;
         this.description = description;
         this.filePath = filePath;
         this.imagePath = imagePath;
-        this.category = category;
         this.duration = duration;
         this.uploadDate = LocalDateTime.now();
+        this.categories = new ArrayList<>();
     }
 
     public Sound() {
+
     }
 
-    public Sound(int i, String title2, String description2, String audioPath, String imagePath2, Integer userId2,
-            String category2, String duration2) {
+    public Sound(int i, String title2, String description2, String audioPath, String imagePath2, Integer userId2, String duration2) {
         this.id = i;
         this.title = title2;
         this.description = description2;
         this.filePath = audioPath;
         this.imagePath = imagePath2;
         this.userId = userId2;
-        this.category = category2;
         this.duration = duration2;
         this.uploadDate = LocalDateTime.now();
+        this.categories = new ArrayList<>();
     }
 
     public String getTitle() {
@@ -95,10 +92,6 @@ public class Sound {
 
     public int getId() {
         return id;
-    }
-
-    public String getCategory() {
-        return category;
     }
 
     public String getDuration() {
@@ -133,10 +126,6 @@ public class Sound {
         this.comments = comments;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
     public void setDuration(String duration) {
         this.duration = duration;
     }
@@ -147,5 +136,18 @@ public class Sound {
 
     public void setUploadDate(LocalDateTime uploadDate) {
         this.uploadDate = uploadDate;
+    }
+
+    public List<Category> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(List<Category> categories) {
+        this.categories = categories;
+    }
+
+    public void addToCategory(Category category) {
+        this.categories.add(category); //This will add the category to the sound
+        category.addSound(this); //This will add the sound to the category
     }
 }
