@@ -152,7 +152,7 @@ public class InMemoryStorage {
 
     public List<Sound> getSoundsByUserId(int userId) {
         return sounds.stream()
-                .filter(sound -> sound.getUserId() == userId)
+                .filter(sound -> sound.getUser() == userId)
                 .sorted(Comparator.comparing(Sound::getUploadDate).reversed())
                 .collect(Collectors.toList());
     }
@@ -163,7 +163,7 @@ public class InMemoryStorage {
 
         // Deleting all the sounds of the user
         List<Sound> userSounds = sounds.stream()
-                .filter(s -> s.getUserId() == userId)
+                .filter(s -> s.getUser() == userId)
                 .collect(Collectors.toList());
 
         userSounds.forEach(sound -> {

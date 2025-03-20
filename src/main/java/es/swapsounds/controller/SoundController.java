@@ -207,7 +207,7 @@ public class SoundController {
         }
 
         Sound sound = soundOpt.get();
-        Optional<User> uploader = storage.findUserById(sound.getUserId());
+        Optional<User> uploader = storage.findUserById(sound.getUser());
 
         String userInitial = "?"; // default value
         String profileImagePath = null; // default profileImagePath set to null
@@ -246,7 +246,7 @@ public class SoundController {
         model.addAttribute("profileImagePath", profileImagePath); // Añadir profileImagePath al modelo
         model.addAttribute("sound", sound);
         model.addAttribute("username", username); // Pasar username al template
-        model.addAttribute("isOwner", userId != null && userId == soundOpt.get().getUserId());
+        model.addAttribute("isOwner", userId != null && userId == soundOpt.get().getUser());
 
         return "sound-details";
     }
@@ -265,7 +265,7 @@ public class SoundController {
         Integer userId = (Integer) session.getAttribute("userId");
         Optional<Sound> originalSound = storage.findSoundById(soundId);
 
-        if (userId == null || !originalSound.isPresent() || originalSound.get().getUserId() != userId) {
+        if (userId == null || !originalSound.isPresent() || originalSound.get().getUser() != userId) {
             model.addAttribute("error", "No tienes permisos para editar este sonido");
             return "redirect:/sounds/" + soundId;
         }
@@ -321,7 +321,7 @@ public class SoundController {
         Sound sound = soundOptional.get();
 
         // Verificar permisos: el usuario debe ser el propietario o un administrador
-        boolean isOwner = sound.getUserId() == userId;
+        boolean isOwner = sound.getUser() == userId;
         boolean isAdmin = "admin".equals(session.getAttribute("role"));
 
         if (!isOwner && !isAdmin) {
