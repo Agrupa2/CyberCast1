@@ -1,5 +1,6 @@
 package es.swapsounds.controller;
 
+import es.swapsounds.repository.UserRepository;
 import es.swapsounds.storage.CommentRepository;
 import es.swapsounds.storage.InMemoryStorage;
 import jakarta.servlet.http.HttpSession;
