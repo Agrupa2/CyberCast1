@@ -13,6 +13,7 @@ public class User {
     private int userId;
     private String role;
 
+    //Controlador + completo (con comments, sounds, userId y role)
     public User(String username, String email, String password, String profilePicturePath, int userId, String role) {
         this.username = username;
         this.email = email;
@@ -24,6 +25,7 @@ public class User {
         this.role = role;
     }
 
+    //Controlador + sencillo
     public User(String username2, String email2, String user_password, String photoPath) {
         this.username = username2;
         this.email = email2;
@@ -79,6 +81,10 @@ public class User {
         return sounds;
     }
 
+    public void setSound(Sound sound) {
+        this.sounds.add(sound);
+    }
+
     public int getUserId() {
         return userId;
     }
@@ -87,7 +93,4 @@ public class User {
         this.userId = userId;
     }
 
-    public void setSound(Sound sound) {
-        this.sounds.add(sound);
-    }
 }
