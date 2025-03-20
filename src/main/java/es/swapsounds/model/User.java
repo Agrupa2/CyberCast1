@@ -1,14 +1,11 @@
 package es.swapsounds.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
+@Entity(name = "User_Table")
 public class User {
 
     @Id
@@ -19,9 +16,13 @@ public class User {
     private String email;
     private String password;
     private String profilePicturePath;
-    private List<Comment> comments;
-    private List<Sound> sounds;
     private String role;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Comment> comments;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL) //Como le he llamado a la línea 22 de Sound (objeto usuario)
+    private List<Sound> sounds;
+
 
     protected User() {
         // Used by JPA
