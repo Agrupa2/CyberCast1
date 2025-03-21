@@ -22,7 +22,6 @@ public class Comment {
     private String soundTitle;
 
     public void setUser(User user) {
-
         this.user = user;
     }
 
