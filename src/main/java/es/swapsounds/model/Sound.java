@@ -11,11 +11,10 @@ public class Sound {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     private String title;
     private String description;
-    private final ArrayList<Object> categories;
 
     @Lob
     @Column(columnDefinition = "LONGBLOB")
@@ -26,10 +25,20 @@ public class Sound {
     private byte[] imageFile;
 
     @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
+
     @OneToMany
     private List<Comment> comments;
-    //private List<Category> categories;
+
+    @ManyToMany
+    @JoinTable(
+        name = "sound_category",
+        joinColumns = @JoinColumn(name = "sound_id"),
+        inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private List<Category> categories;
+
     private String duration;
     private LocalDateTime uploadDate;
 
@@ -49,7 +58,7 @@ public class Sound {
         this.categories = new ArrayList<>();
     }
 
-    public Sound(int id, String title, String description, byte[] imageFile, byte[] audioFile, User user) {
+    public Sound(long id, String title, String description, byte[] imageFile, byte[] audioFile, User user) {
         this.title = title;
         this.id = id;
         this.description = description;
@@ -60,7 +69,7 @@ public class Sound {
         this.categories = new ArrayList<>();
     }
 
-    public Sound(int id, String title, String description,byte[] imageFile, byte[] audioFile, String duration) {
+    public Sound(long id, String title, String description,byte[] imageFile, byte[] audioFile, String duration) {
         this.title = title;
         this.id = id;
         this.description = description;
@@ -70,8 +79,8 @@ public class Sound {
         this.uploadDate = LocalDateTime.now();
         this.categories = new ArrayList<>();
     }
-
-    public Sound(int i, String title2, String description2, byte[] imageFile, byte[] audioFile, User user, String duration2) {
+    
+    public Sound(long i, String title2, String description2, byte[] imageFile, byte[] audioFile, User user, String duration2) {
         this.id = i;
         this.title = title2;
         this.description = description2;
@@ -83,7 +92,7 @@ public class Sound {
         this.categories = new ArrayList<>();
     }
 
-    public Sound(int i, String title, String description, byte[] imageFile, byte[] audioFile, User user, Category category, String duration) {
+    public Sound(long i, String title, String description, byte[] imageFile, byte[] audioFile, User user, Category category, String duration) {
         this.id = i;
         this.title = title;
         this.description = description;
@@ -120,14 +129,6 @@ public class Sound {
         return description;
     }
 
-    public String getFilePath() {
-        return filePath;
-    }
-
-    public String getImagePath() {
-        return imagePath;
-    }
-
     public User getUser() {
         return user;
     }
@@ -136,7 +137,7 @@ public class Sound {
         return comments;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
@@ -144,7 +145,7 @@ public class Sound {
         return duration;
     }
 
-    public void setId(int id) {
+    public long setId(long id) {
         this.id = id;
     }
 
@@ -154,14 +155,6 @@ public class Sound {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
-    }
-
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
     }
 
     public void setUser(User user) {
