@@ -14,7 +14,6 @@ import jakarta.persistence.Table;
 @Table (name = "categories")
 public class Category {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private String id;
