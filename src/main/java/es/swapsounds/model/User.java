@@ -10,7 +10,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int userId;
+    private long userId;
 
     private String username;
     private String email;
@@ -95,7 +95,7 @@ public class User {
     }
 
     public int getUserId() {
-        return userId;
+        return (int) userId;
     }
 
     public void setId(int userId) {

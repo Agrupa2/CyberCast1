@@ -85,7 +85,7 @@ public class InMemoryStorage {
     }
 
     public void addSound(Sound sound) {
-        sound.setId(idCounter++);
+        sound.setId((long) idCounter++);
         sounds.add(sound);
     }
 
