@@ -4,17 +4,40 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "sounds")
 public class Sound {
-    private int id;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String title;
     private String description;
     private String filePath;
     private String imagePath;
     private int userId;
-    private List<Comment> comments;
     private String category;
     private String duration;
     private LocalDateTime uploadDate;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @OneToMany(mappedBy = "sound", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments;
+
 
     public Sound(String title, String description, String filePath, String imagePath, int userId, String Category,
             String duration) {
@@ -29,7 +52,7 @@ public class Sound {
         this.uploadDate = LocalDateTime.now();
     }
 
-    public Sound(int id, String title, String description, String filePath, String imagePath, String category,
+    public Sound(Long id, String title, String description, String filePath, String imagePath, String category,
             int userId) {
         this.title = title;
         this.id = id;
@@ -41,7 +64,7 @@ public class Sound {
         this.uploadDate = LocalDateTime.now();
     }
 
-    public Sound(int id, String title, String description, String filePath, String imagePath, String category,
+    public Sound(Long id, String title, String description, String filePath, String imagePath, String category,
             String duration) {
         this.title = title;
         this.id = id;
@@ -56,7 +79,7 @@ public class Sound {
     public Sound() {
     }
 
-    public Sound(int i, String title2, String description2, String audioPath, String imagePath2, Integer userId2,
+    public Sound(Long i, String title2, String description2, String audioPath, String imagePath2, Integer userId2,
             String category2, String duration2) {
         this.id = i;
         this.title = title2;
@@ -93,7 +116,7 @@ public class Sound {
         return comments;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
@@ -105,7 +128,7 @@ public class Sound {
         return duration;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
