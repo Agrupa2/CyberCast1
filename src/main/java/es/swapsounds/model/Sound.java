@@ -75,6 +75,19 @@ public class Sound {
         this.categories = new ArrayList<>();
     }
 
+    public Sound(int i, String title, String description, String audioPath, String imagePath, User user, Category category, String duration) {
+        this.id = i;
+        this.title = title;
+        this.description = description;
+        this.filePath = audioPath;
+        this.imagePath = imagePath;
+        this.duration = duration;
+        this.uploadDate = LocalDateTime.now();
+        this.categories = new ArrayList<>();
+        this.categories.add(category);
+        this.user = user;
+    }
+
     public String getTitle() {
         return title;
     }
