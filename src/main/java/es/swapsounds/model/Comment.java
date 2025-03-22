@@ -35,6 +35,7 @@ public class Comment {
 
     // empty Constructor (for JPA)
     public Comment() {
+        
     }
 
     // Constructor with parameters
