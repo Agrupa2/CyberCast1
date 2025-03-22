@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import es.swapsounds.model.Category;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,7 +20,7 @@ import es.swapsounds.dto.CommentView;
 import es.swapsounds.model.Comment;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
-import es.swapsounds.storage.CommentRepository;
+import es.swapsounds.storage.InMemoryCommentRepository;
 import es.swapsounds.storage.InMemoryStorage;
 import jakarta.servlet.http.HttpSession;
 
@@ -27,7 +28,7 @@ import jakarta.servlet.http.HttpSession;
 public class SoundController {
 
     @Autowired
-    private CommentRepository commentRepository;
+    private InMemoryCommentRepository inMemoryCommentRepository;
 
     @Autowired
     private InMemoryStorage storage;
@@ -55,7 +56,7 @@ public class SoundController {
         List<Sound> filteredSounds = allSounds.stream()
                 .filter(sound -> {
                     boolean matchesCategory = category.equals("all")
-                            || sound.getCategory().equalsIgnoreCase(category);
+                            || sound.getCategories().stream().filter(category1 -> category1.getName().equalsIgnoreCase(category)).findFirst().isPresent();
 
                     boolean matchesQuery = query == null
                             || sound.getTitle().toLowerCase().contains(query.toLowerCase());
@@ -126,13 +127,18 @@ public class SoundController {
             return "redirect:/login";
         }
 
+        Category categoryObject = storage.findCategoryByName(category);
+
         // Storing files using username
         String username = user.get().getUsername();
         String audioPath = storage.saveFile(username, audioFile, "sounds");
         String imagePath = storage.saveFile(username, imageFile, "images");
 
         // Creating and stroring the sound
+
+
         Sound sound = new Sound((long) 0, title, description, audioPath, imagePath, userId, category, duration);
+ main
         storage.addSound(sound);
 
         model.addAttribute("success", "Sound uploaded successfully!");
@@ -166,7 +172,7 @@ public class SoundController {
         List<Sound> filteredSounds = allSounds.stream()
                 .filter(sound -> {
                     boolean matchesCategory = category.equals("all")
-                            || sound.getCategory().equalsIgnoreCase(category);
+                            || sound.getCategories().stream().filter(category1 -> category1.getName().equalsIgnoreCase(category)).findFirst().isPresent();
 
                     boolean matchesQuery = query == null
                             || sound.getTitle().toLowerCase().contains(query.toLowerCase());
@@ -207,7 +213,7 @@ public class SoundController {
         }
 
         Sound sound = soundOpt.get();
-        Optional<User> uploader = storage.findUserById(sound.getUser());
+        Optional<User> uploader = storage.findUserById(sound.getUser().getUserId());
 
         String userInitial = "?"; // default value
         String profileImagePath = null; // default profileImagePath set to null
@@ -229,7 +235,7 @@ public class SoundController {
             model.addAttribute("uploader", null);
         }
 
-        List<Comment> comments = commentRepository.getCommentsBySoundId(soundId);
+        List<Comment> comments = inMemoryCommentRepository.getCommentsBySoundId(soundId);
 
         // Checking if the user is the owner of the sound
         Integer currentUserId = (Integer) session.getAttribute("userId");
@@ -246,7 +252,7 @@ public class SoundController {
         model.addAttribute("profileImagePath", profileImagePath); // Añadir profileImagePath al modelo
         model.addAttribute("sound", sound);
         model.addAttribute("username", username); // Pasar username al template
-        model.addAttribute("isOwner", userId != null && userId == soundOpt.get().getUser());
+        model.addAttribute("isOwner", userId != null && userId == soundOpt.get().getUser().getUserId());
 
         return "sound-details";
     }
@@ -265,7 +271,7 @@ public class SoundController {
         Integer userId = (Integer) session.getAttribute("userId");
         Optional<Sound> originalSound = storage.findSoundById(soundId);
 
-        if (userId == null || !originalSound.isPresent() || originalSound.get().getUser() != userId) {
+        if (userId == null || !originalSound.isPresent() || originalSound.get().getUser().getUserId() != userId) {
             model.addAttribute("error", "No tienes permisos para editar este sonido");
             return "redirect:/sounds/" + soundId;
         }
@@ -273,10 +279,12 @@ public class SoundController {
         Sound sound = originalSound.get();
         String username = (String) session.getAttribute("username");
 
+        Category categoryObject = storage.findCategoryByName(category);
+        List<Category> listCategory = List.of(categoryObject);
         // Updating the sound with the new values
         sound.setTitle(title);
         sound.setDescription(description);
-        sound.setCategory(category);
+        sound.setCategories(listCategory);
 
         // Dealing with new audio file uploaded in the edition form
         if (!audioFile.isEmpty()) {
@@ -321,7 +329,7 @@ public class SoundController {
         Sound sound = soundOptional.get();
 
         // Verificar permisos: el usuario debe ser el propietario o un administrador
-        boolean isOwner = sound.getUser() == userId;
+        boolean isOwner = sound.getUser().getUserId() == userId;
         boolean isAdmin = "admin".equals(session.getAttribute("role"));
 
         if (!isOwner && !isAdmin) {
@@ -361,7 +369,7 @@ public class SoundController {
         List<Sound> filteredSounds = allSounds.stream()
                 .filter(sound -> {
                     boolean matchesCategory = category.equals("all")
-                            || sound.getCategory().equalsIgnoreCase(category);
+                            || sound.getCategories().stream().filter(category1 -> category1.getName().equalsIgnoreCase(category)).findFirst().isPresent();
 
                     boolean matchesQuery = query == null
                             || sound.getTitle().toLowerCase().contains(query.toLowerCase());
