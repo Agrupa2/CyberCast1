@@ -1,18 +1,13 @@
 package es.swapsounds.model;
 
-import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
+import jakarta.persistence.ManyToMany;
+
 public class Sound {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-
     private String title;
     private String description;
 
@@ -27,7 +22,7 @@ public class Sound {
     @ManyToOne
     private User user;
     private List<Comment> comments;
-    private List<Category> categories;
+    //private List<Category> categories;
     private String duration;
     private LocalDateTime uploadDate;
 
@@ -118,6 +113,14 @@ public class Sound {
         return description;
     }
 
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
     public User getUser() {
         return user;
     }
@@ -126,16 +129,16 @@ public class Sound {
         return comments;
     }
 
-    public Long getId() {
-        return (long) id;
+    public int getId() {
+        return id;
     }
 
     public String getDuration() {
         return duration;
     }
 
-    public void setId(Long id) {
-        this.id = Math.toIntExact(id);
+    public void setId(int id) {
+        this.id = id;
     }
 
     public void setTitle(String title) {
@@ -144,6 +147,14 @@ public class Sound {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 
     public void setUser(User user) {
