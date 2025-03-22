@@ -13,12 +13,15 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+//import java.util.Locale.Category;
 import java.util.stream.Collectors;
+import es.swapsounds.model.Category;
 
 @Component
 public class InMemoryStorage {
     private List<User> users = new ArrayList<>();
     private List<Sound> sounds = new ArrayList<>();
+    private List<Category> categories = new ArrayList<>();
     private int idCounter = 1;
 
     public InMemoryStorage() {
@@ -26,12 +29,30 @@ public class InMemoryStorage {
         users.add(new User("user", "user@gmail.com", "user123", null, idCounter++, null));
         users.add(new User("admin", "admin@gmail.com", "admin123", null, idCounter++, null));
 
+        //adding new categories
+        categories.add(new Category("Football"));
+        categories.add(new Category("Meme"));   
+
+        //creating the sounds without the category
+
         sounds.add(new Sound(idCounter++, "Betis Anthem", "Relaxing forest ambiance", "/audio/betis.mp3",
-                "/images/betis.png", "Football", "0:07"));
-        sounds.add(new Sound(idCounter++, "CR7", "Soothing ocean waves", "/audio/CR7.mp3", "/images/CR7.jpg",
-                "Football", "0:06"));
+                "/images/betis.png", "0:07"));
+        sounds.add(new Sound(idCounter++, "CR7", "Soothing ocean waves", "/audio/CR7.mp3", "/images/CR7.jpg", "0:06"));
         sounds.add(new Sound(idCounter++, "El diablo que malditos tenis", "Peaceful rain for sleep",
-                "/audio/el-diablo-que-malditos-tenis.mp3", "/images/el-diablo-que-malditos-tenis.png", "Meme", "0:04"));
+                "/audio/el-diablo-que-malditos-tenis.mp3", "/images/el-diablo-que-malditos-tenis.png", "0:04"));
+
+        //creating the variables for the categories
+        Category football = categories.get(0);
+        Category meme = categories.get(1);
+
+        //adding the first sound to the football categorie
+
+        football.addSound(sounds.get(0));
+
+        football.addSound(sounds.get(1));
+        meme.addSound(sounds.get(1));
+
+        meme.addSound(sounds.get(2));
 
     }
 
@@ -131,7 +152,7 @@ public class InMemoryStorage {
 
     public List<Sound> getSoundsByUserId(int userId) {
         return sounds.stream()
-                .filter(sound -> sound.getUserId() == userId)
+                .filter(sound -> sound.getUser() == userId)
                 .sorted(Comparator.comparing(Sound::getUploadDate).reversed())
                 .collect(Collectors.toList());
     }
@@ -142,7 +163,7 @@ public class InMemoryStorage {
 
         // Deleting all the sounds of the user
         List<Sound> userSounds = sounds.stream()
-                .filter(s -> s.getUserId() == userId)
+                .filter(s -> s.getUser() == userId)
                 .collect(Collectors.toList());
 
         userSounds.forEach(sound -> {
@@ -214,6 +235,5 @@ public class InMemoryStorage {
                 .filter(u -> u.getUserId() == userId)
                 .findFirst()
                 .ifPresent(u -> u.setProfilePicturePath(imagePath));
-    }
-    
+    } 
 }

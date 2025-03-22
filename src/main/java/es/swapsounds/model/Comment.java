@@ -1,9 +1,18 @@
 package es.swapsounds.model;
 
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 
+
+@Entity
 public class Comment {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id; // comment identification
+
+    @ManyToOne
     private User user; // user uploader of the comment
     private String content; // comment content
     private Sound sound; // sound to which the comment is related
@@ -11,6 +20,10 @@ public class Comment {
     private LocalDateTime modified; // comment modification date
     private int soundId;
     private String soundTitle;
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 
 
     public Comment(String id, String content, User user) {

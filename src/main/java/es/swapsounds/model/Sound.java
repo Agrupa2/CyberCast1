@@ -1,95 +1,78 @@
 package es.swapsounds.model;
 
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-
 @Entity
-@Table(name = "sounds")
 public class Sound {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     private String title;
     private String description;
     private String filePath;
     private String imagePath;
-    private int userId;
-    private String category;
+
+    @ManyToOne
+    private User user;
+    private List<Comment> comments;
+    private List<Category> categories;
     private String duration;
     private LocalDateTime uploadDate;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
-    @OneToMany(mappedBy = "sound", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> comments;
-
-
-    public Sound(String title, String description, String filePath, String imagePath, int userId, String Category,
-            String duration) {
+    public Sound(String title, String description, String filePath, String imagePath, User user, String duration) {
         this.title = title;
         this.description = description;
         this.filePath = filePath;
         this.imagePath = imagePath;
-        this.userId = userId;
+        this.user = user;
         this.comments = new ArrayList<>();
-        this.category = Category;
         this.duration = duration;
         this.uploadDate = LocalDateTime.now();
+        this.categories = new ArrayList<>();
     }
 
-    public Sound(Long id, String title, String description, String filePath, String imagePath, String category,
-            int userId) {
+    public Sound(int id, String title, String description, String filePath, String imagePath, User user) {
         this.title = title;
         this.id = id;
         this.description = description;
         this.filePath = filePath;
         this.imagePath = imagePath;
-        this.category = category;
-        this.userId = userId;
+        this.user = user;
         this.uploadDate = LocalDateTime.now();
+        this.categories = new ArrayList<>();
     }
 
-    public Sound(Long id, String title, String description, String filePath, String imagePath, String category,
-            String duration) {
+    public Sound(int id, String title, String description, String filePath, String imagePath, String duration) {
         this.title = title;
         this.id = id;
         this.description = description;
         this.filePath = filePath;
         this.imagePath = imagePath;
-        this.category = category;
         this.duration = duration;
         this.uploadDate = LocalDateTime.now();
+        this.categories = new ArrayList<>();
     }
 
     public Sound() {
+
     }
 
-    public Sound(Long i, String title2, String description2, String audioPath, String imagePath2, Integer userId2,
-            String category2, String duration2) {
+    public Sound(int i, String title2, String description2, String audioPath, String imagePath2, User user, String duration2) {
         this.id = i;
         this.title = title2;
         this.description = description2;
         this.filePath = audioPath;
         this.imagePath = imagePath2;
-        this.userId = userId2;
-        this.category = category2;
+        this.user = user;
         this.duration = duration2;
         this.uploadDate = LocalDateTime.now();
+        this.categories = new ArrayList<>();
     }
 
     public String getTitle() {
@@ -108,8 +91,8 @@ public class Sound {
         return imagePath;
     }
 
-    public int getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
     public List<Comment> getComments() {
@@ -118,10 +101,6 @@ public class Sound {
 
     public Long getId() {
         return id;
-    }
-
-    public String getCategory() {
-        return category;
     }
 
     public String getDuration() {
@@ -148,16 +127,12 @@ public class Sound {
         this.imagePath = imagePath;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public void setComments(List<Comment> comments) {
         this.comments = comments;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
     }
 
     public void setDuration(String duration) {
@@ -170,5 +145,18 @@ public class Sound {
 
     public void setUploadDate(LocalDateTime uploadDate) {
         this.uploadDate = uploadDate;
+    }
+
+    public List<Category> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(List<Category> categories) {
+        this.categories = categories;
+    }
+
+    public void addToCategory(Category category) {
+        this.categories.add(category); //This will add the category to the sound
+        category.addSound(this); //This will add the sound to the category
     }
 }
