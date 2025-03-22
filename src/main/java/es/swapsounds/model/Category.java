@@ -2,21 +2,37 @@ package es.swapsounds.model;
 
 import java.util.List;
 
+//import jakarta.annotation.Generated;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
+
+@Entity
+@Table (name = "categories")
 public class Category {
 
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private String id;
     private String name;
-    private List <Sound> soundList; // This is a list of sounds that belong to this category
+    //private List <Sound> sounds; // This is a list of sounds that belong to this category
 
-     public Category(String id, String name) {
+    @ManyToMany (mappedBy = "categories") //this isn´t the primary identity of the relationship
+    private List<Sound> sounds;
+
+    public Category(String id, String name) {
         this.id = id;
         this.name = name;
-        this.soundList = null;
+        this.sounds = null;
     }
 
     public Category (String name) {
         this.name = name;
-        this.soundList = null;
+        this.sounds = null;
     }
 
      public String getId() {
@@ -35,15 +51,15 @@ public class Category {
         this.name = name;
     }
 
-    public List<Sound> getSoundList() {
-        return soundList;
+    public List<Sound> getSounds() {
+        return sounds;
     }
 
-    public void setSoundList(List<Sound> soundList) {
-        this.soundList = soundList;
+    public void setSounds(List<Sound> soundList) {
+        this.sounds = soundList;
     }
 
     public void addSound(Sound sound) {
-        soundList.add(sound);
+        sounds.add(sound);
     }
 }
