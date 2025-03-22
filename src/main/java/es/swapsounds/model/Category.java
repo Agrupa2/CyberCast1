@@ -24,6 +24,10 @@ public class Category {
     @ManyToMany (mappedBy = "categories") //this isn´t the primary identity of the relationship
     private List<Sound> sounds;
 
+    public Category() {
+        // JPA
+    }
+
     public Category(String id, String name) {
         this.id = id;
         this.name = name;
