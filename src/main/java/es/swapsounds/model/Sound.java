@@ -15,6 +15,7 @@ public class Sound {
 
     private String title;
     private String description;
+    private final ArrayList<Object> categories;
 
     @Lob
     @Column(columnDefinition = "LONGBLOB")
@@ -32,6 +33,10 @@ public class Sound {
     private String duration;
     private LocalDateTime uploadDate;
 
+    public Sound() {
+     // JPA
+    }
+    
     public Sound(String title, String description, byte[] imageFile, byte[] audioFile, User user, String duration) {
         this.title = title;
         this.description = description;
@@ -64,10 +69,6 @@ public class Sound {
         this.duration = duration;
         this.uploadDate = LocalDateTime.now();
         this.categories = new ArrayList<>();
-    }
-
-    public Sound() {
-
     }
 
     public Sound(int i, String title2, String description2, byte[] imageFile, byte[] audioFile, User user, String duration2) {
