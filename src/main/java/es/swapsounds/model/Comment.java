@@ -1,49 +1,72 @@
 package es.swapsounds.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
-
 @Entity
+@Table (name = "comments") // Table name
 public class Comment {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id; // comment identification
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Autoincremental
+    private Long id; 
 
     @ManyToOne
-    private User user; // user uploader of the comment
-    private String content; // comment content
-    private Sound sound; // sound to which the comment is related
-    private LocalDateTime created; // comment upload date
-    private LocalDateTime modified; // comment modification date
-    private int soundId;
-    private String soundTitle;
+    @JoinColumn(name = "user_id", nullable = false) // intership with user table
+    private User user; // User who made the comment
+
+    @Column(nullable = false, length = 500) // comment content
+    private String content;
+
+    @ManyToOne
+    @JoinColumn(name = "sound_id", nullable = false) // intership with sound table 
+    private Sound sound; // Comentary sound
+
+    @CreationTimestamp //  automatic crated date
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp // automatic modify date
+    @Column(name = "modified_at")
+    private LocalDateTime modifiedAt;
+
+    // empty Constructor (for JPA)
+    public Comment() {
+    }
+
+    // Constructor with parameters
+    public Comment(String content, User user, Sound sound) {
+        this.content = content;
+        this.user = user;
+        this.sound = sound;
+    }
+
+    // Getters and Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public User getUser() {
+        return user;
+    }
 
     public void setUser(User user) {
         this.user = user;
     }
 
-
-    public Comment(String id, String content, User user) {
-        this.id = id;
-        this.content = content;
-        this.user = user;
-        this.created = LocalDateTime.now();
-        this.modified = null;
-    }
-
-    public Comment() {
-    }
-
-    // Getters
-    public User getUser() {
-        return user;
-    }
-
     public String getContent() {
         return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public Sound getSound() {
@@ -54,51 +77,19 @@ public class Comment {
         this.sound = sound;
     }
 
-    public String getId() {
-        return id;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public LocalDateTime getCreated() {
-        return created;
+    public LocalDateTime getModifiedAt() {
+        return modifiedAt;
     }
 
-    public void setCreated(LocalDateTime created) {
-        this.created = created;
-    }
-
-    public LocalDateTime getModified() {
-        return modified;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public void setModified(LocalDateTime modified) {
-        this.modified = modified;
-    }
-
-    public int getAuthorId() {
-        return this.user.getUserId();
-    }
-
-    public int getSoundId() {
-        return soundId;
-    }
-
-    public void setSoundId(int soundId) {
-        this.soundId = soundId;
-    }
-
-    public String getSoundTitle() {
-        return soundTitle;
-    }
-
-    public void setSoundTitle(String soundTitle) {
-        this.soundTitle = soundTitle;
+    public void setModifiedAt(LocalDateTime modifiedAt) {
+        this.modifiedAt = modifiedAt;
     }
 }
