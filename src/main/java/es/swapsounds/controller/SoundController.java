@@ -135,7 +135,10 @@ public class SoundController {
         String imagePath = storage.saveFile(username, imageFile, "images");
 
         // Creating and stroring the sound
-        Sound sound = new Sound(0, title, description, audioPath, imagePath, user.get(), categoryObject, duration);
+
+
+        Sound sound = new Sound((long) 0, title, description, audioPath, imagePath, userId, category, duration);
+ main
         storage.addSound(sound);
 
         model.addAttribute("success", "Sound uploaded successfully!");

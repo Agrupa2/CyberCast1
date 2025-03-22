@@ -112,7 +112,7 @@ public class Sound {
         return comments;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
@@ -120,7 +120,7 @@ public class Sound {
         return duration;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
