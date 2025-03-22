@@ -137,8 +137,7 @@ public class SoundController {
         // Creating and stroring the sound
 
 
-        Sound sound = new Sound((long) 0, title, description, audioPath, imagePath, userId, category, duration);
- main
+        Sound sound = new Sound(0, title, description, audioPath, imagePath, user.get(), categoryObject, duration);
         storage.addSound(sound);
 
         model.addAttribute("success", "Sound uploaded successfully!");

@@ -113,7 +113,7 @@ public class Sound {
     }
 
     public Long getId() {
-        return id;
+        return (long) id;
     }
 
     public String getDuration() {
@@ -121,7 +121,7 @@ public class Sound {
     }
 
     public void setId(Long id) {
-        this.id = id;
+        this.id = Math.toIntExact(id);
     }
 
     public void setTitle(String title) {
