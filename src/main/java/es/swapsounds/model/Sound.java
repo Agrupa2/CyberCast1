@@ -4,10 +4,15 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.*;
 
+@Entity
 public class Sound {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
     private String title;
     private String description;
 
@@ -21,6 +26,7 @@ public class Sound {
 
     @ManyToOne
     private User user;
+    @OneToMany
     private List<Comment> comments;
     //private List<Category> categories;
     private String duration;
