@@ -7,7 +7,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table (name = "comments") // Table name
+@Table (name = "Comment_Table") // Table name
 public class Comment {
 
     @Id
@@ -25,7 +25,7 @@ public class Comment {
     @JoinColumn(name = "sound_id", nullable = false) // intership with sound table 
     private Sound sound; // Comentary sound
 
-    @CreationTimestamp //  automatic crated date
+    @CreationTimestamp //  automatic created date
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
