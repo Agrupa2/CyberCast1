@@ -4,13 +4,15 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Lob;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 
+@Entity
 public class Sound {
-    private int id;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String title;
     private String description;
 
@@ -23,15 +25,27 @@ public class Sound {
     private byte[] imageFile;
 
     @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToMany
     private List<Comment> comments;
 
-    @ManyToMany (mappedBy = "sounds") //This is a list of categories that belong to this sound
-    private List<Category> categories; //This isn´t the primary identity of the relationship
+    @ManyToMany
+    @JoinTable(
+        name = "sound_category",
+        joinColumns = @JoinColumn(name = "sound_id"),
+        inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private List<Category> categories;
 
     private String duration;
     private LocalDateTime uploadDate;
 
+    public Sound() {
+     // JPA
+    }
+    
     public Sound(String title, String description, byte[] imageFile, byte[] audioFile, User user, String duration) {
         this.title = title;
         this.description = description;
@@ -44,7 +58,7 @@ public class Sound {
         this.categories = new ArrayList<>();
     }
 
-    public Sound(int id, String title, String description, byte[] imageFile, byte[] audioFile, User user) {
+    public Sound(long id, String title, String description, byte[] imageFile, byte[] audioFile, User user) {
         this.title = title;
         this.id = id;
         this.description = description;
@@ -55,7 +69,7 @@ public class Sound {
         this.categories = new ArrayList<>();
     }
 
-    public Sound(int id, String title, String description,byte[] imageFile, byte[] audioFile, String duration) {
+    public Sound(long id, String title, String description,byte[] imageFile, byte[] audioFile, String duration) {
         this.title = title;
         this.id = id;
         this.description = description;
@@ -65,12 +79,8 @@ public class Sound {
         this.uploadDate = LocalDateTime.now();
         this.categories = new ArrayList<>();
     }
-
-    public Sound() {
-
-    }
-
-    public Sound(int i, String title2, String description2, byte[] imageFile, byte[] audioFile, User user, String duration2) {
+    
+    public Sound(long i, String title2, String description2, byte[] imageFile, byte[] audioFile, User user, String duration2) {
         this.id = i;
         this.title = title2;
         this.description = description2;
@@ -82,7 +92,7 @@ public class Sound {
         this.categories = new ArrayList<>();
     }
 
-    public Sound(int i, String title, String description, byte[] imageFile, byte[] audioFile, User user, Category category, String duration) {
+    public Sound(long i, String title, String description, byte[] imageFile, byte[] audioFile, User user, Category category, String duration) {
         this.id = i;
         this.title = title;
         this.description = description;
@@ -119,14 +129,6 @@ public class Sound {
         return description;
     }
 
-    public String getFilePath() {
-        return filePath;
-    }
-
-    public String getImagePath() {
-        return imagePath;
-    }
-
     public User getUser() {
         return user;
     }
@@ -135,7 +137,7 @@ public class Sound {
         return comments;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
@@ -143,7 +145,7 @@ public class Sound {
         return duration;
     }
 
-    public void setId(int id) {
+    public long setId(long id) {
         this.id = id;
     }
 
@@ -153,14 +155,6 @@ public class Sound {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
-    }
-
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
     }
 
     public void setUser(User user) {

@@ -14,7 +14,6 @@ import jakarta.persistence.Table;
 @Table (name = "categories")
 public class Category {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private String id;
@@ -23,6 +22,10 @@ public class Category {
 
     @ManyToMany (mappedBy = "categories") //this isn´t the primary identity of the relationship
     private List<Sound> sounds;
+
+    public Category() {
+        // JPA
+    }
 
     public Category(String id, String name) {
         this.id = id;
@@ -35,7 +38,7 @@ public class Category {
         this.sounds = null;
     }
 
-     public String getId() {
+    public String getId() {
         return id;
     }
 
