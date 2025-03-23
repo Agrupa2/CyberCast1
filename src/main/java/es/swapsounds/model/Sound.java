@@ -4,7 +4,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 
 public class Sound {
     private int id;
@@ -22,7 +25,10 @@ public class Sound {
     @ManyToOne
     private User user;
     private List<Comment> comments;
-    //private List<Category> categories;
+
+    @ManyToMany (mappedBy = "sounds") //This is a list of categories that belong to this sound
+    private List<Category> categories; //This isn´t the primary identity of the relationship
+
     private String duration;
     private LocalDateTime uploadDate;
 
