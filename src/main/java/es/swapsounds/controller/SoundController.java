@@ -3,6 +3,7 @@ package es.swapsounds.controller;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import es.swapsounds.model.Category;
@@ -279,7 +280,7 @@ public class SoundController {
         String username = (String) session.getAttribute("username");
 
         Category categoryObject = storage.findCategoryByName(category);
-        List<Category> listCategory = List.of(categoryObject);
+        Set<Category> listCategory = Set.of(categoryObject);
         // Updating the sound with the new values
         sound.setTitle(title);
         sound.setDescription(description);
