@@ -1,6 +1,7 @@
 package es.swapsounds.model;
 
 import java.util.List;
+import java.util.Set;
 
 //import jakarta.annotation.Generated;
 import jakarta.persistence.Entity;
@@ -20,8 +21,8 @@ public class Category {
     private String name;
     //private List <Sound> sounds; // This is a list of sounds that belong to this category
 
-    @ManyToMany (mappedBy = "categories") //this isn´t the primary identity of the relationship
-    private List<Sound> sounds;
+    @ManyToMany (mappedBy = "categories") //this isn´t the primary identity of the relationship, MappedBy will help us to find all the sounds of one category
+    private Set<Sound> sounds;
 
     public Category() {
         // JPA
@@ -54,11 +55,11 @@ public class Category {
         this.name = name;
     }
 
-    public List<Sound> getSounds() {
+    public Set<Sound> getSounds() {
         return sounds;
     }
 
-    public void setSounds(List<Sound> soundList) {
+    public void setSounds(Set<Sound> soundList) {
         this.sounds = soundList;
     }
 
