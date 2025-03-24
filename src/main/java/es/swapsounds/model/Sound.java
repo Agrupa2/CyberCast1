@@ -2,7 +2,9 @@ package es.swapsounds.model;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import jakarta.persistence.*;
 
@@ -37,7 +39,7 @@ public class Sound {
         joinColumns = @JoinColumn(name = "sound_id"),
         inverseJoinColumns = @JoinColumn(name = "category_id")
     )
-    private List<Category> categories;
+    private Set<Category> categories;
 
     private String duration;
     private LocalDateTime uploadDate;
@@ -55,7 +57,7 @@ public class Sound {
         this.comments = new ArrayList<>();
         this.duration = duration;
         this.uploadDate = LocalDateTime.now();
-        this.categories = new ArrayList<>();
+        this.categories = new HashSet<>();
     }
 
     public Sound(long id, String title, String description, byte[] imageFile, byte[] audioFile, User user) {
@@ -66,7 +68,7 @@ public class Sound {
         this.imageFile = imageFile;
         this.user = user;
         this.uploadDate = LocalDateTime.now();
-        this.categories = new ArrayList<>();
+        this.categories = new HashSet<>();
     }
 
     public Sound(long id, String title, String description,byte[] imageFile, byte[] audioFile, String duration) {
@@ -77,7 +79,7 @@ public class Sound {
         this.imageFile = imageFile;
         this.duration = duration;
         this.uploadDate = LocalDateTime.now();
-        this.categories = new ArrayList<>();
+        this.categories = new HashSet<>();
     }
     
     public Sound(long i, String title2, String description2, byte[] imageFile, byte[] audioFile, User user, String duration2) {
@@ -89,7 +91,7 @@ public class Sound {
         this.user = user;
         this.duration = duration2;
         this.uploadDate = LocalDateTime.now();
-        this.categories = new ArrayList<>();
+        this.categories = new HashSet<>();
     }
 
     public Sound(long i, String title, String description, byte[] imageFile, byte[] audioFile, User user, Category category, String duration) {
@@ -100,7 +102,7 @@ public class Sound {
         this.imageFile = imageFile;
         this.duration = duration;
         this.uploadDate = LocalDateTime.now();
-        this.categories = new ArrayList<>();
+        this.categories = new HashSet<>();
         this.categories.add(category);
         this.user = user;
     }
@@ -177,11 +179,11 @@ public class Sound {
         this.uploadDate = uploadDate;
     }
 
-    public List<Category> getCategories() {
+    public Set<Category> getCategories() {
         return categories;
     }
 
-    public void setCategories(List<Category> categories) {
+    public void setCategories(Set<Category> categories) {
         this.categories = categories;
     }
 
