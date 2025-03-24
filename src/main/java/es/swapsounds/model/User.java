@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+
 @Entity(name = "User_Table")
 public class User {
 
@@ -17,6 +18,9 @@ public class User {
     private String password;
     private String profilePicturePath;
     private String role;
+    @Lob
+    @Column(columnDefinition = "LONGBLOB")
+    private byte[] profilePicture;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Comment> comments;

@@ -7,6 +7,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import es.swapsounds.model.Category;
+import es.swapsounds.repository.SoundRepository;
+import es.swapsounds.service.SoundService;
+import es.swapsounds.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,6 +30,12 @@ import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class SoundController {
+
+    @Autowired
+    private SoundService soundService;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private InMemoryCommentRepository inMemoryCommentRepository;
@@ -213,7 +222,7 @@ public class SoundController {
         }
 
         Sound sound = soundOpt.get();
-        Optional<User> uploader = storage.findUserById(sound.getUser().getUserId());
+        Optional<User> uploader = userService.findUserById(sound.getUser().getUserId());
 
         String userInitial = "?"; // default value
         String profileImagePath = null; // default profileImagePath set to null
@@ -338,7 +347,7 @@ public class SoundController {
         }
 
         // Eliminar el sonido
-        storage.deleteSound(id);
+        soundService.deleteSound((long)id);
         redirectAttributes.addFlashAttribute("success", "El sonido se ha eliminado correctamente.");
 
         return "redirect:/dashboard"; // Redirigir al dashboard después de eliminar
