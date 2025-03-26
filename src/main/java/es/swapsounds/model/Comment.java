@@ -12,7 +12,7 @@ public class Comment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id; // comment identification
+    private Long id; // comment identification
     private User user; // user uploader of the comment
     private String content; // comment content
     private Sound sound; // sound to which the comment is related
@@ -22,7 +22,7 @@ public class Comment {
     private String soundTitle;
 
 
-    public Comment(String id, String content, User user) {
+    public Comment(Long id, String content, User user) {
         this.id = id;
         this.content = content;
         this.user = user;
@@ -50,11 +50,11 @@ public class Comment {
         this.sound = sound;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -78,7 +78,7 @@ public class Comment {
         this.modified = modified;
     }
 
-    public int getAuthorId() {
+    public Long getAuthorId() {
         return this.user.getUserId();
     }
 

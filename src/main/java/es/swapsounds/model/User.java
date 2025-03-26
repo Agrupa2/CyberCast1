@@ -18,10 +18,10 @@ public class User {
     private String profilePicturePath;
     private List<Comment> comments;
     private List<Sound> sounds;
-    private int userId;
+    private Long userId;
     private String role;
 
-    public User(String username, String email, String password, String profilePicturePath, int userId, String role) {
+    public User(String username, String email, String password, String profilePicturePath, Long userId, String role) {
         this.username = username;
         this.email = email;
         this.password = password;
@@ -84,11 +84,11 @@ public class User {
         return sounds;
     }
 
-    public int getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setId(int userId) {
+    public void setId(Long userId) {
         this.userId = userId;
     }
 

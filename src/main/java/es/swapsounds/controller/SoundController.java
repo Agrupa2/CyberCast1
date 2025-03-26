@@ -40,7 +40,7 @@ public class SoundController {
             Model model) {
 
         String username = (String) session.getAttribute("username");
-        Integer userId = (Integer) session.getAttribute("userId");
+        Long userId = (Long) session.getAttribute("userId");
 
         if (username != null && userId != null) {
             model.addAttribute("message", "Welcome, " + username + "!");
@@ -113,7 +113,7 @@ public class SoundController {
             HttpSession session, // Using HttpSession in order to get UserId
             Model model) throws IOException {
 
-        Integer userId = (Integer) session.getAttribute("userId");
+        Long userId = (Long) session.getAttribute("userId");
         if (userId == null) {
             model.addAttribute("error", "You must be logged in to upload sounds.");
             return "redirect:/login"; // If the user is not logged in, redirect to the login page
@@ -132,7 +132,7 @@ public class SoundController {
         String imagePath = storage.saveFile(username, imageFile, "images");
 
         // Creating and stroring the sound
-        Sound sound = new Sound(0, title, description, audioPath, imagePath, userId, category, duration);
+        Sound sound = new Sound(0, title, description, audioPath, imagePath, category, duration);
         storage.addSound(sound);
 
         model.addAttribute("success", "Sound uploaded successfully!");
@@ -150,7 +150,7 @@ public class SoundController {
 
         // Obtainint username and userId from session
         String username = (String) session.getAttribute("username");
-        Integer userId = (Integer) session.getAttribute("userId");
+        Long userId = (Long) session.getAttribute("userId");
 
         // If the user is logged, it adds ths info to the model
         if (username != null && userId != null) {
@@ -198,7 +198,7 @@ public class SoundController {
             Model model) {
 
         // Obtaining userId and username from the session
-        Integer userId = (Integer) session.getAttribute("userId");
+        Long userId = (Long) session.getAttribute("userId");
         String username = (String) session.getAttribute("username");
 
         Optional<Sound> soundOpt = storage.findSoundById(soundId);
@@ -232,7 +232,7 @@ public class SoundController {
         List<Comment> comments = inMemoryCommentRepository.getCommentsBySoundId(soundId);
 
         // Checking if the user is the owner of the sound
-        Integer currentUserId = (Integer) session.getAttribute("userId");
+        Long currentUserId = (Long) session.getAttribute("userId");
         List<CommentView> commentViews = comments.stream()
                 .map(comment -> {
                     boolean isOwner = currentUserId != null &&
@@ -262,7 +262,7 @@ public class SoundController {
             HttpSession session,
             Model model) throws IOException {
 
-        Integer userId = (Integer) session.getAttribute("userId");
+        Long userId = (Long) session.getAttribute("userId");
         Optional<Sound> originalSound = storage.findSoundById(soundId);
 
         if (userId == null || !originalSound.isPresent() || originalSound.get().getUserId() != userId) {
@@ -301,7 +301,7 @@ public class SoundController {
             RedirectAttributes redirectAttributes) { // Para enviar mensajes de retroalimentación
 
         // Obtener el ID del usuario actual desde la sesión
-        Integer userId = (Integer) session.getAttribute("userId");
+        Long userId = (Long) session.getAttribute("userId");
 
         // Verificar si el usuario está autenticado
         if (userId == null) {
@@ -345,7 +345,7 @@ public class SoundController {
 
         // Obtainint username and userId from session
         String username = (String) session.getAttribute("username");
-        Integer userId = (Integer) session.getAttribute("userId");
+        Long userId = (Long) session.getAttribute("userId");
 
         // If the user is logged, it adds ths info to the model
         if (username != null && userId != null) {

@@ -60,7 +60,7 @@ public class InMemoryCommentRepository {
             .anyMatch(comments -> comments.removeIf(c -> c.getId().equals(commentId)));
     }
 
-    public void deleteCommentsByUserId(int userId) {
+    public void deleteCommentsByUserId(long userId) {
         commentsBySoundId.values()
                 .forEach(comments -> comments.removeIf(comment -> comment.getUser().getUserId() == userId));
     }
@@ -72,7 +72,7 @@ public class InMemoryCommentRepository {
             .findFirst(); // Devuelve el primer comentario que coincida
     }
 
-    public List<Comment> getCommentsByUserId(int userId) {
+    public List<Comment> getCommentsByUserId(long userId) {
     return commentsBySoundId.values().stream()
         .flatMap(List::stream)
         .filter(comment -> comment.getAuthorId() == userId)

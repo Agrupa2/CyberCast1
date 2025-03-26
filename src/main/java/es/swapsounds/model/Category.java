@@ -12,11 +12,11 @@ public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
+    private Long id;
     private String name;
     private List <Sound> soundList; // This is a list of sounds that belong to this category
 
-    public Category(String id, String name) {
+    public Category(Long id, String name) {
         this.id = id;
         this.name = name;
         this.soundList = null;
@@ -31,11 +31,11 @@ public class Category {
         //Used by JPA
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

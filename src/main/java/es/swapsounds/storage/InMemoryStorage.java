@@ -78,7 +78,7 @@ public class InMemoryStorage {
                 .findFirst();
     }
 
-    public Optional<User> findUserById(int userId) {
+    public Optional<User> findUserById(long userId) {
         return users.stream()
                 .filter(u -> u.getUserId() == userId)
                 .findFirst();
@@ -129,14 +129,14 @@ public class InMemoryStorage {
         sounds.add(updatedSound);
     }
 
-    public List<Sound> getSoundsByUserId(int userId) {
+    public List<Sound> getSoundsByUserId(long userId) {
         return sounds.stream()
                 .filter(sound -> sound.getUserId() == userId)
                 .sorted(Comparator.comparing(Sound::getUploadDate).reversed())
                 .collect(Collectors.toList());
     }
 
-    public void deleteUser(int userId) {
+    public void deleteUser(long userId) {
         // Deletes the user from the list
         users.removeIf(u -> u.getUserId() == userId);
 
@@ -202,14 +202,14 @@ public class InMemoryStorage {
         }
     }
 
-    public void updateUsername(int userId, String newUsername) {
+    public void updateUsername(long userId, String newUsername) {
         users.stream()
                 .filter(u -> u.getUserId() == userId)
                 .findFirst()
                 .ifPresent(u -> u.setUsername(newUsername));
     }
 
-    public void updateProfilePicture(int userId, String imagePath) {
+    public void updateProfilePicture(long userId, String imagePath) {
         users.stream()
                 .filter(u -> u.getUserId() == userId)
                 .findFirst()

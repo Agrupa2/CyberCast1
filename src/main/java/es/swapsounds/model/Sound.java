@@ -14,12 +14,12 @@ public class Sound {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
     private String title;
     private String description;
     private String filePath;
     private String imagePath;
-    private int userId;
+    private long userId;
     private List<Comment> comments;
     private String category;
     private String duration;
@@ -95,7 +95,7 @@ public class Sound {
         return imagePath;
     }
 
-    public int getUserId() {
+    public long getUserId() {
         return userId;
     }
 
@@ -103,7 +103,7 @@ public class Sound {
         return comments;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
