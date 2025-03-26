@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/upload-sound.css" />
+    <title>Upload Sound</title>
+</head>
+
+<body> <!-- This shows the different field to fill to upload a sound -->
+    <h1>Upload a New Sound</h1>
+    <form action="/sounds/upload" method="post" enctype="multipart/form-data">
+        <div>
+            <label for="title">Title:</label>
+            <input type="text" id="title" name="title" required>
+        </div>
+        <div>
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" required></textarea>
+        </div>
+        <div>
+            <label for="category">Category:</label>
+            <select id="category" name="category" required>
+                <option value="">Select a category</option>
+                <option value="Music">Music</option>
+                <option value="Podcast">Podcast</option>
+                <option value="Ambient">Ambient</option>
+                <option value="Effects">Sound Effects</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+        <div>
+            <label for="duration">Duration (minutes):</label>
+            <input type="number" id="duration" name="duration" step="0.1" min="0.1" required>
+        </div>
+        <div>
+            <label for="audioFile">Audio File:</label>
+            <input type="file" id="audioFile" name="audioFile" accept="audio/*" required>
+        </div>
+        <div>
+            <label for="imageFile">Image File:</label>
+            <input type="file" id="imageFile" name="imageFile" accept="image/*" required>
+        </div>
+        <button type="submit">Upload Sound</button>
+        {{#error}}
+        <p style="color: red;">{{error}}</p> <!-- Shows the error message -->
+        {{/error}}
+        {{#success}}
+        <p style="color: green;">{{success}}</p> <!-- Shows the success message -->
+        {{/success}}
+    </form>
+    <a href="/start">Back to Sounds</a>
+</body>
+
+</html>
