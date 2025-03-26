@@ -59,7 +59,7 @@ public class CategoryService {
         categoryRepository.delete(category);
     }
 
-    // Process categories to add them to a sound
+   // (Ejemplo simplificado en CategoryService)
     public Set<Category> processCategories(Set<String> categoryNames) {
         Set<Category> categories = new HashSet<>();
     

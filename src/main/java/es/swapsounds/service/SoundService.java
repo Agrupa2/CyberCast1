@@ -55,7 +55,7 @@ public class SoundService {
         sound.setAudioFile(audioFile.getBytes());
         sound.setImageFile(imageFile.getBytes());
 
-        // Procesar categorías, para que se añadan solo aquellas que exitan
+        // Procesar categorías
         Set<Category> categorySet = categoryService.processCategories(categories);
         sound.setCategories(categorySet);
 
