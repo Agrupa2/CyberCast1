@@ -15,7 +15,6 @@ import es.swapsounds.repository.SoundRepository;
 import es.swapsounds.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import es.swapsounds.service.CategoryService;
 
 @Service
 public class SoundService {

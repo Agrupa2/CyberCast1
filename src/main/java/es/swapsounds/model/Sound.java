@@ -145,7 +145,7 @@ public class Sound {
         return duration;
     }
 
-    public void setId(long id) {
+    public long setId(long id) {
         this.id = id;
     }
 
