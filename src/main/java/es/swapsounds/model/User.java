@@ -1,9 +1,17 @@
 package es.swapsounds.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity(name = "UserTable")
 public class User {
+
+    @Id@GeneratedValue(strategy = GenerationType.IDENTITY)
     private String username;
     private String email;
     private String password;
@@ -29,6 +37,10 @@ public class User {
         this.email = email2;
         this.password = user_password;
         this.profilePicturePath = photoPath;
+    }
+
+    public User() {
+        // Used by JPA
     }
 
     public String getRole() {
@@ -57,14 +69,7 @@ public class User {
     }
 
     public String getProfilePicturePath() {
-        return profilePicturePath != null ? profilePicturePath : "/uploads/profiles/default-avatar.png"; // If the user
-                                                                                                         // profile
-                                                                                                         // image is
-                                                                                                         // set to null,
-                                                                                                         // use the
-                                                                                                         // default
-                                                                                                         // profile
-                                                                                                         // image
+        return profilePicturePath != null ? profilePicturePath : "/uploads/profiles/default-avatar.png"; // If the user profile image is set to null, use the default profile image
     }
 
     public void setProfilePicturePath(String profilePicturePath) {

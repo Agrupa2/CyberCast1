@@ -1,10 +1,19 @@
 package es.swapsounds.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
 public class Sound {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String title;
     private String description;
@@ -54,6 +63,7 @@ public class Sound {
     }
 
     public Sound() {
+        //Used by JPA
     }
 
     public Sound(int i, String title2, String description2, String audioPath, String imagePath2, Integer userId2,

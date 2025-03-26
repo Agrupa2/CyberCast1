@@ -1,8 +1,17 @@
 package es.swapsounds.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
 import java.time.LocalDateTime;
 
+@Entity
 public class Comment {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id; // comment identification
     private User user; // user uploader of the comment
     private String content; // comment content
