@@ -12,13 +12,14 @@ import java.util.List;
 public class User {
 
     @Id@GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+    private long userId;
     private String username;
     private String email;
     private String password;
     private String profilePicturePath;
     private List<Comment> comments;
     private List<Sound> sounds;
-    private Long userId;
     private String role;
 
     public User(String username, String email, String password, String profilePicturePath, Long userId, String role) {

@@ -12,7 +12,7 @@ public class Comment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // comment identification
+    private long id; // comment identification
     private User user; // user uploader of the comment
     private String content; // comment content
     private Sound sound; // sound to which the comment is related
