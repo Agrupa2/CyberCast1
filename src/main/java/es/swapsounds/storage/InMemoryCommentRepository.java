@@ -19,7 +19,7 @@ public class InMemoryCommentRepository {
 
     public Comment addComment(int soundId, String soundTitle, String content, User user) {
         Comment comment = new Comment(
-            UUID.randomUUID().toString(), // ID único
+            generateUniqueLong(), // ID único
             content, // Contenido del comentario
             user // Usuario que comenta
         );
@@ -77,5 +77,11 @@ public class InMemoryCommentRepository {
         .flatMap(List::stream)
         .filter(comment -> comment.getAuthorId() == userId)
         .collect(Collectors.toList());
-}
+    }
+
+    // Genera un Long único usando los bits del UUID
+    public static long generateUniqueLong() {
+        UUID uuid = UUID.randomUUID();
+        return uuid.getMostSignificantBits() ^ uuid.getLeastSignificantBits();
+    }
 }

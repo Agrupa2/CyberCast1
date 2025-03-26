@@ -26,11 +26,11 @@ public class InMemoryStorage {
         users.add(new User("user", "user@gmail.com", "user123", null, idCounter++, null));
         users.add(new User("admin", "admin@gmail.com", "admin123", null, idCounter++, null));
 
-        sounds.add(new Sound(idCounter++, "Betis Anthem", "Relaxing forest ambiance", "/audio/betis.mp3",
+        sounds.add(new Sound((long)idCounter++, "Betis Anthem", "Relaxing forest ambiance", "/audio/betis.mp3",
                 "/images/betis.png", "Football", "0:07"));
-        sounds.add(new Sound(idCounter++, "CR7", "Soothing ocean waves", "/audio/CR7.mp3", "/images/CR7.jpg",
+        sounds.add(new Sound((long)idCounter++, "CR7", "Soothing ocean waves", "/audio/CR7.mp3", "/images/CR7.jpg",
                 "Football", "0:06"));
-        sounds.add(new Sound(idCounter++, "El diablo que malditos tenis", "Peaceful rain for sleep",
+        sounds.add(new Sound((long)idCounter++, "El diablo que malditos tenis", "Peaceful rain for sleep",
                 "/audio/el-diablo-que-malditos-tenis.mp3", "/images/el-diablo-que-malditos-tenis.png", "Meme", "0:04"));
 
     }
@@ -64,7 +64,7 @@ public class InMemoryStorage {
     }
 
     public void addSound(Sound sound) {
-        sound.setId(idCounter++);
+        sound.setId((long)idCounter++);
         sounds.add(sound);
     }
 

@@ -4,38 +4,44 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 
+import java.util.ArrayList;
 import java.util.List;
+
 
 @Entity
 public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
+    private Long id;
     private String name;
-    private List <Sound> soundList; // This is a list of sounds that belong to this category
 
-    public Category(String id, String name) {
+    //1 categoria tiene M sonidos
+    @ManyToMany
+    private List<Sound> sounds = new ArrayList<>(); // This is a list of sounds that belong to this category
+
+    public Category(Long id, String name) {
         this.id = id;
         this.name = name;
-        this.soundList = null;
+        this.sounds = null;
     }
 
     public Category (String name) {
         this.name = name;
-        this.soundList = null;
+        this.sounds = null;
     }
 
     public Category() {
         //Used by JPA
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -48,14 +54,14 @@ public class Category {
     }
 
     public List<Sound> getSoundList() {
-        return soundList;
+        return sounds;
     }
 
     public void setSoundList(List<Sound> soundList) {
-        this.soundList = soundList;
+        this.sounds = soundList;
     }
 
     public void addSound(Sound sound) {
-        soundList.add(sound);
+        sounds.add(sound);
     }
 }

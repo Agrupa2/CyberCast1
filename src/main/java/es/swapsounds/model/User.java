@@ -4,22 +4,31 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity(name = "UserTable")
+@Entity
+@Table(name = "UserTable")
 public class User {
 
-    @Id@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String username;
     private String email;
     private String password;
     private String profilePicturePath;
-    private List<Comment> comments;
-    private List<Sound> sounds;
     private int userId;
     private String role;
+
+    @OneToMany
+    private List<Comment> comments = new ArrayList<>();
+
+    @ManyToMany (mappedBy = "users")
+    private List<Sound> sounds = new ArrayList<>();
 
     public User(String username, String email, String password, String profilePicturePath, int userId, String role) {
         this.username = username;

@@ -4,6 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 import java.time.LocalDateTime;
 
@@ -12,17 +14,20 @@ public class Comment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id; // comment identification
-    private User user; // user uploader of the comment
+    private Long id; // comment identification
     private String content; // comment content
-    private Sound sound; // sound to which the comment is related
     private LocalDateTime created; // comment upload date
     private LocalDateTime modified; // comment modification date
-    private int soundId;
-    private String soundTitle;
+    /*private int soundId;
+    private String soundTitle;*/
+    //@ManyToOne
+    private User user;
+    //@ManyToOne
+    private Sound sound;
 
 
-    public Comment(String id, String content, User user) {
+
+    public Comment(Long id, String content, User user) {
         this.id = id;
         this.content = content;
         this.user = user;
@@ -50,11 +55,11 @@ public class Comment {
         this.sound = sound;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -82,7 +87,7 @@ public class Comment {
         return this.user.getUserId();
     }
 
-    public int getSoundId() {
+    /*public int getSoundId() {
         return soundId;
     }
 
@@ -96,5 +101,5 @@ public class Comment {
 
     public void setSoundTitle(String soundTitle) {
         this.soundTitle = soundTitle;
-    }
+    }*/
 }
