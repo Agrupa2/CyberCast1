@@ -1,6 +1,10 @@
 package es.swapsounds.repository;
 
-public interface CommentRepository {
+import es.swapsounds.model.Comment;
+import es.swapsounds.model.Sound;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface CommentRepository extends JpaRepository <Comment, Long> {
 
     
 }

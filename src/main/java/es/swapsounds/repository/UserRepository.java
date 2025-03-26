@@ -1,6 +1,10 @@
 package es.swapsounds.repository;
 
-public interface UserRepository {
+import es.swapsounds.model.Sound;
+import es.swapsounds.model.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface UserRepository extends JpaRepository <User, Long> {
 
     
 } 
