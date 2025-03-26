@@ -6,8 +6,6 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
-import es.swapsounds.service.SoundService;
-import es.swapsounds.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,10 +29,6 @@ public class ProfileController {
     private InMemoryCommentRepository inMemoryCommentRepository;
     @Autowired
     private InMemoryStorage storage;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private SoundService soundService;
 
     @GetMapping("/profile")
     public String userProfile(HttpSession session, Model model) {
@@ -46,7 +40,7 @@ public class ProfileController {
             return "redirect:/login";
         }
 
-        Optional<User> userOpt = userService.findUserById(userId);
+        Optional<User> userOpt = storage.findUserById(userId);
         if (!userOpt.isPresent()) {
             return "redirect:/start";
         }
@@ -65,7 +59,7 @@ public class ProfileController {
             }
 
         
-        List<Sound> userSounds = soundService.getSoundsByUserId(userId);
+        List<Sound> userSounds = storage.getSoundsByUserId(userId);
         List<Comment> userComments = inMemoryCommentRepository.getCommentsByUserId(userId); // Nuevo: Obtener comentarios
 
         model.addAttribute("comments", userComments); // Añadir comentarios al modelo
@@ -94,7 +88,7 @@ public class ProfileController {
             return "redirect:/profile";
         }
 
-        userService.updateUsername(userId, newUsername.trim());
+        storage.updateUsername(userId, newUsername.trim());
         session.setAttribute("username", newUsername.trim());
 
         redirectAttributes.addFlashAttribute("success", "Nombre de usuario actualizado");

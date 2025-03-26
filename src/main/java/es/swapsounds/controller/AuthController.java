@@ -1,7 +1,6 @@
 package es.swapsounds.controller;
 
 import es.swapsounds.model.User;
-import es.swapsounds.service.UserService;
 import es.swapsounds.storage.InMemoryStorage;
 import jakarta.servlet.http.HttpSession;
 
@@ -20,8 +19,6 @@ import java.util.Optional;
 
 @Controller
 public class AuthController {
-    @Autowired
-    private UserService userService;
 
     @Autowired
     private InMemoryStorage storage;
@@ -41,7 +38,7 @@ public class AuthController {
             RedirectAttributes redirectAttributes) throws IOException {
 
         // Validates if the username already exists
-        if (this.userService.existsByUsername(username)) {
+        if (storage.findUserByUsername(username).isPresent()) {
             redirectAttributes.addFlashAttribute("error", "El nombre de usuario ya existe");
             return "redirect:/signup";
         }
@@ -89,7 +86,7 @@ public class AuthController {
             HttpSession session, // Adding HttpSession as a parameter
             Model model) {
 
-        Optional<User> user = userService.authenticate(username, user_password);
+        Optional<User> user = storage.authenticate(username, user_password);
         if (user.isPresent()) {
             // Obtain the user's username and userId
             session.setAttribute("username", user.get().getUsername());

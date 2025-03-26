@@ -1,7 +1,5 @@
 package es.swapsounds.controller;
 
-import es.swapsounds.service.SoundService;
-import es.swapsounds.service.UserService;
 import org.springframework.stereotype.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +19,6 @@ import jakarta.servlet.http.HttpSession;
 public class CommentApiController {
 
     @Autowired
-    private UserService userService;
-    @Autowired
-    private SoundService soundService;
-    @Autowired
     private InMemoryCommentRepository inMemoryCommentRepository;
     @Autowired
     private InMemoryStorage storage;
@@ -41,11 +35,11 @@ public class CommentApiController {
         if (userId == null)
             return "redirect:/login";
 
-        User currentUser = userService.findUserById(userId)
-                .orElseThrow(() -> new RuntimeException("El usuario no ha sido encontrado"));
+        User currentUser = storage.findUserById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         // Obtener el sonido
-        Sound sound = soundService.getSoundById((long)soundId);
+        Sound sound = storage.getSoundById(soundId);
         if (sound == null) {
             redirectAttributes.addFlashAttribute("error", "Sonido no encontrado");
             return "redirect:/start";
@@ -75,8 +69,8 @@ public class CommentApiController {
             return "redirect:/login";
         }
 
-        User currentUser = userService.findUserById(userId)
-                .orElseThrow(() -> new RuntimeException("El usuario no ha sido encontrado"));
+        User currentUser = storage.findUserById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         // Updating the comment with the user input
         boolean success = inMemoryCommentRepository.editComment(

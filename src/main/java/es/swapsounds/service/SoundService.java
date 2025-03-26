@@ -69,10 +69,6 @@ public class SoundService {
             .orElseThrow(() -> new EntityNotFoundException("Sonido no encontrado"));
     }
 
-    public List<Sound> getSoundsByUserId(int userId) {
-        return soundRepository.findByUserUserIdOrderByUploadDateDesc(userId);
-    }
-
     @Transactional(readOnly = true)
     public byte[] getAudioFile(Long soundId) {
         Sound sound = getSoundById(soundId);

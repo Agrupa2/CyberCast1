@@ -1,6 +1,5 @@
 package es.swapsounds.controller;
 
-import es.swapsounds.service.UserService;
 import es.swapsounds.storage.InMemoryCommentRepository;
 import es.swapsounds.storage.InMemoryStorage;
 import jakarta.servlet.http.HttpSession;
@@ -15,10 +14,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class UserController {
-   @Autowired
-   private UserService userService;
+
    @Autowired
    private InMemoryCommentRepository inMemoryCommentRepository;
+
+   @Autowired
+   private InMemoryStorage storage;
 
    @GetMapping("/delete-account")
    public String showDeletePage(HttpSession session, Model model) {
@@ -32,12 +33,12 @@ public class UserController {
 
    // Procesar eliminación
    @PostMapping("/delete-account")
-      public String processDelete(
+   public String processDelete(
          @RequestParam String confirmation,
          HttpSession session,
          RedirectAttributes ra) {
 
-      Long userId = (Long) session.getAttribute("userId");
+      Integer userId = (Integer) session.getAttribute("userId");
       if (userId == null)
          return "redirect:/login";
 
@@ -46,8 +47,8 @@ public class UserController {
          return "redirect:/delete-account";
       }
 
-      inMemoryCommentRepository.deleteCommentsByUserId(userId.intValue());
-      userService.deleteUser(userId);
+      inMemoryCommentRepository.deleteCommentsByUserId(userId);
+      storage.deleteUser(userId);
       session.invalidate();
 
       ra.addFlashAttribute("success", "¡Cuenta eliminada permanentemente!");
