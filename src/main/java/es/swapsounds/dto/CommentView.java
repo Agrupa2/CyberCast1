@@ -6,7 +6,7 @@ import es.swapsounds.model.Comment;
 import es.swapsounds.model.User;
 
 public class CommentView {
-    private Long id;
+    private String id;
     private String content;
     private User user;
     private LocalDateTime created;
@@ -16,15 +16,15 @@ public class CommentView {
         this.id = comment.getId();
         this.content = comment.getContent();
         this.user = comment.getUser();
-        this.created = comment.getCreatedAt();
+        this.created = comment.getCreated();
         this.isCommentOwner = isCommentOwner;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
