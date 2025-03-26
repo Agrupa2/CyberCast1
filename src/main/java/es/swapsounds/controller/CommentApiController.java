@@ -90,7 +90,7 @@ public class CommentApiController {
             RedirectAttributes redirectAttributes) {
 
         // Validate logged users
-        Integer currentUserId = (Integer) session.getAttribute("userId");
+        Long currentUserId = (Long) session.getAttribute("userId");
         if (currentUserId == null)
             return "redirect:/login";
 

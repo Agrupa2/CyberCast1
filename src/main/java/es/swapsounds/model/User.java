@@ -93,11 +93,11 @@ public class User {
         return sounds;
     }
 
-    public int getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setId(int userId) {
+    public void setId(Long userId) {
         this.userId = userId;
     }
 

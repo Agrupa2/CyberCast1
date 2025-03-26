@@ -26,7 +26,6 @@ public class Comment {
     private Sound sound;
 
 
-
     public Comment(Long id, String content, User user) {
         this.id = id;
         this.content = content;
@@ -83,7 +82,7 @@ public class Comment {
         this.modified = modified;
     }
 
-    public int getAuthorId() {
+    public Long getAuthorId() {
         return this.user.getUserId();
     }
 
