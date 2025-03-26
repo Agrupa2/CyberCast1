@@ -1,5 +1,6 @@
 package es.swapsounds.model;
 
+import java.util.List;
 import java.util.Set;
 
 //import jakarta.annotation.Generated;

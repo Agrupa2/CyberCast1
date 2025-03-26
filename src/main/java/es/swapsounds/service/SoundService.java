@@ -14,7 +14,7 @@ import es.swapsounds.model.User;
 import es.swapsounds.repository.SoundRepository;
 import es.swapsounds.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.transaction.annotation.Transactional;
+import jakarta.transaction.Transactional;
 import es.swapsounds.service.CategoryService;
 
 @Service
