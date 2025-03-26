@@ -15,9 +15,9 @@ import java.util.stream.Collectors;
 @Repository
 public class InMemoryCommentRepository {
     // Map: soundId -> Comment List
-    private final Map<Long, List<Comment>> commentsBySoundId = new ConcurrentHashMap<>();
+    private final Map<Integer, List<Comment>> commentsBySoundId = new ConcurrentHashMap<>();
 
-    public Comment addComment(long soundId, String soundTitle, String content, User user) {
+    public Comment addComment(int soundId, String soundTitle, String content, User user) {
         Comment comment = new Comment(
             UUID.randomUUID().toString(), // ID único
             content, // Contenido del comentario
@@ -37,11 +37,11 @@ public class InMemoryCommentRepository {
         return comment;
     }
 
-    public List<Comment> getCommentsBySoundId(long soundId) {
+    public List<Comment> getCommentsBySoundId(int soundId) {
         return commentsBySoundId.getOrDefault(soundId, Collections.emptyList());
     }
 
-    public boolean editComment(long soundId, String commentId, String newContent, User user) {
+    public boolean editComment(int soundId, String commentId, String newContent, User user) {
         return commentsBySoundId.getOrDefault(soundId, Collections.emptyList())
                 .stream()
                 .filter(comment -> comment.getId().equals(commentId) &&
@@ -55,24 +55,24 @@ public class InMemoryCommentRepository {
                 .orElse(false);
     }
 
-    public boolean deleteComment(long commentId) {
+    public boolean deleteComment(String commentId) {
         return commentsBySoundId.values().stream()
             .anyMatch(comments -> comments.removeIf(c -> c.getId().equals(commentId)));
     }
 
-    public void deleteCommentsByUserId(long userId) {
+    public void deleteCommentsByUserId(int userId) {
         commentsBySoundId.values()
                 .forEach(comments -> comments.removeIf(comment -> comment.getUser().getUserId() == userId));
     }
 
-    public Optional<Comment> findCommentById(long commentId) {
+    public Optional<Comment> findCommentById(String commentId) {
         return commentsBySoundId.values().stream() // Recorre todas las listas de comentarios
             .flatMap(List::stream) // Convierte las listas en un solo stream
             .filter(comment -> comment.getId().equals(commentId)) // Filtra por ID
             .findFirst(); // Devuelve el primer comentario que coincida
     }
 
-    public List<Comment> getCommentsByUserId(long userId) {
+    public List<Comment> getCommentsByUserId(int userId) {
     return commentsBySoundId.values().stream()
         .flatMap(List::stream)
         .filter(comment -> comment.getAuthorId() == userId)

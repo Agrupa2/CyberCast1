@@ -18,7 +18,7 @@ public class Comment {
     private Sound sound; // sound to which the comment is related
     private LocalDateTime created; // comment upload date
     private LocalDateTime modified; // comment modification date
-    private long soundId;
+    private int soundId;
     private String soundTitle;
 
 
@@ -78,15 +78,15 @@ public class Comment {
         this.modified = modified;
     }
 
-    public long getAuthorId() {
+    public int getAuthorId() {
         return this.user.getUserId();
     }
 
-    public long getSoundId() {
+    public int getSoundId() {
         return soundId;
     }
 
-    public void setSoundId(long soundId) {
+    public void setSoundId(int soundId) {
         this.soundId = soundId;
     }
 

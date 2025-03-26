@@ -25,13 +25,13 @@ public class CommentApiController {
 
     @PostMapping("/sounds/{soundId}/comments")
     public String addComment(
-            @PathVariable long soundId,
+            @PathVariable int soundId,
             @RequestParam String content,
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
         // Obtener el usuario actual
-        Long userId = (Long) session.getAttribute("userId");
+        Integer userId = (Integer) session.getAttribute("userId");
         if (userId == null)
             return "redirect:/login";
 
@@ -58,13 +58,13 @@ public class CommentApiController {
 
     @PostMapping("/sounds/{soundId}/comments/{commentId}/edit")
     public String editComment(
-            @PathVariable long soundId,
+            @PathVariable int soundId,
             @PathVariable String commentId,
             @RequestParam String content,
             HttpSession session) {
 
         // User validation
-        Long userId = (Long) session.getAttribute("userId");
+        Integer userId = (Integer) session.getAttribute("userId");
         if (userId == null) {
             return "redirect:/login";
         }
@@ -84,13 +84,13 @@ public class CommentApiController {
 
     @PostMapping("/sounds/{soundId}/comments/{commentId}/delete")
     public String deleteComment(
-            @PathVariable long soundId,
-            @PathVariable long commentId,
+            @PathVariable int soundId,
+            @PathVariable String commentId,
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
         // Validate logged users
-        Long currentUserId = (Long) session.getAttribute("userId");
+        Integer currentUserId = (Integer) session.getAttribute("userId");
         if (currentUserId == null)
             return "redirect:/login";
 

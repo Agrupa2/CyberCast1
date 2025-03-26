@@ -72,13 +72,13 @@ public class InMemoryStorage {
         return new ArrayList<>(sounds != null ? sounds : new ArrayList<>());
     }
 
-    public Optional<Sound> findSoundById(long id) {
+    public Optional<Sound> findSoundById(int id) {
         return sounds.stream()
                 .filter(s -> s.getId() == id)
                 .findFirst();
     }
 
-    public Optional<User> findUserById(long userId) {
+    public Optional<User> findUserById(int userId) {
         return users.stream()
                 .filter(u -> u.getUserId() == userId)
                 .findFirst();
@@ -117,7 +117,7 @@ public class InMemoryStorage {
         return "/uploads/" + directory + "/" + fileName;
     }
 
-    public Sound getSoundById(long soundId) {
+    public Sound getSoundById(int soundId) {
         return sounds.stream()
                 .filter(sound -> sound.getId() == soundId)
                 .findFirst()
@@ -129,14 +129,14 @@ public class InMemoryStorage {
         sounds.add(updatedSound);
     }
 
-    public List<Sound> getSoundsByUserId(long userId) {
+    public List<Sound> getSoundsByUserId(int userId) {
         return sounds.stream()
                 .filter(sound -> sound.getUserId() == userId)
                 .sorted(Comparator.comparing(Sound::getUploadDate).reversed())
                 .collect(Collectors.toList());
     }
 
-    public void deleteUser(long userId) {
+    public void deleteUser(int userId) {
         // Deletes the user from the list
         users.removeIf(u -> u.getUserId() == userId);
 
@@ -175,7 +175,7 @@ public class InMemoryStorage {
                 });
     }
 
-    public void deleteSound(long soundId) {
+    public void deleteSound(int soundId) {
         Optional<Sound> soundOptional = sounds.stream()
                 .filter(s -> s.getId() == soundId)
                 .findFirst();
@@ -202,14 +202,14 @@ public class InMemoryStorage {
         }
     }
 
-    public void updateUsername(long userId, String newUsername) {
+    public void updateUsername(int userId, String newUsername) {
         users.stream()
                 .filter(u -> u.getUserId() == userId)
                 .findFirst()
                 .ifPresent(u -> u.setUsername(newUsername));
     }
 
-    public void updateProfilePicture(long userId, String imagePath) {
+    public void updateProfilePicture(int userId, String imagePath) {
         users.stream()
                 .filter(u -> u.getUserId() == userId)
                 .findFirst()
