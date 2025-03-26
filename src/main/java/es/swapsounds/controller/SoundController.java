@@ -19,7 +19,7 @@ import es.swapsounds.dto.CommentView;
 import es.swapsounds.model.Comment;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
-import es.swapsounds.storage.CommentRepository;
+import es.swapsounds.storage.InMemoryCommentRepository;
 import es.swapsounds.storage.InMemoryStorage;
 import jakarta.servlet.http.HttpSession;
 
@@ -27,7 +27,7 @@ import jakarta.servlet.http.HttpSession;
 public class SoundController {
 
     @Autowired
-    private CommentRepository commentRepository;
+    private InMemoryCommentRepository inMemoryCommentRepository;
 
     @Autowired
     private InMemoryStorage storage;
@@ -229,7 +229,7 @@ public class SoundController {
             model.addAttribute("uploader", null);
         }
 
-        List<Comment> comments = commentRepository.getCommentsBySoundId(soundId);
+        List<Comment> comments = inMemoryCommentRepository.getCommentsBySoundId(soundId);
 
         // Checking if the user is the owner of the sound
         Integer currentUserId = (Integer) session.getAttribute("userId");

@@ -13,7 +13,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 @Repository
-public class CommentRepository {
+public class InMemoryCommentRepository {
     // Map: soundId -> Comment List
     private final Map<Integer, List<Comment>> commentsBySoundId = new ConcurrentHashMap<>();
 

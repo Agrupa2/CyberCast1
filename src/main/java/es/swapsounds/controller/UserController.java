@@ -1,6 +1,6 @@
 package es.swapsounds.controller;
 
-import es.swapsounds.storage.CommentRepository;
+import es.swapsounds.storage.InMemoryCommentRepository;
 import es.swapsounds.storage.InMemoryStorage;
 import jakarta.servlet.http.HttpSession;
 
@@ -16,7 +16,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class UserController {
 
    @Autowired
-   private CommentRepository commentRepository;
+   private InMemoryCommentRepository inMemoryCommentRepository;
 
    @Autowired
    private InMemoryStorage storage;
@@ -47,7 +47,7 @@ public class UserController {
          return "redirect:/delete-account";
       }
 
-      commentRepository.deleteCommentsByUserId(userId);
+      inMemoryCommentRepository.deleteCommentsByUserId(userId);
       storage.deleteUser(userId);
       session.invalidate();
 
