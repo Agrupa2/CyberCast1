@@ -32,7 +32,7 @@ public class User {
     }
 
     public String getRole() {
-        return this.role;
+        return role;
     }
 
     public void setRole(String role) {
