@@ -68,12 +68,12 @@
         <form action="/start" method="GET" class="search-container">
             <input type="text" name="query" class="search-bar" placeholder="Searching for sounds..."
                 value="{{#query}}{{query}}{{/query}}"> <!-- Maintain the value after searching -->
-
-            <select name="category" class="fold-out" onchange="this.form.submit()"> <!-- Send when changing category -->
-                <option value="all" {{#selectedAll}}selected{{/selectedAll}}>All Categories</option>
-                <option value="Meme" {{#selectedMeme}}selected{{/selectedMeme}}>Meme</option>
-                <option value="Football" {{#selectedFootball}}selected{{/selectedFootball}}>Football</option>
-                <option value="Party" {{#selectedParty}}selected{{/selectedParty}}>Party</option>
+            
+            <select name="category" class="fold-out" onchange="this.form.submit()">
+                <option value="all" {{#selectedAll}}selected{{/selectedAll}}>Todas las categorías</option>
+                {{#allCategories}}
+                <option value="{{name}}" {{#selected}}selected{{/selected}}>{{name}}</option>
+                {{/allCategories}}
             </select>
 
             <!-- Hiden Button to submit with Enter -->
@@ -95,7 +95,11 @@
                 <div class="card-body">
                     <h3 class="card-title"><a href="/sounds/{{id}}">{{title}}</a></h3>
                     <div class="card-info">
-                        <span class="category">{{category}}</span>
+                        <div class="categories">
+                            {{#categories}}
+                            <span class="category">{{name}}</span>
+                            {{/categories}}
+                        </div>
                         <span class="duration">{{duration}} min</span>
                     </div>
                     <div class="audio-container">
