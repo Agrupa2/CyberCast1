@@ -18,7 +18,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import es.swapsounds.model.Comment;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
-import es.swapsounds.storage.CommentRepository;
+import es.swapsounds.storage.InMemoryCommentRepository;
 import es.swapsounds.storage.InMemoryStorage;
 import jakarta.servlet.http.HttpSession;
 
@@ -26,7 +26,7 @@ import jakarta.servlet.http.HttpSession;
 public class ProfileController {
 
     @Autowired
-    private CommentRepository commentRepository;
+    private InMemoryCommentRepository inMemoryCommentRepository;
     @Autowired
     private InMemoryStorage storage;
 
@@ -34,7 +34,7 @@ public class ProfileController {
     public String userProfile(HttpSession session, Model model) {
 
         String username = (String) session.getAttribute("username");
-        Integer userId = (Integer) session.getAttribute("userId");
+        Long userId = (Long) session.getAttribute("userId");
 
         if (userId == null) {
             return "redirect:/login";
@@ -60,7 +60,7 @@ public class ProfileController {
 
         
         List<Sound> userSounds = storage.getSoundsByUserId(userId);
-        List<Comment> userComments = commentRepository.getCommentsByUserId(userId); // Nuevo: Obtener comentarios
+        List<Comment> userComments = inMemoryCommentRepository.getCommentsByUserId(userId); // Nuevo: Obtener comentarios
 
         model.addAttribute("comments", userComments); // Añadir comentarios al modelo
         model.addAttribute("profileImagePath", profileImagePath); 
@@ -79,7 +79,7 @@ public class ProfileController {
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
-        Integer userId = (Integer) session.getAttribute("userId");
+        Long userId = (Long) session.getAttribute("userId");
         if (userId == null)
             return "redirect:/login";
 
@@ -101,7 +101,7 @@ public class ProfileController {
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
-        Integer userId = (Integer) session.getAttribute("userId");
+        Long userId = (Long) session.getAttribute("userId");
         if (userId == null)
             return "redirect:/login";
 

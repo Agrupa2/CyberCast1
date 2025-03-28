@@ -1,3 +1,4 @@
+
 //para almacenar los comentarios de los sonidos
 package es.swapsounds.storage;
 
@@ -13,13 +14,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 @Repository
-public class CommentRepository {
+public class InMemoryCommentRepository {
     // Map: soundId -> Comment List
     private final Map<Integer, List<Comment>> commentsBySoundId = new ConcurrentHashMap<>();
 
     public Comment addComment(int soundId, String soundTitle, String content, User user) {
         Comment comment = new Comment(
-            UUID.randomUUID().toString(), // ID único
+            generateUniqueLong(), // ID único
             content, // Contenido del comentario
             user // Usuario que comenta
         );
@@ -60,7 +61,7 @@ public class CommentRepository {
             .anyMatch(comments -> comments.removeIf(c -> c.getId().equals(commentId)));
     }
 
-    public void deleteCommentsByUserId(int userId) {
+    public void deleteCommentsByUserId(long userId) {
         commentsBySoundId.values()
                 .forEach(comments -> comments.removeIf(comment -> comment.getUser().getUserId() == userId));
     }
@@ -72,10 +73,22 @@ public class CommentRepository {
             .findFirst(); // Devuelve el primer comentario que coincida
     }
 
-    public List<Comment> getCommentsByUserId(int userId) {
+    public List<Comment> getCommentsByUserId(long userId) {
     return commentsBySoundId.values().stream()
         .flatMap(List::stream)
         .filter(comment -> comment.getAuthorId() == userId)
         .collect(Collectors.toList());
+<<<<<<< HEAD
+    }
+
+    // Genera un Long único usando los bits del UUID
+    public static long generateUniqueLong() {
+        UUID uuid = UUID.randomUUID();
+        return uuid.getMostSignificantBits() ^ uuid.getLeastSignificantBits();
+    }
+}
+=======
 }
 }
+
+>>>>>>> 282c629ae78952cde1d0a892bb9262706a47f1e2
