@@ -10,7 +10,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import es.swapsounds.model.Comment;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
-import es.swapsounds.storage.InMemoryCommentRepository;
+import es.swapsounds.storage.CommentRepository;
 import es.swapsounds.storage.InMemoryStorage;
 import jakarta.servlet.http.HttpSession;
 
@@ -19,7 +19,7 @@ import jakarta.servlet.http.HttpSession;
 public class CommentApiController {
 
     @Autowired
-    private InMemoryCommentRepository inMemoryCommentRepository;
+    private CommentRepository commentRepository;
     @Autowired
     private InMemoryStorage storage;
 
@@ -46,7 +46,7 @@ public class CommentApiController {
         }
 
         // Crear y guardar el comentario
-        Comment comment = inMemoryCommentRepository.addComment(
+        Comment comment = commentRepository.addComment(
                 soundId,
                 sound.getTitle(), // Pasar el título del sonido
                 content,
@@ -73,7 +73,7 @@ public class CommentApiController {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         // Updating the comment with the user input
-        boolean success = inMemoryCommentRepository.editComment(
+        boolean success = commentRepository.editComment(
                 soundId,
                 commentId,
                 content,
@@ -90,12 +90,12 @@ public class CommentApiController {
             RedirectAttributes redirectAttributes) {
 
         // Validate logged users
-        Long currentUserId = (Long) session.getAttribute("userId");
+        Integer currentUserId = (Integer) session.getAttribute("userId");
         if (currentUserId == null)
             return "redirect:/login";
 
         // Search for the comment
-        Comment comment = inMemoryCommentRepository.findCommentById(commentId)
+        Comment comment = commentRepository.findCommentById(commentId)
                 .orElseThrow(() -> new RuntimeException("Comentario no encontrado"));
 
         // ID author and session validation
@@ -105,7 +105,7 @@ public class CommentApiController {
         }
 
         // Deleting comment
-        inMemoryCommentRepository.deleteComment(commentId);
+        commentRepository.deleteComment(commentId);
 
         redirectAttributes.addFlashAttribute("success", "Comentario eliminado");
         return "redirect:/sounds/" + soundId;

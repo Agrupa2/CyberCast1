@@ -1,34 +1,17 @@
 package es.swapsounds.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-@Table(name = "UserTable")
 public class User {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String username;
     private String email;
     private String password;
     private String profilePicturePath;
+    private List<Comment> comments;
+    private List<Sound> sounds;
     private int userId;
     private String role;
-
-    @OneToMany
-    private List<Comment> comments = new ArrayList<>();
-
-    @ManyToMany (mappedBy = "users")
-    private List<Sound> sounds = new ArrayList<>();
 
     public User(String username, String email, String password, String profilePicturePath, int userId, String role) {
         this.username = username;
@@ -46,10 +29,6 @@ public class User {
         this.email = email2;
         this.password = user_password;
         this.profilePicturePath = photoPath;
-    }
-
-    public User() {
-        // Used by JPA
     }
 
     public String getRole() {
@@ -78,7 +57,14 @@ public class User {
     }
 
     public String getProfilePicturePath() {
-        return profilePicturePath != null ? profilePicturePath : "/uploads/profiles/default-avatar.png"; // If the user profile image is set to null, use the default profile image
+        return profilePicturePath != null ? profilePicturePath : "/uploads/profiles/default-avatar.png"; // If the user
+                                                                                                         // profile
+                                                                                                         // image is
+                                                                                                         // set to null,
+                                                                                                         // use the
+                                                                                                         // default
+                                                                                                         // profile
+                                                                                                         // image
     }
 
     public void setProfilePicturePath(String profilePicturePath) {
@@ -93,11 +79,11 @@ public class User {
         return sounds;
     }
 
-    public Long getUserId() {
+    public int getUserId() {
         return userId;
     }
 
-    public void setId(Long userId) {
+    public void setId(int userId) {
         this.userId = userId;
     }
 

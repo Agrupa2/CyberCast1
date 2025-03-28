@@ -19,7 +19,7 @@ import es.swapsounds.dto.CommentView;
 import es.swapsounds.model.Comment;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
-import es.swapsounds.storage.InMemoryCommentRepository;
+import es.swapsounds.storage.CommentRepository;
 import es.swapsounds.storage.InMemoryStorage;
 import jakarta.servlet.http.HttpSession;
 
@@ -27,7 +27,7 @@ import jakarta.servlet.http.HttpSession;
 public class SoundController {
 
     @Autowired
-    private InMemoryCommentRepository inMemoryCommentRepository;
+    private CommentRepository commentRepository;
 
     @Autowired
     private InMemoryStorage storage;
@@ -40,7 +40,7 @@ public class SoundController {
             Model model) {
 
         String username = (String) session.getAttribute("username");
-        Long userId = (Long) session.getAttribute("userId");
+        Integer userId = (Integer) session.getAttribute("userId");
 
         if (username != null && userId != null) {
             model.addAttribute("message", "Welcome, " + username + "!");
@@ -113,7 +113,7 @@ public class SoundController {
             HttpSession session, // Using HttpSession in order to get UserId
             Model model) throws IOException {
 
-        Long userId = (Long) session.getAttribute("userId");
+        Integer userId = (Integer) session.getAttribute("userId");
         if (userId == null) {
             model.addAttribute("error", "You must be logged in to upload sounds.");
             return "redirect:/login"; // If the user is not logged in, redirect to the login page
@@ -132,11 +132,7 @@ public class SoundController {
         String imagePath = storage.saveFile(username, imageFile, "images");
 
         // Creating and stroring the sound
-<<<<<<< HEAD
-        Sound sound = new Sound((long)0, title, description, audioPath, imagePath, userId, category, duration);
-=======
-        Sound sound = new Sound(0, title, description, audioPath, imagePath, category, duration);
->>>>>>> 282c629ae78952cde1d0a892bb9262706a47f1e2
+        Sound sound = new Sound(0, title, description, audioPath, imagePath, userId, category, duration);
         storage.addSound(sound);
 
         model.addAttribute("success", "Sound uploaded successfully!");
@@ -154,7 +150,7 @@ public class SoundController {
 
         // Obtainint username and userId from session
         String username = (String) session.getAttribute("username");
-        Long userId = (Long) session.getAttribute("userId");
+        Integer userId = (Integer) session.getAttribute("userId");
 
         // If the user is logged, it adds ths info to the model
         if (username != null && userId != null) {
@@ -202,7 +198,7 @@ public class SoundController {
             Model model) {
 
         // Obtaining userId and username from the session
-        Long userId = (Long) session.getAttribute("userId");
+        Integer userId = (Integer) session.getAttribute("userId");
         String username = (String) session.getAttribute("username");
 
         Optional<Sound> soundOpt = storage.findSoundById(soundId);
@@ -233,10 +229,10 @@ public class SoundController {
             model.addAttribute("uploader", null);
         }
 
-        List<Comment> comments = inMemoryCommentRepository.getCommentsBySoundId(soundId);
+        List<Comment> comments = commentRepository.getCommentsBySoundId(soundId);
 
         // Checking if the user is the owner of the sound
-        Long currentUserId = (Long) session.getAttribute("userId");
+        Integer currentUserId = (Integer) session.getAttribute("userId");
         List<CommentView> commentViews = comments.stream()
                 .map(comment -> {
                     boolean isOwner = currentUserId != null &&
@@ -266,7 +262,7 @@ public class SoundController {
             HttpSession session,
             Model model) throws IOException {
 
-        Long userId = (Long) session.getAttribute("userId");
+        Integer userId = (Integer) session.getAttribute("userId");
         Optional<Sound> originalSound = storage.findSoundById(soundId);
 
         if (userId == null || !originalSound.isPresent() || originalSound.get().getUserId() != userId) {
@@ -305,7 +301,7 @@ public class SoundController {
             RedirectAttributes redirectAttributes) { // Para enviar mensajes de retroalimentación
 
         // Obtener el ID del usuario actual desde la sesión
-        Long userId = (Long) session.getAttribute("userId");
+        Integer userId = (Integer) session.getAttribute("userId");
 
         // Verificar si el usuario está autenticado
         if (userId == null) {
@@ -339,56 +335,5 @@ public class SoundController {
 
         return "redirect:/dashboard"; // Redirigir al dashboard después de eliminar
     }
-
-    @GetMapping("/sounds/delete")
-    public String showDeleteSounds(
-            @RequestParam(name = "query", required = false) String query,
-            @RequestParam(name = "category", defaultValue = "all") String category,
-            HttpSession session,
-            Model model) {
-
-        // Obtainint username and userId from session
-        String username = (String) session.getAttribute("username");
-        Long userId = (Long) session.getAttribute("userId");
-
-        // If the user is logged, it adds ths info to the model
-        if (username != null && userId != null) {
-            model.addAttribute("message", "Welcome, " + username + "!");
-            model.addAttribute("username", username);
-            model.addAttribute("userId", userId);
-        }
-
-        // Obtaining every sound
-        List<Sound> allSounds = storage.getAllSounds();
-
-        // Filtering sounds by the user search or category selected
-        List<Sound> filteredSounds = allSounds.stream()
-                .filter(sound -> {
-                    boolean matchesCategory = category.equals("all")
-                            || sound.getCategory().equalsIgnoreCase(category);
-
-                    boolean matchesQuery = query == null
-                            || sound.getTitle().toLowerCase().contains(query.toLowerCase());
-
-                    return matchesCategory && matchesQuery;
-                })
-                .collect(Collectors.toList());
-
-        // Adding the filtered sounds to the model
-        model.addAttribute("sounds", filteredSounds);
-
-        // Keeping the search and category selected by the user
-        model.addAttribute("query", query);
-        model.addAttribute("category", category);
-
-        // Keeping the selected category
-        model.addAttribute("selectedAll", category.equals("all"));
-        model.addAttribute("selectedMeme", category.equalsIgnoreCase("Meme"));
-        model.addAttribute("selectedFootball", category.equalsIgnoreCase("Football"));
-        model.addAttribute("selectedParty", category.equalsIgnoreCase("Party"));
-
-        return "delete-sound";
-    }
 }
-
 
