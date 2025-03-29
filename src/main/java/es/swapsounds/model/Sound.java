@@ -69,9 +69,9 @@ public class Sound {
         this.uploadDate = LocalDateTime.now();
     }
 
-    public Sound(int i, String title2, String description2, String audioPath, String imagePath2, User user,
+    public Sound(long i, String title2, String description2, String audioPath, String imagePath2, User user,
             Object object, String duration2) {
-        this.id = i;
+        this.soundId = i;
         this.title = title2;
         this.description = description2;
         this.filePath = audioPath;

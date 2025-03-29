@@ -172,7 +172,7 @@ public String showSounds(
         storage.addSound(sound);
 
         model.addAttribute("success", "¡Sonido subido con éxito!");
-        return "redirect:/sounds/" + sound.getId();
+        return "redirect:/sounds/" + sound.getSoundId();
     }
 
     @GetMapping("/sounds/download")
