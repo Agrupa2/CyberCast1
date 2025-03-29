@@ -34,7 +34,7 @@ public class ProfileController {
     public String userProfile(HttpSession session, Model model) {
 
         String username = (String) session.getAttribute("username");
-        Integer userId = (Integer) session.getAttribute("userId");
+        Long userId = (Long) session.getAttribute("userId");
 
         if (userId == null) {
             return "redirect:/login";
@@ -79,7 +79,7 @@ public class ProfileController {
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
-        Integer userId = (Integer) session.getAttribute("userId");
+        Long userId = (Long) session.getAttribute("userId");
         if (userId == null)
             return "redirect:/login";
 
@@ -101,7 +101,7 @@ public class ProfileController {
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
-        Integer userId = (Integer) session.getAttribute("userId");
+        Long userId = (Long) session.getAttribute("userId");
         if (userId == null)
             return "redirect:/login";
 

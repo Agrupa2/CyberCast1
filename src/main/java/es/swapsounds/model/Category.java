@@ -4,13 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-
 public class Category {
 
 
-    private Long id;
+    private long id;
     private String name;
-
     private List<Sound> sounds = new ArrayList<>(); // This is a list of sounds that belong to this category
 
     public Category(Long id, String name) {
@@ -28,11 +26,11 @@ public class Category {
         //Used by JPA
     }
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
     }
 

@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class InMemoryStorage {
     private List<User> users = new ArrayList<>();
     private List<Sound> sounds = new ArrayList<>();
-    private int idCounter = 1;
+    private long idCounter = 1;
 
     public InMemoryStorage() {
         // Locally generated users for testing
@@ -64,7 +64,7 @@ public class InMemoryStorage {
     }
 
     public void addSound(Sound sound) {
-        sound.setId(idCounter++);
+        sound.setSoundId(idCounter++);
         sounds.add(sound);
     }
 
@@ -72,13 +72,13 @@ public class InMemoryStorage {
         return new ArrayList<>(sounds != null ? sounds : new ArrayList<>());
     }
 
-    public Optional<Sound> findSoundById(int id) {
+    public Optional<Sound> findSoundById(long id) {
         return sounds.stream()
-                .filter(s -> s.getId() == id)
+                .filter(s -> s.getSoundId() == id)
                 .findFirst();
     }
 
-    public Optional<User> findUserById(int userId) {
+    public Optional<User> findUserById(long userId) {
         return users.stream()
                 .filter(u -> u.getUserId() == userId)
                 .findFirst();
@@ -117,26 +117,26 @@ public class InMemoryStorage {
         return "/uploads/" + directory + "/" + fileName;
     }
 
-    public Sound getSoundById(int soundId) {
+    public Sound getSoundById(long soundId) {
         return sounds.stream()
-                .filter(sound -> sound.getId() == soundId)
+                .filter(sound -> sound.getSoundId() == soundId)
                 .findFirst()
                 .orElse(null);
     }
 
     public void updateSound(Sound updatedSound) {
-        sounds.removeIf(s -> s.getId() == updatedSound.getId());
+        sounds.removeIf(s -> s.getSoundId() == updatedSound.getSoundId());
         sounds.add(updatedSound);
     }
 
-    public List<Sound> getSoundsByUserId(int userId) {
+    public List<Sound> getSoundsByUserId(long userId) {
         return sounds.stream()
                 .filter(sound -> sound.getUserId() == userId)
                 .sorted(Comparator.comparing(Sound::getUploadDate).reversed())
                 .collect(Collectors.toList());
     }
 
-    public void deleteUser(int userId) {
+    public void deleteUser(long userId) {
         // Deletes the user from the list
         users.removeIf(u -> u.getUserId() == userId);
 
@@ -175,9 +175,9 @@ public class InMemoryStorage {
                 });
     }
 
-    public void deleteSound(int soundId) {
+    public void deleteSound(long soundId) {
         Optional<Sound> soundOptional = sounds.stream()
-                .filter(s -> s.getId() == soundId)
+                .filter(s -> s.getSoundId() == soundId)
                 .findFirst();
     
         if (soundOptional.isPresent()) {
@@ -202,14 +202,14 @@ public class InMemoryStorage {
         }
     }
 
-    public void updateUsername(int userId, String newUsername) {
+    public void updateUsername(long userId, String newUsername) {
         users.stream()
                 .filter(u -> u.getUserId() == userId)
                 .findFirst()
                 .ifPresent(u -> u.setUsername(newUsername));
     }
 
-    public void updateProfilePicture(int userId, String imagePath) {
+    public void updateProfilePicture(long userId, String imagePath) {
         users.stream()
                 .filter(u -> u.getUserId() == userId)
                 .findFirst()

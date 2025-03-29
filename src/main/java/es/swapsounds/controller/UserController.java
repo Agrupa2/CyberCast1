@@ -23,7 +23,7 @@ public class UserController {
 
    @GetMapping("/delete-account")
    public String showDeletePage(HttpSession session, Model model) {
-      Integer userId = (Integer) session.getAttribute("userId");
+      Long userId = (Long) session.getAttribute("userId");
       if (userId == null)
          return "redirect:/login";
 
@@ -38,7 +38,7 @@ public class UserController {
          HttpSession session,
          RedirectAttributes ra) {
 
-      Integer userId = (Integer) session.getAttribute("userId");
+      Long userId = (Long) session.getAttribute("userId");
       if (userId == null)
          return "redirect:/login";
 

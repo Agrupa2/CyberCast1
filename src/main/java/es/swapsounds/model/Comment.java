@@ -1,20 +1,21 @@
 package es.swapsounds.model;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public class Comment {
-    private String id; // comment identification
+    private long commentId; // comment identification
     private User user; // user uploader of the comment
     private String content; // comment content
     private Sound sound; // sound to which the comment is related
     private LocalDateTime created; // comment upload date
     private LocalDateTime modified; // comment modification date
-    private int soundId;
+    private long soundId;
     private String soundTitle;
 
 
-    public Comment(String id, String content, User user) {
-        this.id = id;
+    public Comment(Long commentId, String content, User user) {
+        this.commentId = commentId;
         this.content = content;
         this.user = user;
         this.created = LocalDateTime.now();
@@ -23,6 +24,7 @@ public class Comment {
 
     public Comment() {
     }
+
 
     // Getters
     public User getUser() {
@@ -41,12 +43,12 @@ public class Comment {
         this.sound = sound;
     }
 
-    public String getId() {
-        return id;
+    public long getCommentId() {
+        return commentId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setCommentId(long commentId) {
+        this.commentId = commentId;
     }
 
     public LocalDateTime getCreated() {
@@ -69,15 +71,15 @@ public class Comment {
         this.modified = modified;
     }
 
-    public int getAuthorId() {
+    public long getAuthorId() {
         return this.user.getUserId();
     }
 
-    public int getSoundId() {
+    public long getSoundId() {
         return soundId;
     }
 
-    public void setSoundId(int soundId) {
+    public void setSoundId(long soundId) {
         this.soundId = soundId;
     }
 

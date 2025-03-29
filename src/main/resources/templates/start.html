@@ -69,11 +69,11 @@
             <input type="text" name="query" class="search-bar" placeholder="Searching for sounds..."
                 value="{{#query}}{{query}}{{/query}}"> <!-- Maintain the value after searching -->
 
-            <select name="category" class="fold-out" onchange="this.form.submit()"> <!-- Send when changing category -->
-                <option value="all" {{#selectedAll}}selected{{/selectedAll}}>All Categories</option>
-                <option value="Meme" {{#selectedMeme}}selected{{/selectedMeme}}>Meme</option>
-                <option value="Football" {{#selectedFootball}}selected{{/selectedFootball}}>Football</option>
-                <option value="Party" {{#selectedParty}}selected{{/selectedParty}}>Party</option>
+            <select name="category" class="fold-out" onchange="this.form.submit()">
+                <option value="all" {{{selectedAll}}}>All Categories</option>
+                <option value="Meme" {{{selectedMeme}}}>Meme</option>
+                <option value="Football" {{{selectedFootball}}}>Football</option>
+                <option value="Party" {{{selectedParty}}}>Party</option>
             </select>
 
             <!-- Hiden Button to submit with Enter -->
@@ -82,7 +82,7 @@
 
         <!-- Sound Grid -->
         <div class="sound-grid" id="soundsContainer">
-            {{#sounds}} <!-- Shows the different characteristics of the sounds -->
+            {{#sounds}} <!-- Iterate over the list of sounds -->
             <div class="sound-card">
                 <div class="card-head">
                     <img src="{{imagePath}}" alt="{{title}}" class="card-img">
@@ -93,16 +93,16 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <h3 class="card-title"><a href="/sounds/{{id}}">{{title}}</a></h3>
+                    <h3 class="card-title"><a href="/sounds/{{soundId}}">{{title}}</a></h3>
                     <div class="card-info">
                         <span class="category">{{category}}</span>
                         <span class="duration">{{duration}} min</span>
                     </div>
                     <div class="audio-container">
-                        <!-- Hiden audio media player -->
+                        <!-- Hidden audio media player -->
                         <audio class="custom-audio">
                             <source src="{{filePath}}" type="audio/mpeg">
-                            Tu navegador no soporta el elemento de audio.
+                            Your browser does not support the audio element.
                         </audio>
                         <!-- Custom controls -->
                         <div class="audio-controls">
@@ -115,8 +115,8 @@
                 </div>
             </div>
             {{/sounds}}
-            {{^sounds}} <!-- If there is no sounds -->
-            <p>No se encontraron sonidos.</p>
+            {{^sounds}} <!-- If no sounds are found -->
+            <p>No sounds found.</p>
             {{/sounds}}
         </div>
 

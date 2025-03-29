@@ -5,18 +5,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Sound {
-    private int id;
+    private long soundId;
     private String title;
     private String description;
     private String filePath;
     private String imagePath;
-    private int userId;
+    private long userId;
     private List<Comment> comments;
     private String category;
     private String duration;
     private LocalDateTime uploadDate;
 
-    public Sound(String title, String description, String filePath, String imagePath, int userId, String Category,
+    public Sound(String title, String description, String filePath, String imagePath, long userId, String Category,
             String duration) {
         this.title = title;
         this.description = description;
@@ -29,10 +29,10 @@ public class Sound {
         this.uploadDate = LocalDateTime.now();
     }
 
-    public Sound(int id, String title, String description, String filePath, String imagePath, String category,
-            int userId) {
+    public Sound(long soundId, String title, String description, String filePath, String imagePath, String category,
+                 long userId) {
         this.title = title;
-        this.id = id;
+        this.soundId = soundId;
         this.description = description;
         this.filePath = filePath;
         this.imagePath = imagePath;
@@ -41,10 +41,10 @@ public class Sound {
         this.uploadDate = LocalDateTime.now();
     }
 
-    public Sound(int id, String title, String description, String filePath, String imagePath, String category,
-            String duration) {
+    public Sound(long soundId, String title, String description, String filePath, String imagePath, String category,
+                 String duration) {
         this.title = title;
-        this.id = id;
+        this.soundId = soundId;
         this.description = description;
         this.filePath = filePath;
         this.imagePath = imagePath;
@@ -56,9 +56,9 @@ public class Sound {
     public Sound() {
     }
 
-    public Sound(int i, String title2, String description2, String audioPath, String imagePath2, Integer userId2,
+    public Sound(long soundId, String title2, String description2, String audioPath, String imagePath2, long userId2,
             String category2, String duration2) {
-        this.id = i;
+        this.soundId = soundId;
         this.title = title2;
         this.description = description2;
         this.filePath = audioPath;
@@ -85,7 +85,7 @@ public class Sound {
         return imagePath;
     }
 
-    public int getUserId() {
+    public long getUserId() {
         return userId;
     }
 
@@ -93,8 +93,8 @@ public class Sound {
         return comments;
     }
 
-    public int getId() {
-        return id;
+    public long getSoundId() {
+        return soundId;
     }
 
     public String getCategory() {
@@ -105,8 +105,8 @@ public class Sound {
         return duration;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setSoundId(long soundId) {
+        this.soundId = soundId;
     }
 
     public void setTitle(String title) {
@@ -125,7 +125,7 @@ public class Sound {
         this.imagePath = imagePath;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(long userId) {
         this.userId = userId;
     }
 

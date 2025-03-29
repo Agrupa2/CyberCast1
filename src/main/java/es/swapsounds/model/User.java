@@ -4,16 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class User {
+    private long userId;
     private String username;
     private String email;
     private String password;
     private String profilePicturePath;
     private List<Comment> comments;
     private List<Sound> sounds;
-    private int userId;
     private String role;
 
-    public User(String username, String email, String password, String profilePicturePath, int userId, String role) {
+    public User(String username, String email, String password, String profilePicturePath, long userId, String role) {
         this.username = username;
         this.email = email;
         this.password = password;
@@ -79,11 +79,11 @@ public class User {
         return sounds;
     }
 
-    public int getUserId() {
+    public long getUserId() {
         return userId;
     }
 
-    public void setId(int userId) {
+    public void setId(long userId) {
         this.userId = userId;
     }
 
