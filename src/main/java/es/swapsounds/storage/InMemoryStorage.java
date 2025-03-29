@@ -1,5 +1,6 @@
 package es.swapsounds.storage;
 
+import es.swapsounds.model.Category;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
 import org.springframework.stereotype.Component;
@@ -11,15 +12,20 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
 public class InMemoryStorage {
     private List<User> users = new ArrayList<>();
     private List<Sound> sounds = new ArrayList<>();
+
     private long idCounter = 1;
+    private Set<Category> categories = new HashSet<>();
+
 
     public InMemoryStorage() {
         // Locally generated users for testing
@@ -33,6 +39,26 @@ public class InMemoryStorage {
         sounds.add(new Sound(idCounter++, "El diablo que malditos tenis", "Peaceful rain for sleep",
                 "/audio/el-diablo-que-malditos-tenis.mp3", "/images/el-diablo-que-malditos-tenis.png", "Meme", "0:04"));
 
+        initializeDefaultCategories();
+
+    }
+
+    private void initializeDefaultCategories() {
+        addCategoryIfNotExists("Música");
+        addCategoryIfNotExists("Podcast");
+        addCategoryIfNotExists("Efectos de sonido");
+        addCategoryIfNotExists("Naturaleza");
+        addCategoryIfNotExists("Tecnología");
+    }
+
+    private void addCategoryIfNotExists(String name) {
+        String normalizedName = name.trim().toLowerCase();
+        boolean exists = categories.stream()
+            .anyMatch(c -> c.getName().trim().equalsIgnoreCase(normalizedName));
+        
+        if (!exists) {
+            categories.add(new Category(name.trim()));
+        }
     }
 
     public void addUser(User user) {
@@ -215,5 +241,21 @@ public class InMemoryStorage {
                 .findFirst()
                 .ifPresent(u -> u.setProfilePicturePath(imagePath));
     }
+
+    public Category findOrCreateCategory(String name) {
+        return categories.stream()
+            .filter(c -> c.getName().equalsIgnoreCase(name))
+            .findFirst()
+            .orElseGet(() -> {
+                Category newCategory = new Category(name);
+                categories.add(newCategory);
+                return newCategory;
+            });
+    }
     
+    public List<Category> getAllCategories() {
+        return new ArrayList<>(categories);
+    }
+
+
 }

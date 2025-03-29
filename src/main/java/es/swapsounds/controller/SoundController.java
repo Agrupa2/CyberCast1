@@ -1,8 +1,10 @@
 package es.swapsounds.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import es.swapsounds.dto.CommentView;
+import es.swapsounds.model.Category;
 import es.swapsounds.model.Comment;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
@@ -33,11 +36,11 @@ public class SoundController {
     private InMemoryStorage storage;
 
     @GetMapping("/start")
-    public String showSounds(
-            @RequestParam(name = "query", required = false) String query,
-            @RequestParam(name = "category", defaultValue = "all") String category,
-            HttpSession session,
-            Model model) {
+public String showSounds(
+        @RequestParam(name = "query", required = false) String query,
+        @RequestParam(name = "category", defaultValue = "all") String category,
+        HttpSession session,
+        Model model) {
 
         String username = (String) session.getAttribute("username");
         Long userId = (Long) session.getAttribute("userId");
@@ -54,20 +57,27 @@ public class SoundController {
         // Aplicar filtros para la barra de búsqueda
         List<Sound> filteredSounds = allSounds.stream()
                 .filter(sound -> {
-                    boolean matchesCategory = category.equals("all")
-                            || sound.getCategory().equalsIgnoreCase(category);
+                    // 1. Filtro de categoría modificado
+                    boolean matchesCategory = category.equals("all") ||
+                            sound.getCategories().stream()
+                                    .anyMatch(cat -> cat.getName().equalsIgnoreCase(category));
 
-                    boolean matchesQuery = query == null
-                            || sound.getTitle().toLowerCase().contains(query.toLowerCase());
+                    // 2. Filtro de búsqueda (se mantiene igual)
+                    boolean matchesQuery = query == null ||
+                            sound.getTitle().toLowerCase().contains(query.toLowerCase());
 
                     return matchesCategory && matchesQuery;
                 })
                 .collect(Collectors.toList());
 
+
+        // 3. Obtener todas las categorías para el dropdown
+        List<Category> allCategories = storage.getAllCategories(); // Necesitarás implementar este método
         // Preparar el modelo con la selección del usuario
         model.addAttribute("sounds", filteredSounds);
         model.addAttribute("query", query);
         model.addAttribute("category", category);
+        model.addAttribute("allCategories", allCategories); // Para mostrar en la vista
 
         // Aplicar la categoría seleccionada
         model.addAttribute("selectedAll", category.equals("all") ? "selected" : "");
@@ -88,6 +98,12 @@ public class SoundController {
             return "login";
         }
 
+        // Obtener todas las categorías existentes
+        List<Category> allCategories = storage.getAllCategories();
+
+        // Añadir al modelo
+        model.addAttribute("allCategories", allCategories);
+
         Optional<User> user = storage.findUserByUsername(username);
         if (user.isPresent()) {
             model.addAttribute("userId", user.get().getUserId());
@@ -99,46 +115,64 @@ public class SoundController {
             model.addAttribute("error", "User not found. Please login again.");
             return "login";
         }
-    }
 
+    }
 
     @PostMapping("/sounds/upload")
     public String uploadSound(
             @RequestParam String title,
             @RequestParam String description,
-            @RequestParam String category,
+            @RequestParam List<String> categories, // Lista de nombres de categorías
             @RequestParam String duration,
             @RequestParam MultipartFile audioFile,
             @RequestParam MultipartFile imageFile,
-            HttpSession session, // Using HttpSession in order to get UserId
+            HttpSession session,
             Model model) throws IOException {
 
         Long userId = (Long) session.getAttribute("userId");
         if (userId == null) {
-            model.addAttribute("error", "You must be logged in to upload sounds.");
-            return "redirect:/login"; // If the user is not logged in, redirect to the login page
+            model.addAttribute("error", "Debes iniciar sesión para subir sonidos.");
+            return "redirect:/login";
         }
 
         Optional<User> user = storage.findUserById(userId);
         if (!user.isPresent()) {
-            model.addAttribute("error", "User not found. Please login again.");
-            session.invalidate(); // Deleting invalid session
+            model.addAttribute("error", "Usuario no encontrado.");
+            session.invalidate();
             return "redirect:/login";
         }
 
-        // Storing files using username
+        // Guardar archivos
         String username = user.get().getUsername();
         String audioPath = storage.saveFile(username, audioFile, "sounds");
         String imagePath = storage.saveFile(username, imageFile, "images");
 
-        // Creating and stroring the sound
-        Sound sound = new Sound(0, title, description, audioPath, imagePath, userId, category, duration);
+        // Crear el sonido
+        Sound sound = new Sound(
+                0,
+                title,
+                description,
+                audioPath,
+                imagePath,
+                user.get(),
+                new ArrayList<>(), // Categorías vacías inicialmente
+                duration);
+
+        // Procesar categorías
+        for (String categoryName : categories) {
+            Category category = storage.findOrCreateCategory(categoryName);
+            sound.getCategories().add(category);
+            category.getSounds().add(sound); // Relación bidireccional
+        }
+
+        List<Category> allCategories = storage.getAllCategories();
+
+        model.addAttribute("allCategories", allCategories);
+
         storage.addSound(sound);
 
-        model.addAttribute("success", "Sound uploaded successfully!");
-        model.addAttribute("username", username);
-        model.addAttribute("userId", userId);
-        return "upload-sound";
+        model.addAttribute("success", "¡Sonido subido con éxito!");
+        return "redirect:/sounds/" + sound.getId();
     }
 
     @GetMapping("/sounds/download")
@@ -165,11 +199,14 @@ public class SoundController {
         // Filtering sounds by the user search or category selected
         List<Sound> filteredSounds = allSounds.stream()
                 .filter(sound -> {
-                    boolean matchesCategory = category.equals("all")
-                            || sound.getCategory().equalsIgnoreCase(category);
+                    // 1. Filtro de categoría modificado
+                    boolean matchesCategory = category.equals("all") ||
+                            sound.getCategories().stream()
+                                    .anyMatch(cat -> cat.getName().equalsIgnoreCase(category));
 
-                    boolean matchesQuery = query == null
-                            || sound.getTitle().toLowerCase().contains(query.toLowerCase());
+                    // 2. Filtro de búsqueda (se mantiene igual)
+                    boolean matchesQuery = query == null ||
+                            sound.getTitle().toLowerCase().contains(query.toLowerCase());
 
                     return matchesCategory && matchesQuery;
                 })
@@ -241,6 +278,13 @@ public class SoundController {
                 })
                 .collect(Collectors.toList());
 
+        List<Category> allCategories = storage.getAllCategories();
+
+        model.addAttribute("allCategories", allCategories);
+        model.addAttribute("selectedCategories", sound.getCategories().stream()
+                .map(Category::getName)
+                .collect(Collectors.toSet()));
+
         model.addAttribute("comments", commentViews);
         model.addAttribute("userInitial", userInitial);
         model.addAttribute("profileImagePath", profileImagePath); // Añadir profileImagePath al modelo
@@ -256,7 +300,7 @@ public class SoundController {
             @PathVariable long soundId,
             @RequestParam String title,
             @RequestParam String description,
-            @RequestParam String category,
+            @RequestParam Set<String> categories, // Cambiado a Set<String>
             @RequestParam(required = false) MultipartFile audioFile,
             @RequestParam(required = false) MultipartFile imageFile,
             HttpSession session,
@@ -265,6 +309,7 @@ public class SoundController {
         Long userId = (Long) session.getAttribute("userId");
         Optional<Sound> originalSound = storage.findSoundById(soundId);
 
+        // Validación de permisos
         if (userId == null || !originalSound.isPresent() || originalSound.get().getUserId() != userId) {
             model.addAttribute("error", "No tienes permisos para editar este sonido");
             return "redirect:/sounds/" + soundId;
@@ -273,25 +318,40 @@ public class SoundController {
         Sound sound = originalSound.get();
         String username = (String) session.getAttribute("username");
 
-        // Updating the sound with the new values
-        sound.setTitle(title);
-        sound.setDescription(description);
-        sound.setCategory(category);
+        try {
+            // 1. Limpiar categorías existentes (bidireccional)
+            sound.getCategories().forEach(cat -> cat.getSounds().remove(sound));
+            sound.getCategories().clear();
 
-        // Dealing with new audio file uploaded in the edition form
-        if (!audioFile.isEmpty()) {
-            String newAudioPath = storage.saveFile(username, audioFile, "sounds");
-            sound.setFilePath(newAudioPath);
+            // 2. Actualizar campos básicos
+            sound.setTitle(title);
+            sound.setDescription(description);
+
+            // 3. Procesar nuevas categorías
+            categories.forEach(catName -> {
+                Category category = storage.findOrCreateCategory(catName);
+                category.getSounds().add(sound);
+                sound.addCategory(category);
+            });
+
+            // 4. Manejar archivos
+            if (audioFile != null && !audioFile.isEmpty()) {
+                String newAudioPath = storage.saveFile(username, audioFile, "sounds");
+                sound.setFilePath(newAudioPath);
+            }
+
+            if (imageFile != null && !imageFile.isEmpty()) {
+                String newImagePath = storage.saveFile(username, imageFile, "images");
+                sound.setImagePath(newImagePath);
+            }
+
+            storage.updateSound(sound);
+            return "redirect:/sounds/" + soundId;
+
+        } catch (Exception e) {
+            model.addAttribute("error", "Error al actualizar: " + e.getMessage());
+            return "redirect:/sounds/" + soundId + "/edit";
         }
-
-        // Dealing with new image file uploaded in the edition form
-        if (!imageFile.isEmpty()) {
-            String newImagePath = storage.saveFile(username, imageFile, "images");
-            sound.setImagePath(newImagePath);
-        }
-
-        storage.updateSound(sound);
-        return "redirect:/sounds/" + soundId;
     }
 
         @PostMapping("/sounds/{id}/delete")

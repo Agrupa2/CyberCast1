@@ -2,7 +2,9 @@ package es.swapsounds.model;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Sound {
     private long soundId;
@@ -12,11 +14,13 @@ public class Sound {
     private String imagePath;
     private long userId;
     private List<Comment> comments;
-    private String category;
     private String duration;
     private LocalDateTime uploadDate;
 
-    public Sound(String title, String description, String filePath, String imagePath, long userId, String Category,
+    private Set<Category> categories = new HashSet<>(); // Múltiples categorías
+
+
+    public Sound(String title, String description, String filePath, String imagePath, int userId, String Category,
             String duration) {
         this.title = title;
         this.description = description;
@@ -24,7 +28,6 @@ public class Sound {
         this.imagePath = imagePath;
         this.userId = userId;
         this.comments = new ArrayList<>();
-        this.category = Category;
         this.duration = duration;
         this.uploadDate = LocalDateTime.now();
     }
@@ -36,7 +39,6 @@ public class Sound {
         this.description = description;
         this.filePath = filePath;
         this.imagePath = imagePath;
-        this.category = category;
         this.userId = userId;
         this.uploadDate = LocalDateTime.now();
     }
@@ -48,7 +50,6 @@ public class Sound {
         this.description = description;
         this.filePath = filePath;
         this.imagePath = imagePath;
-        this.category = category;
         this.duration = duration;
         this.uploadDate = LocalDateTime.now();
     }
@@ -64,7 +65,18 @@ public class Sound {
         this.filePath = audioPath;
         this.imagePath = imagePath2;
         this.userId = userId2;
-        this.category = category2;
+        this.duration = duration2;
+        this.uploadDate = LocalDateTime.now();
+    }
+
+    public Sound(int i, String title2, String description2, String audioPath, String imagePath2, User user,
+            Object object, String duration2) {
+        this.id = i;
+        this.title = title2;
+        this.description = description2;
+        this.filePath = audioPath;
+        this.imagePath = imagePath2;
+        this.userId = user.getUserId();
         this.duration = duration2;
         this.uploadDate = LocalDateTime.now();
     }
@@ -97,9 +109,6 @@ public class Sound {
         return soundId;
     }
 
-    public String getCategory() {
-        return category;
-    }
 
     public String getDuration() {
         return duration;
@@ -133,9 +142,6 @@ public class Sound {
         this.comments = comments;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
-    }
 
     public void setDuration(String duration) {
         this.duration = duration;
@@ -147,5 +153,14 @@ public class Sound {
 
     public void setUploadDate(LocalDateTime uploadDate) {
         this.uploadDate = uploadDate;
+    }
+
+    public void addCategory(Category category) {
+        categories.add(category);
+    }
+
+    // Getters
+    public Set<Category> getCategories() {
+        return categories;
     }
 }

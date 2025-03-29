@@ -71,10 +71,11 @@
 
             <select name="category" class="fold-out" onchange="this.form.submit()">
                 <option value="all" {{{selectedAll}}}>All Categories</option>
-                <option value="Meme" {{{selectedMeme}}}>Meme</option>
-                <option value="Football" {{{selectedFootball}}}>Football</option>
-                <option value="Party" {{{selectedParty}}}>Party</option>
+                {{#allCategories}}
+                <option value="{{name}}" {{{selectedAll}}}>{{name}}</option>
+                {{/allCategories}}
             </select>
+            
 
             <!-- Hiden Button to submit with Enter -->
             <button type="submit" hidden></button>
@@ -95,7 +96,11 @@
                 <div class="card-body">
                     <h3 class="card-title"><a href="/sounds/{{soundId}}">{{title}}</a></h3>
                     <div class="card-info">
-                        <span class="category">{{category}}</span>
+                        <div class="categories">
+                            {{#categories}}
+                            <span class="category">{{name}}</span>
+                            {{/categories}}
+                        </div>
                         <span class="duration">{{duration}} min</span>
                     </div>
                     <div class="audio-container">

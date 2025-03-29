@@ -6,24 +6,24 @@ import java.util.List;
 
 public class Category {
 
-
     private long id;
     private String name;
     private List<Sound> sounds = new ArrayList<>(); // This is a list of sounds that belong to this category
 
+
     public Category(Long id, String name) {
         this.id = id;
         this.name = name;
-        this.sounds = null;
+        this.sounds = new ArrayList<>(); // Eliminar null
     }
 
-    public Category (String name) {
+    public Category(String name) {
         this.name = name;
-        this.sounds = null;
+        this.sounds = new ArrayList<>(); // Eliminar null
     }
 
     public Category() {
-        //Used by JPA
+        this.sounds = new ArrayList<>(); // Inicializar en constructor vacío
     }
 
     public long getId() {
@@ -52,5 +52,9 @@ public class Category {
 
     public void addSound(Sound sound) {
         sounds.add(sound);
+    }
+
+    public List<Sound> getSounds() {
+        return sounds;
     }
 }

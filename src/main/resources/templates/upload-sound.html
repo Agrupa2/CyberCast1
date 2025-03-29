@@ -21,15 +21,26 @@
         </div>
         <div>
             <label for="category">Category:</label>
-            <select id="category" name="category" required>
-                <option value="">Select a category</option>
-                <option value="Music">Music</option>
-                <option value="Podcast">Podcast</option>
-                <option value="Ambient">Ambient</option>
-                <option value="Effects">Sound Effects</option>
-                <option value="Other">Other</option>
-            </select>
-        </div>
+            
+            <!-- Campo de categorías múltiples -->
+            <!-- Reemplazar el bloque de categorías original con este -->
+            <div class="form-group">
+                <label>Categorías:</label>
+                <div class="categories-container">
+                    {{#allCategories}}
+                    <div class="category-option">
+                        <label>
+                            <input type="checkbox" name="categories" value="{{name}}">
+                            {{name}}
+                        </label>
+                    </div>
+                    {{/allCategories}}
+                    {{^allCategories}}
+                    <p>No hay categorías disponibles</p>
+                    {{/allCategories}}
+                </div>
+            </div>
+            </div>
         <div>
             <label for="duration">Duration (minutes):</label>
             <input type="number" id="duration" name="duration" step="0.1" min="0.1" required>
