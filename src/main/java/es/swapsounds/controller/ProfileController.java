@@ -1,11 +1,13 @@
 package es.swapsounds.controller;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Optional;
-
+import es.swapsounds.model.Comment;
+import es.swapsounds.model.Sound;
+import es.swapsounds.model.User;
+import es.swapsounds.service.CommentService;
+import es.swapsounds.service.ProfileService;
+import es.swapsounds.service.SoundService;
+import es.swapsounds.service.UserService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,109 +17,90 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import es.swapsounds.model.Comment;
-import es.swapsounds.model.Sound;
-import es.swapsounds.model.User;
-import es.swapsounds.storage.CommentRepository;
-import es.swapsounds.storage.InMemoryStorage;
-import jakarta.servlet.http.HttpSession;
+import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class ProfileController {
 
     @Autowired
-    private CommentRepository commentRepository;
+    private UserService userService;
+
     @Autowired
-    private InMemoryStorage storage;
+    private SoundService soundService;
+
+    @Autowired
+    private CommentService commentService;
+
+    @Autowired
+    private ProfileService profileService;
 
     @GetMapping("/profile")
     public String userProfile(HttpSession session, Model model) {
-
-        String username = (String) session.getAttribute("username");
-        Long userId = (Long) session.getAttribute("userId");
-
+        // Delegamos la obtención del ID de usuario a UserService
+        Long userId = userService.getUserIdFromSession(session);
         if (userId == null) {
             return "redirect:/login";
         }
 
-        Optional<User> userOpt = storage.findUserById(userId);
+        // Obtener el usuario y validar su existencia
+        Optional<User> userOpt = userService.getUserById(userId);
         if (!userOpt.isPresent()) {
             return "redirect:/start";
         }
-
         User user = userOpt.get();
 
-        String userInitial = "?"; // Valor por defecto
-            
-            // Asignamos profileImagePath desde el usuario
-        String profileImagePath = user.getProfilePicturePath();
-            
-        if (profileImagePath == null) {
-            userInitial = user.getUsername().length() > 0
-                    ? user.getUsername().substring(0, 1).toUpperCase()
-                    : "?";
-            }
+        // Obtener inicial del usuario (en caso de no tener avatar)
+        String userInitial = profileService.getUserInitial(user);
 
-        
-        List<Sound> userSounds = storage.getSoundsByUserId(userId);
-        List<Comment> userComments = commentRepository.getCommentsByUserId(userId); // Nuevo: Obtener comentarios
+        // Obtener sonidos y comentarios del usuario usando SoundService y CommentService
+        List<Sound> userSounds = soundService.getSoundsByUserId(userId);
+        List<Comment> userComments = commentService.getCommentsByUserId(userId);
 
-        model.addAttribute("comments", userComments); // Añadir comentarios al modelo
-        model.addAttribute("profileImagePath", profileImagePath); 
+        // Agregar atributos al modelo
+        model.addAttribute("comments", userComments);
+        model.addAttribute("profileImagePath", user.getProfilePicturePath());
         model.addAttribute("userInitial", userInitial);
-        model.addAttribute("username", username);
+        model.addAttribute("username", user.getUsername());
         model.addAttribute("user", user);
         model.addAttribute("sounds", userSounds);
 
         return "profile";
     }
 
-
     @PostMapping("/profile/update-username")
-    public String updateUsername(
-            @RequestParam String newUsername,
-            HttpSession session,
-            RedirectAttributes redirectAttributes) {
-
-        Long userId = (Long) session.getAttribute("userId");
-        if (userId == null)
+    public String updateUsername(@RequestParam String newUsername,
+                                 HttpSession session,
+                                 RedirectAttributes redirectAttributes) {
+        Long userId = userService.getUserIdFromSession(session);
+        if (userId == null) {
             return "redirect:/login";
-
+        }
         if (newUsername == null || newUsername.trim().isEmpty()) {
             redirectAttributes.addFlashAttribute("error", "El nombre de usuario no puede estar vacío");
             return "redirect:/profile";
         }
 
-        storage.updateUsername(userId, newUsername.trim());
+        userService.updateUsername(userId, newUsername.trim());
         session.setAttribute("username", newUsername.trim());
-
         redirectAttributes.addFlashAttribute("success", "Nombre de usuario actualizado");
         return "redirect:/profile";
     }
 
     @PostMapping("/profile/update-avatar")
-    public String updateAvatar(
-            @RequestParam("avatar") MultipartFile file,
-            HttpSession session,
-            RedirectAttributes redirectAttributes) {
-
-        Long userId = (Long) session.getAttribute("userId");
-        if (userId == null)
+    public String updateAvatar(@RequestParam("avatar") MultipartFile file,
+                               HttpSession session,
+                               RedirectAttributes redirectAttributes) {
+        Long userId = userService.getUserIdFromSession(session);
+        if (userId == null) {
             return "redirect:/login";
+        }
 
         try {
-            String uploadDir = "uploads/profiles/";
-            Files.createDirectories(Paths.get(uploadDir));
-
-            String filename = userId + "_" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
-            Path filePath = Paths.get(uploadDir + filename);
-            file.transferTo(filePath);
-
-            storage.updateProfilePicture(userId, "/" + uploadDir + filename);
-
+            profileService.updateProfilePicture(userId, file);
             redirectAttributes.addFlashAttribute("success", "Avatar actualizado");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error al subir la imagen");
+            redirectAttributes.addFlashAttribute("error", "Error al subir la imagen: " + e.getMessage());
         }
 
         return "redirect:/profile";
