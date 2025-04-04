@@ -2,7 +2,6 @@ package es.swapsounds.controller;
 
 import es.swapsounds.service.UserService;
 import es.swapsounds.storage.CommentRepository;
-import es.swapsounds.storage.InMemoryStorage;
 import jakarta.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +17,6 @@ public class UserController {
 
    @Autowired
    private CommentRepository commentRepository;
-
-   @Autowired
-   private InMemoryStorage storage;
 
    @Autowired
    private UserService userService;

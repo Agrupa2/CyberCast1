@@ -1,7 +1,6 @@
 package es.swapsounds.service;
 
 import es.swapsounds.model.User;
-import es.swapsounds.storage.InMemoryStorage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,9 +12,6 @@ import java.nio.file.Paths;
 
 @Service
 public class ProfileService {
-
-    @Autowired
-    private InMemoryStorage storage;
 
     @Autowired
     private UserService userService;
