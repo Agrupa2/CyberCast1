@@ -17,6 +17,9 @@ public class ProfileService {
     @Autowired
     private InMemoryStorage storage;
 
+    @Autowired
+    private UserService userService;
+
     public String getUserInitial(User user) {
         String profileImagePath = user.getProfilePicturePath();
         if (profileImagePath == null) {
@@ -34,6 +37,6 @@ public class ProfileService {
         file.transferTo(filePath);
 
         String filePathStr = "/" + uploadDir + filename;
-        storage.updateProfilePicture(userId, filePathStr);
+        userService.updateProfilePicture(userId, filePathStr);
     }
 }

@@ -15,10 +15,13 @@ public class AuthService {
     @Autowired
     private InMemoryStorage storage;
 
+    @Autowired
+    private UserService userService;
+
     public User registerUser(String username, String email, String password, MultipartFile profilePhoto) throws IOException {
-        if (storage.findUserByUsername(username).isPresent()) {
+        if (userService.findUserByUsername(username).isPresent()) {
             throw new IllegalArgumentException("El nombre de usuario ya existe");
-        }else if(storage.findUserByEmail(email).isPresent()) {
+        }else if(userService.findUserByEmail(email).isPresent()) {
             throw new IllegalArgumentException("El correo ya está registrado");
         }
 
@@ -31,13 +34,13 @@ public class AuthService {
                 : "/uploads/profiles/default-avatar.png";
 
         User user = new User(username, email, password, photoPath);
-        storage.addUser(user);
+        userService.addUser(user);
 
         return user;
     }
 
     public User authenticate(String username, String password) {
-        Optional<User> user = storage.authenticate(username, password);
+        Optional<User> user = userService.authenticate(username, password);
         return user.orElse(null);
     }
 

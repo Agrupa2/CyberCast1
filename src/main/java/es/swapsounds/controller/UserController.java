@@ -1,5 +1,6 @@
 package es.swapsounds.controller;
 
+import es.swapsounds.service.UserService;
 import es.swapsounds.storage.CommentRepository;
 import es.swapsounds.storage.InMemoryStorage;
 import jakarta.servlet.http.HttpSession;
@@ -20,6 +21,9 @@ public class UserController {
 
    @Autowired
    private InMemoryStorage storage;
+
+   @Autowired
+   private UserService userService;
 
    @GetMapping("/delete-account")
    public String showDeletePage(HttpSession session, Model model) {
@@ -48,7 +52,7 @@ public class UserController {
       }
 
       commentRepository.deleteCommentsByUserId(userId);
-      storage.deleteUser(userId);
+      userService.deleteUser(userId);
       session.invalidate();
 
       ra.addFlashAttribute("success", "¡Cuenta eliminada permanentemente!");

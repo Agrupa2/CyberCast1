@@ -18,12 +18,15 @@ public class CommentService {
     @Autowired
     private InMemoryStorage storage;
 
+    @Autowired
+    private UserService userService;
+
     /**
      * Agrega un comentario a un sonido.
      */
     public Comment addComment(Long userId, long soundId, String content) {
         // Obtener el usuario actual
-        User currentUser = storage.findUserById(userId)
+        User currentUser = userService.findUserById(userId)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         String soundTitle = storage.findSoundById(soundId).get().getTitle();
@@ -39,7 +42,7 @@ public class CommentService {
      * Edita un comentario, verificando que el usuario sea el autor.
      */
     public boolean editComment(Long userId, long soundId, long commentId, String newContent) {
-        User currentUser = storage.findUserById(userId)
+        User currentUser = userService.findUserById(userId)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         return commentRepository.editComment(soundId, commentId, newContent, currentUser);
     }

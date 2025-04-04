@@ -22,6 +22,7 @@ import es.swapsounds.model.Category;
 import es.swapsounds.model.Comment;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
+import es.swapsounds.service.UserService;
 import es.swapsounds.storage.CommentRepository;
 import es.swapsounds.storage.InMemoryStorage;
 import jakarta.servlet.http.HttpSession;
@@ -34,6 +35,9 @@ public class SoundController {
 
     @Autowired
     private InMemoryStorage storage;
+
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/start")
 public String showSounds(
@@ -104,7 +108,7 @@ public String showSounds(
         // Añadir al modelo
         model.addAttribute("allCategories", allCategories);
 
-        Optional<User> user = storage.findUserByUsername(username);
+        Optional<User> user = userService.findUserByUsername(username);
         if (user.isPresent()) {
             model.addAttribute("userId", user.get().getUserId());
             model.addAttribute("username", username);
@@ -135,7 +139,7 @@ public String showSounds(
             return "redirect:/login";
         }
 
-        Optional<User> user = storage.findUserById(userId);
+        Optional<User> user = userService.findUserById(userId);
         if (!user.isPresent()) {
             model.addAttribute("error", "Usuario no encontrado.");
             session.invalidate();
@@ -244,7 +248,7 @@ public String showSounds(
         }
 
         Sound sound = soundOpt.get();
-        Optional<User> uploader = storage.findUserById(sound.getUserId());
+        Optional<User> uploader = userService.findUserById(sound.getUserId());
 
         String userInitial = "?"; // default value
         String profileImagePath = null; // default profileImagePath set to null
