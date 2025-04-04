@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import es.swapsounds.service.SoundService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,6 +24,7 @@ import es.swapsounds.model.Comment;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
 import es.swapsounds.service.UserService;
+import es.swapsounds.service.CategoryService;
 import es.swapsounds.storage.CommentRepository;
 import es.swapsounds.storage.InMemoryStorage;
 import jakarta.servlet.http.HttpSession;
@@ -32,6 +34,12 @@ public class SoundController {
 
     @Autowired
     private CommentRepository commentRepository;
+
+    @Autowired
+    private CategoryService categoryService; 
+
+    @Autowired
+    private SoundService soundService;
 
     @Autowired
     private InMemoryStorage storage;
@@ -56,7 +64,7 @@ public String showSounds(
         }
 
         // Obtener todos los sonidos almacenados localmente
-        List<Sound> allSounds = storage.getAllSounds();
+        List<Sound> allSounds = soundService.getAllSounds();
 
         // Aplicar filtros para la barra de búsqueda
         List<Sound> filteredSounds = allSounds.stream()
@@ -76,7 +84,7 @@ public String showSounds(
 
 
         // 3. Obtener todas las categorías para el dropdown
-        List<Category> allCategories = storage.getAllCategories(); // Necesitarás implementar este método
+        List<Category> allCategories = categoryService.getAllCategories(); // Necesitarás implementar este método
         // Preparar el modelo con la selección del usuario
         model.addAttribute("sounds", filteredSounds);
         model.addAttribute("query", query);
@@ -103,7 +111,7 @@ public String showSounds(
         }
 
         // Obtener todas las categorías existentes
-        List<Category> allCategories = storage.getAllCategories();
+        List<Category> allCategories = categoryService.getAllCategories();
 
         // Añadir al modelo
         model.addAttribute("allCategories", allCategories);
@@ -164,16 +172,16 @@ public String showSounds(
 
         // Procesar categorías
         for (String categoryName : categories) {
-            Category category = storage.findOrCreateCategory(categoryName);
+            Category category = categoryService.findOrCreateCategory(categoryName);
             sound.getCategories().add(category);
             category.getSounds().add(sound); // Relación bidireccional
         }
 
-        List<Category> allCategories = storage.getAllCategories();
+        List<Category> allCategories = categoryService.getAllCategories();
 
         model.addAttribute("allCategories", allCategories);
 
-        storage.addSound(sound);
+        soundService.addSound(sound);
 
         model.addAttribute("success", "¡Sonido subido con éxito!");
         return "redirect:/sounds/" + sound.getSoundId();
@@ -198,7 +206,7 @@ public String showSounds(
         }
 
         // Obtaining every sound
-        List<Sound> allSounds = storage.getAllSounds();
+        List<Sound> allSounds = soundService.getAllSounds();
 
         // Filtering sounds by the user search or category selected
         List<Sound> filteredSounds = allSounds.stream()
@@ -242,7 +250,7 @@ public String showSounds(
         Long userId = (Long) session.getAttribute("userId");
         String username = (String) session.getAttribute("username");
 
-        Optional<Sound> soundOpt = storage.findSoundById(soundId);
+        Optional<Sound> soundOpt = soundService.findSoundById(soundId);
         if (!soundOpt.isPresent()) {
             return "redirect:/start";
         }
@@ -282,7 +290,7 @@ public String showSounds(
                 })
                 .collect(Collectors.toList());
 
-        List<Category> allCategories = storage.getAllCategories();
+        List<Category> allCategories = categoryService.getAllCategories();
 
         model.addAttribute("allCategories", allCategories);
         model.addAttribute("selectedCategories", sound.getCategories().stream()
@@ -311,7 +319,7 @@ public String showSounds(
             Model model) throws IOException {
 
         Long userId = (Long) session.getAttribute("userId");
-        Optional<Sound> originalSound = storage.findSoundById(soundId);
+        Optional<Sound> originalSound = soundService.findSoundById(soundId);
 
         // Validación de permisos
         if (userId == null || !originalSound.isPresent() || originalSound.get().getUserId() != userId) {
@@ -333,7 +341,7 @@ public String showSounds(
 
             // 3. Procesar nuevas categorías
             categories.forEach(catName -> {
-                Category category = storage.findOrCreateCategory(catName);
+                Category category = categoryService.findOrCreateCategory(catName);
                 category.getSounds().add(sound);
                 sound.addCategory(category);
             });
@@ -349,7 +357,7 @@ public String showSounds(
                 sound.setImagePath(newImagePath);
             }
 
-            storage.updateSound(sound);
+            soundService.updateSound(sound);
             return "redirect:/sounds/" + soundId;
 
         } catch (Exception e) {
@@ -374,7 +382,7 @@ public String showSounds(
         }
 
         // Buscar el sonido por su ID
-        Optional<Sound> soundOptional = storage.findSoundById(id);
+        Optional<Sound> soundOptional = soundService.findSoundById(id);
 
         // Verificar si el sonido existe
         if (!soundOptional.isPresent()) {
@@ -394,7 +402,7 @@ public String showSounds(
         }
 
         // Eliminar el sonido
-        storage.deleteSound(id);
+        soundService.deleteSound(id);
         redirectAttributes.addFlashAttribute("success", "El sonido se ha eliminado correctamente.");
 
         return "redirect:/dashboard"; // Redirigir al dashboard después de eliminar

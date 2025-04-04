@@ -1,8 +1,8 @@
 package es.swapsounds.storage;
 
-import es.swapsounds.model.Category;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
+
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,25 +11,21 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
 public class InMemoryStorage {
     private List<User> users = new ArrayList<>();
     private List<Sound> sounds = new ArrayList<>();
-
     private long idCounter = 1;
-    private Set<Category> categories = new HashSet<>();
 
 
     public InMemoryStorage() {
         // Locally generated users for testing
         users.add(new User("user", "user@gmail.com", "user123", null, idCounter++, null));
+<<<<<<< HEAD
         users.add(new User("admin", "admin@gmail.com", "admin123", "https://imgs.search.brave.com/VuBfiTd2u6sg7kwHVE-LzZGF_uwTzV8Hssy42MikWg8/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9yZXNv/dXJjZXMudGlkYWwu/Y29tL2ltYWdlcy8w/MTRlYWYzMi84NjY5/LzRmYTkvYWRiZi8z/ODRjZmUzMjRmZTYv/NjQweDY0MC5qcGc", idCounter++, null));
 
         sounds.add(new Sound(idCounter++, "Betis Anthem", "Relaxing forest ambiance", "/audio/betis.mp3",
@@ -55,11 +51,12 @@ public class InMemoryStorage {
         String normalizedName = name.trim().toLowerCase();
         boolean exists = categories.stream()
             .anyMatch(c -> c.getName().trim().equalsIgnoreCase(normalizedName));
+=======
+        users.add(new User("admin", "admin@gmail.com", "admin123", null, idCounter++, null));
+>>>>>>> cfc36244caa45686adf7d26f9c567758b0319115
         
-        if (!exists) {
-            categories.add(new Category(name.trim()));
-        }
     }
+
 
     public void addUser(User user) {
         user.setId(idCounter++);
@@ -89,20 +86,6 @@ public class InMemoryStorage {
         return new ArrayList<>(users);
     }
 
-    public void addSound(Sound sound) {
-        sound.setSoundId(idCounter++);
-        sounds.add(sound);
-    }
-
-    public List<Sound> getAllSounds() {
-        return new ArrayList<>(sounds != null ? sounds : new ArrayList<>());
-    }
-
-    public Optional<Sound> findSoundById(long id) {
-        return sounds.stream()
-                .filter(s -> s.getSoundId() == id)
-                .findFirst();
-    }
 
     public Optional<User> findUserById(long userId) {
         return users.stream()
@@ -141,25 +124,6 @@ public class InMemoryStorage {
 
         // Retourns the path to the file
         return "/uploads/" + directory + "/" + fileName;
-    }
-
-    public Sound getSoundById(long soundId) {
-        return sounds.stream()
-                .filter(sound -> sound.getSoundId() == soundId)
-                .findFirst()
-                .orElse(null);
-    }
-
-    public void updateSound(Sound updatedSound) {
-        sounds.removeIf(s -> s.getSoundId() == updatedSound.getSoundId());
-        sounds.add(updatedSound);
-    }
-
-    public List<Sound> getSoundsByUserId(long userId) {
-        return sounds.stream()
-                .filter(sound -> sound.getUserId() == userId)
-                .sorted(Comparator.comparing(Sound::getUploadDate).reversed())
-                .collect(Collectors.toList());
     }
 
     public void deleteUser(long userId) {
@@ -201,33 +165,6 @@ public class InMemoryStorage {
                 });
     }
 
-    public void deleteSound(long soundId) {
-        Optional<Sound> soundOptional = sounds.stream()
-                .filter(s -> s.getSoundId() == soundId)
-                .findFirst();
-    
-        if (soundOptional.isPresent()) {
-            Sound sound = soundOptional.get();
-            
-            // Eliminar archivos físicos
-            try {
-                if (sound.getFilePath() != null) {
-                    Path audioPath = Paths.get("uploads" + sound.getFilePath().replace("/uploads/", "/"));
-                    Files.deleteIfExists(audioPath);
-                }
-                if (sound.getImagePath() != null) {
-                    Path imagePath = Paths.get("uploads" + sound.getImagePath().replace("/uploads/", "/"));
-                    Files.deleteIfExists(imagePath);
-                }
-            } catch (IOException e) {
-                System.err.println("Error eliminando archivos de sonido: " + e.getMessage());
-            }
-    
-            // Eliminar de la lista de sonidos
-            sounds.remove(sound);
-        }
-    }
-
     public void updateUsername(long userId, String newUsername) {
         users.stream()
                 .filter(u -> u.getUserId() == userId)
@@ -241,23 +178,5 @@ public class InMemoryStorage {
                 .findFirst()
                 .ifPresent(u -> u.setProfilePicturePath(imagePath));
     }
-
-    public Category findOrCreateCategory(String name) {
-        return categories.stream()
-            .filter(c -> c.getName().equalsIgnoreCase(name))
-            .findFirst()
-            .orElseGet(() -> {
-                Category newCategory = new Category(name);
-                categories.add(newCategory);
-                return newCategory;
-            });
-    }
-    
-    public List<Category> getAllCategories() {
-        return new ArrayList<>(categories);
-    }
-
-    
-
 
 }

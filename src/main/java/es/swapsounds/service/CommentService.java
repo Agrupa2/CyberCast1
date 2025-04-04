@@ -17,6 +17,8 @@ public class CommentService {
 
     @Autowired
     private InMemoryStorage storage;
+    @Autowired
+    private SoundService soundService;
 
     @Autowired
     private UserService userService;
@@ -29,9 +31,9 @@ public class CommentService {
         User currentUser = userService.findUserById(userId)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        String soundTitle = storage.findSoundById(soundId).get().getTitle();
+        String soundTitle = soundService.findSoundById(soundId).get().getTitle();
         // Obtener el sonido (para validación, si lo necesitas)
-        if (storage.findSoundById(soundId).isEmpty()) {
+        if (soundService.findSoundById(soundId).isEmpty()) {
             throw new RuntimeException("Sonido no encontrado");
         }
         // Delegar la creación del comentario al repositorio

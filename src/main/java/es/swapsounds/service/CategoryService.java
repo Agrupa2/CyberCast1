@@ -1,23 +1,51 @@
 package es.swapsounds.service;
 
 import es.swapsounds.model.Category;
-import es.swapsounds.storage.InMemoryStorage;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.PostConstruct;
+
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class CategoryService {
 
-    @Autowired
-    private InMemoryStorage storage;
+    private Set<Category> categories = new HashSet<>();
 
-    public List<Category> getAllCategories() {
-        return storage.getAllCategories();
+    @PostConstruct
+    private void initializeDefaultCategories() {
+        addCategoryIfNotExists("Música");
+        addCategoryIfNotExists("Podcast");
+        addCategoryIfNotExists("Efectos de sonido");
+        addCategoryIfNotExists("Naturaleza");
+        addCategoryIfNotExists("Tecnología");
     }
 
-    public Category findOrCreateCategory(String categoryName) {
-        return storage.findOrCreateCategory(categoryName);
+    public void addCategoryIfNotExists(String name) {
+        String normalizedName = name.trim().toLowerCase();
+        boolean exists = categories.stream()
+            .anyMatch(c -> c.getName().trim().equalsIgnoreCase(normalizedName));
+        
+        if (!exists) {
+            categories.add(new Category(name.trim()));
+        }
+    }
+
+    public Category findOrCreateCategory(String name) {
+        return categories.stream()
+            .filter(c -> c.getName().equalsIgnoreCase(name))
+            .findFirst()
+            .orElseGet(() -> {
+                Category newCategory = new Category(name);
+                categories.add(newCategory);
+                return newCategory;
+            });
+    }
+
+    public List<Category> getAllCategories() {
+        return new ArrayList<>(categories);
     }
 }
