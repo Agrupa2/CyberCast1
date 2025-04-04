@@ -22,6 +22,8 @@ public class CategoryService {
         addCategoryIfNotExists("Efectos de sonido");
         addCategoryIfNotExists("Naturaleza");
         addCategoryIfNotExists("Tecnología");
+        addCategoryIfNotExists("Meme");
+        addCategoryIfNotExists("Football");
     }
 
     public void addCategoryIfNotExists(String name) {

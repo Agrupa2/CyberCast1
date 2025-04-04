@@ -48,7 +48,7 @@ public class SoundController {
     private UserService userService;
 
     @GetMapping("/start")
-public String showSounds(
+    public String showSounds(
         @RequestParam(name = "query", required = false) String query,
         @RequestParam(name = "category", defaultValue = "all") String category,
         HttpSession session,

@@ -50,6 +50,7 @@ public class Sound {
         this.description = description;
         this.filePath = filePath;
         this.imagePath = imagePath;
+        this.categories.add(new Category(category));
         this.duration = duration;
         this.uploadDate = LocalDateTime.now();
     }
