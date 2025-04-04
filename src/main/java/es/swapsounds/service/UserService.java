@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
 
-     private List<User> users = new ArrayList<>();
+    private List<User> users = new ArrayList<>();
     private List<Sound> sounds = new ArrayList<>();
 
     private long idCounter = 1;

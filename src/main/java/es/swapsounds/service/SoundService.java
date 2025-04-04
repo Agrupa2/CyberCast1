@@ -28,7 +28,7 @@ public class SoundService {
 
     public List <Sound> getSoundByUserId(long soundId) {
         return sounds.stream()
-                .filter(sound -> sound.getSoundId() == soundId)
+                .filter(sound -> sound.getUserId() == soundId)
                 .collect(Collectors.toList());
     }
 
