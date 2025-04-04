@@ -35,7 +35,7 @@ public class SoundController {
     private CommentRepository commentRepository;
 
     @Autowired
-    private CategoryService categoryService;
+    private CategoryService categoryService; 
 
     @Autowired
     private SoundService soundService;

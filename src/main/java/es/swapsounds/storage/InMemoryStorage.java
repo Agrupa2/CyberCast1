@@ -26,7 +26,7 @@ public class InMemoryStorage {
         // Locally generated users for testing
         users.add(new User("user", "user@gmail.com", "user123", null, idCounter++, null));
         users.add(new User("admin", "admin@gmail.com", "admin123", null, idCounter++, null));
-
+        
     }
 
 
