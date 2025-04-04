@@ -30,7 +30,7 @@ public class InMemoryStorage {
     public InMemoryStorage() {
         // Locally generated users for testing
         users.add(new User("user", "user@gmail.com", "user123", null, idCounter++, null));
-        users.add(new User("admin", "admin@gmail.com", "admin123", null, idCounter++, null));
+        users.add(new User("admin", "admin@gmail.com", "admin123", "https://imgs.search.brave.com/VuBfiTd2u6sg7kwHVE-LzZGF_uwTzV8Hssy42MikWg8/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9yZXNv/dXJjZXMudGlkYWwu/Y29tL2ltYWdlcy8w/MTRlYWYzMi84NjY5/LzRmYTkvYWRiZi8z/ODRjZmUzMjRmZTYv/NjQweDY0MC5qcGc", idCounter++, null));
 
         sounds.add(new Sound(idCounter++, "Betis Anthem", "Relaxing forest ambiance", "/audio/betis.mp3",
                 "/images/betis.png", "Football", "0:07"));
