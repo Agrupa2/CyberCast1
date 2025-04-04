@@ -3,7 +3,6 @@ package es.swapsounds.service;
 import es.swapsounds.model.Comment;
 import es.swapsounds.model.User;
 import es.swapsounds.storage.CommentRepository;
-import es.swapsounds.storage.InMemoryStorage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,8 +14,6 @@ public class CommentService {
     @Autowired
     private CommentRepository commentRepository;
 
-    @Autowired
-    private InMemoryStorage storage;
     @Autowired
     private SoundService soundService;
 
