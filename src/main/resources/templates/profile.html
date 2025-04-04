@@ -118,12 +118,16 @@
                 </div>
                 
                 <div class="sound-meta">
-                    <span class="category">{{category}}</span>
+                    <div class="categories-container">
+                        {{#categories}}
+                        <span class="category-tag">{{name}}</span>
+                        {{/categories}}
+                    </div>
                     <span class="duration">{{duration}} min</span>
                 </div>
                 
                 <div class="sound-actions">
-                    <a href="/sounds/{{id}}" class="btn">Ver</a>
+                    <a href="/sounds/{{soundId}}" class="btn">Ver</a>
                 </div>
             </div>
             {{/sounds}}
@@ -147,7 +151,7 @@
                     </small>
                 </div>
                 <div class="comment-actions">
-                    <form action="/sounds/{{soundId}}/comments/{{id}}/delete" method="POST">
+                    <form action="/sounds/{{soundId}}/comments/{{commentId}}/delete" method="POST">
                         <input type="hidden" name="_method" value="DELETE">
                         <button type="submit" class="btn-danger">Eliminar</button>
                     </form>

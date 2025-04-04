@@ -135,6 +135,22 @@ P {
     flex-grow: 1;
 }
 
+.categories-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 8px;
+}
+
+.category-tag {
+  background-color: #e0e0e0;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.85em;
+  color: #333;
+  white-space: nowrap;
+}
+
 .sounds-list {
     background: var(--rich-blank-fogra-29);
     border-radius: 12px;

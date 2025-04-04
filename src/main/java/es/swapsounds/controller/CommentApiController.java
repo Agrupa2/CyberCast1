@@ -1,27 +1,17 @@
 package es.swapsounds.controller;
 
-import org.springframework.stereotype.Controller;
-
+import es.swapsounds.service.CommentService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import es.swapsounds.model.Comment;
-import es.swapsounds.model.Sound;
-import es.swapsounds.model.User;
-import es.swapsounds.storage.CommentRepository;
-import es.swapsounds.storage.InMemoryStorage;
-import jakarta.servlet.http.HttpSession;
-
 @Controller
-
 public class CommentApiController {
 
     @Autowired
-    private CommentRepository commentRepository;
-    @Autowired
-    private InMemoryStorage storage;
+    private CommentService commentService;
 
     @PostMapping("/sounds/{soundId}/comments")
     public String addComment(
@@ -30,29 +20,16 @@ public class CommentApiController {
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
-        // Obtener el usuario actual
         Long userId = (Long) session.getAttribute("userId");
         if (userId == null)
             return "redirect:/login";
 
-        User currentUser = storage.findUserById(userId)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
-        // Obtener el sonido
-        Sound sound = storage.getSoundById(soundId);
-        if (sound == null) {
-            redirectAttributes.addFlashAttribute("error", "Sonido no encontrado");
-            return "redirect:/start";
+        try {
+            commentService.addComment(userId, soundId, content);
+            redirectAttributes.addFlashAttribute("success", "Comentario publicado");
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-
-        // Crear y guardar el comentario
-        Comment comment = commentRepository.addComment(
-                soundId,
-                sound.getTitle(), // Pasar el título del sonido
-                content,
-                currentUser);
-
-        redirectAttributes.addFlashAttribute("success", "Comentario publicado");
         return "redirect:/sounds/" + soundId;
     }
 
@@ -61,23 +38,21 @@ public class CommentApiController {
             @PathVariable long soundId,
             @PathVariable long commentId,
             @RequestParam String content,
-            HttpSession session) {
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
 
-        // User validation
         Long userId = (Long) session.getAttribute("userId");
-        if (userId == null) {
+        if (userId == null)
             return "redirect:/login";
+
+        try {
+            boolean success = commentService.editComment(userId, soundId, commentId, content);
+            if (!success) {
+                redirectAttributes.addFlashAttribute("error", "No se pudo editar el comentario");
+            }
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-
-        User currentUser = storage.findUserById(userId)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
-        // Updating the comment with the user input
-        boolean success = commentRepository.editComment(
-                soundId,
-                commentId,
-                content,
-                currentUser);
 
         return "redirect:/sounds/" + soundId;
     }
@@ -89,26 +64,19 @@ public class CommentApiController {
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
-        // Validate logged users
-        Long currentUserId = (Long) session.getAttribute("userId");
-        if (currentUserId == null)
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null)
             return "redirect:/login";
 
-        // Search for the comment
-        Comment comment = commentRepository.findCommentById(commentId)
-                .orElseThrow(() -> new RuntimeException("Comentario no encontrado"));
-
-        // ID author and session validation
-        if (comment.getAuthorId() != currentUserId) {
-            redirectAttributes.addFlashAttribute("error", "No tienes permiso");
-            return "redirect:/sounds/" + soundId;
+        try {
+            commentService.deleteComment(userId, soundId, commentId);
+            redirectAttributes.addFlashAttribute("success", "Comentario eliminado");
+        } catch (SecurityException se) {
+            redirectAttributes.addFlashAttribute("error", se.getMessage());
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
 
-        // Deleting comment
-        commentRepository.deleteComment(commentId);
-
-        redirectAttributes.addFlashAttribute("success", "Comentario eliminado");
         return "redirect:/sounds/" + soundId;
     }
-
 }
