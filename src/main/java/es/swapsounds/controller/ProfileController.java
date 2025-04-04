@@ -54,7 +54,7 @@ public class ProfileController {
         String userInitial = profileService.getUserInitial(user);
 
         // Obtener sonidos y comentarios del usuario usando SoundService y CommentService
-        List<Sound> userSounds = soundService.getSoundsByUserId(userId);
+        List<Sound> userSounds = soundService.getSoundByUserId(userId);
         List<Comment> userComments = commentService.getCommentsByUserId(userId);
 
         // Agregar atributos al modelo

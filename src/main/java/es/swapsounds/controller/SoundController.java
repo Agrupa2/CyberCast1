@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import es.swapsounds.service.SoundService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -33,6 +34,8 @@ public class SoundController {
     private CommentRepository commentRepository;
 
     @Autowired
+    private SoundService soundService;
+    @Autowired
     private InMemoryStorage storage;
 
     @GetMapping("/start")
@@ -52,7 +55,7 @@ public String showSounds(
         }
 
         // Obtener todos los sonidos almacenados localmente
-        List<Sound> allSounds = storage.getAllSounds();
+        List<Sound> allSounds = soundService.getAllSounds();
 
         // Aplicar filtros para la barra de búsqueda
         List<Sound> filteredSounds = allSounds.stream()
@@ -169,7 +172,7 @@ public String showSounds(
 
         model.addAttribute("allCategories", allCategories);
 
-        storage.addSound(sound);
+        soundService.addSound(sound);
 
         model.addAttribute("success", "¡Sonido subido con éxito!");
         return "redirect:/sounds/" + sound.getSoundId();
@@ -194,7 +197,7 @@ public String showSounds(
         }
 
         // Obtaining every sound
-        List<Sound> allSounds = storage.getAllSounds();
+        List<Sound> allSounds = soundService.getAllSounds();
 
         // Filtering sounds by the user search or category selected
         List<Sound> filteredSounds = allSounds.stream()
@@ -238,7 +241,7 @@ public String showSounds(
         Long userId = (Long) session.getAttribute("userId");
         String username = (String) session.getAttribute("username");
 
-        Optional<Sound> soundOpt = storage.findSoundById(soundId);
+        Optional<Sound> soundOpt = soundService.findSoundById(soundId);
         if (!soundOpt.isPresent()) {
             return "redirect:/start";
         }
@@ -307,7 +310,7 @@ public String showSounds(
             Model model) throws IOException {
 
         Long userId = (Long) session.getAttribute("userId");
-        Optional<Sound> originalSound = storage.findSoundById(soundId);
+        Optional<Sound> originalSound = soundService.findSoundById(soundId);
 
         // Validación de permisos
         if (userId == null || !originalSound.isPresent() || originalSound.get().getUserId() != userId) {
@@ -345,7 +348,7 @@ public String showSounds(
                 sound.setImagePath(newImagePath);
             }
 
-            storage.updateSound(sound);
+            soundService.updateSound(sound);
             return "redirect:/sounds/" + soundId;
 
         } catch (Exception e) {
@@ -370,7 +373,7 @@ public String showSounds(
         }
 
         // Buscar el sonido por su ID
-        Optional<Sound> soundOptional = storage.findSoundById(id);
+        Optional<Sound> soundOptional = soundService.findSoundById(id);
 
         // Verificar si el sonido existe
         if (!soundOptional.isPresent()) {
@@ -390,7 +393,7 @@ public String showSounds(
         }
 
         // Eliminar el sonido
-        storage.deleteSound(id);
+        soundService.deleteSound(id);
         redirectAttributes.addFlashAttribute("success", "El sonido se ha eliminado correctamente.");
 
         return "redirect:/dashboard"; // Redirigir al dashboard después de eliminar
