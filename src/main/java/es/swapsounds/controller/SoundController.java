@@ -22,6 +22,7 @@ import es.swapsounds.model.Category;
 import es.swapsounds.model.Comment;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
+import es.swapsounds.service.CategoryService;
 import es.swapsounds.storage.CommentRepository;
 import es.swapsounds.storage.InMemoryStorage;
 import jakarta.servlet.http.HttpSession;
@@ -31,6 +32,9 @@ public class SoundController {
 
     @Autowired
     private CommentRepository commentRepository;
+
+    @Autowired
+    private CategoryService categoryService;
 
     @Autowired
     private InMemoryStorage storage;
@@ -72,7 +76,7 @@ public String showSounds(
 
 
         // 3. Obtener todas las categorías para el dropdown
-        List<Category> allCategories = storage.getAllCategories(); // Necesitarás implementar este método
+        List<Category> allCategories = categoryService.getAllCategories(); // Necesitarás implementar este método
         // Preparar el modelo con la selección del usuario
         model.addAttribute("sounds", filteredSounds);
         model.addAttribute("query", query);
@@ -99,7 +103,7 @@ public String showSounds(
         }
 
         // Obtener todas las categorías existentes
-        List<Category> allCategories = storage.getAllCategories();
+        List<Category> allCategories = categoryService.getAllCategories();
 
         // Añadir al modelo
         model.addAttribute("allCategories", allCategories);
@@ -160,12 +164,12 @@ public String showSounds(
 
         // Procesar categorías
         for (String categoryName : categories) {
-            Category category = storage.findOrCreateCategory(categoryName);
+            Category category = categoryService.findOrCreateCategory(categoryName);
             sound.getCategories().add(category);
             category.getSounds().add(sound); // Relación bidireccional
         }
 
-        List<Category> allCategories = storage.getAllCategories();
+        List<Category> allCategories = categoryService.getAllCategories();
 
         model.addAttribute("allCategories", allCategories);
 
@@ -278,7 +282,7 @@ public String showSounds(
                 })
                 .collect(Collectors.toList());
 
-        List<Category> allCategories = storage.getAllCategories();
+        List<Category> allCategories = categoryService.getAllCategories();
 
         model.addAttribute("allCategories", allCategories);
         model.addAttribute("selectedCategories", sound.getCategories().stream()
@@ -329,7 +333,7 @@ public String showSounds(
 
             // 3. Procesar nuevas categorías
             categories.forEach(catName -> {
-                Category category = storage.findOrCreateCategory(catName);
+                Category category = categoryService.findOrCreateCategory(catName);
                 category.getSounds().add(sound);
                 sound.addCategory(category);
             });
