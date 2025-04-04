@@ -70,9 +70,9 @@
                 value="{{#query}}{{query}}{{/query}}"> <!-- Maintain the value after searching -->
 
             <select name="category" class="fold-out" onchange="this.form.submit()">
-                <option value="all" {{{selectedAll}}}>All Categories</option>
+                <option value="all" {{#selectedAll}}selected{{/selectedAll}}>All Categories</option>
                 {{#allCategories}}
-                <option value="{{name}}" {{{selectedAll}}}>{{name}}</option>
+                <option value="{{name}}" {{#selected}}selected{{/selected}}>{{name}}</option>
                 {{/allCategories}}
             </select>
 

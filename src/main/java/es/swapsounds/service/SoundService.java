@@ -22,7 +22,7 @@ public class SoundService {
                 "/audio/el-diablo-que-malditos-tenis.mp3", "/images/el-diablo-que-malditos-tenis.png", "Meme", "0:04"));
     }
 
-    private List<Sound> sounds = new ArrayList<>();
+    private final List<Sound> sounds = new ArrayList<>();
     private long idCounter = 1;
 
 
@@ -33,7 +33,7 @@ public class SoundService {
     }
 
     public List<Sound> getAllSounds() {
-        return new ArrayList<>(sounds != null ? sounds : new ArrayList<>());
+        return new ArrayList<>(sounds);
     }
 
     public Optional<Sound> findSoundById(long id) {
