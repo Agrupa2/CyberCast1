@@ -1,7 +1,6 @@
 package es.swapsounds.model;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 public class Comment {
     private long commentId; // comment identification
