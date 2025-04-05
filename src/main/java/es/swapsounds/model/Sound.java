@@ -2,9 +2,7 @@ package es.swapsounds.model;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class Sound {
     private long soundId;
@@ -17,8 +15,7 @@ public class Sound {
     private String duration;
     private LocalDateTime uploadDate;
 
-    private Set<Category> categories = new HashSet<>(); // Múltiples categorías
-
+    private List<Category> categories = new ArrayList<>();
 
     public Sound(String title, String description, String filePath, String imagePath, int userId, String Category,
             String duration) {
@@ -43,16 +40,14 @@ public class Sound {
         this.uploadDate = LocalDateTime.now();
     }
 
-    public Sound(long soundId, String title, String description, String filePath, String imagePath, String category,
-                 String duration) {
+    public Sound(long id, String title, String description, String filePath, String imagePath, List<Category> categories, String duration) {
+        this.soundId = id;
         this.title = title;
-        this.soundId = soundId;
         this.description = description;
         this.filePath = filePath;
         this.imagePath = imagePath;
-        this.categories.add(new Category(category));
+        this.categories = categories != null ? categories : new ArrayList<>();
         this.duration = duration;
-        this.uploadDate = LocalDateTime.now();
     }
 
     public Sound() {
@@ -161,7 +156,7 @@ public class Sound {
     }
 
     // Getters
-    public Set<Category> getCategories() {
+    public List<Category> getCategories() {
         return categories;
     }
 }

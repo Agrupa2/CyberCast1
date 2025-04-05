@@ -1,6 +1,11 @@
 package es.swapsounds.service;
 
+import es.swapsounds.model.Category;
 import es.swapsounds.model.Sound;
+import es.swapsounds.storage.CommentRepository;
+import jakarta.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -13,13 +18,25 @@ import java.util.stream.Collectors;
 @Service
 public class SoundService {
 
-    public SoundService() {
+    @Autowired
+    private CategoryService categoryService;
+
+    @Autowired
+    private CommentRepository commentRepository;
+
+    @PostConstruct
+    private void initializeDefaultSounds() {
+
+        Category football = categoryService.findOrCreateCategory("Football");
+        Category meme = categoryService.findOrCreateCategory("Meme");
+
         sounds.add(new Sound(idCounter++, "Betis Anthem", "Relaxing forest ambiance", "/audio/betis.mp3",
-                "/images/betis.png", "Football", "0:07"));
+                "/images/betis.png", Arrays.asList(football), "0:07"));
         sounds.add(new Sound(idCounter++, "CR7", "Soothing ocean waves", "/audio/CR7.mp3", "/images/CR7.jpg",
-                "Football", "0:06"));
+                Arrays.asList(football), "0:06"));
         sounds.add(new Sound(idCounter++, "El diablo que malditos tenis", "Peaceful rain for sleep",
-                "/audio/el-diablo-que-malditos-tenis.mp3", "/images/el-diablo-que-malditos-tenis.png", "Meme", "0:04"));
+                "/audio/el-diablo-que-malditos-tenis.mp3", "/images/el-diablo-que-malditos-tenis.png", 
+                Arrays.asList(meme), "0:04"));
     }
 
     private final List<Sound> sounds = new ArrayList<>();
@@ -68,6 +85,8 @@ public class SoundService {
             } catch (IOException e) {
                 System.err.println("Error eliminando archivos de sonido: " + e.getMessage());
             }
+
+            commentRepository.deleteCommentsBySoundId(soundId);
 
             // Eliminar de la lista de sonidos
             sounds.remove(sound);

@@ -1,6 +1,5 @@
 package es.swapsounds.service;
 
-import es.swapsounds.model.Category;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
 import org.springframework.stereotype.Service;
@@ -44,7 +43,7 @@ public class UserService {
     }
 
     public void addUser(User user) {
-        ((Category) users).setId(idCounter++);
+        user.setId(idCounter++);
         users.add(user);
     }
 

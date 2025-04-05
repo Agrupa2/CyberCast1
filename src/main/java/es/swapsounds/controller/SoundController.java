@@ -49,10 +49,10 @@ public class SoundController {
 
     @GetMapping("/start")
     public String showSounds(
-        @RequestParam(name = "query", required = false) String query,
-        @RequestParam(name = "category", defaultValue = "all") String category,
-        HttpSession session,
-        Model model) {
+            @RequestParam(name = "query", required = false) String query,
+            @RequestParam(name = "category", defaultValue = "all") String category,
+            HttpSession session,
+            Model model) {
 
         String username = (String) session.getAttribute("username");
         Long userId = (Long) session.getAttribute("userId");
@@ -65,37 +65,42 @@ public class SoundController {
 
         // Obtener todos los sonidos almacenados localmente
         List<Sound> allSounds = soundService.getAllSounds();
+        
+        allSounds.forEach(sound -> System.out.println("Sound: " + sound.getTitle() + ", Categories: " +
+                (sound.getCategories() != null
+                        ? sound.getCategories().stream().map(Category::getName).collect(Collectors.toList())
+                        : "None")));
 
         // Aplicar filtros para la barra de búsqueda
         List<Sound> filteredSounds = allSounds.stream()
                 .filter(sound -> {
-                    // 1. Filtro de categoría modificado
-                    boolean matchesCategory = category.equals("all") ||
-                            sound.getCategories().stream()
-                                    .anyMatch(cat -> cat.getName().equalsIgnoreCase(category));
+                    // 1. Filtro de categoría
+                    boolean matchesCategory = true;
+                    if (!category.equals("all")) {
+                        matchesCategory = sound.getCategories() != null && sound.getCategories().stream()
+                                .anyMatch(cat -> cat.getName().equalsIgnoreCase(category));
+                    }
 
-                    // 2. Filtro de búsqueda (se mantiene igual)
-                    boolean matchesQuery = query == null ||
+                    // 2. Filtro de búsqueda
+                    boolean matchesQuery = query == null || query.trim().isEmpty() ||
                             sound.getTitle().toLowerCase().contains(query.toLowerCase());
 
                     return matchesCategory && matchesQuery;
                 })
                 .collect(Collectors.toList());
 
-
-        // 3. Obtener todas las categorías para el dropdown
-        List<Category> allCategories = categoryService.getAllCategories(); // Necesitarás implementar este método
-        // Preparar el modelo con la selección del usuario
+        // Obtener todas las categorías para el dropdown
+        List<Category> allCategories = categoryService.getAllCategories();
         model.addAttribute("sounds", filteredSounds);
         model.addAttribute("query", query);
         model.addAttribute("category", category);
-        model.addAttribute("allCategories", allCategories); // Para mostrar en la vista
+        model.addAttribute("allCategories", allCategories);
 
-        // Aplicar la categoría seleccionada
-        model.addAttribute("selectedAll", category.equals("all") ? "selected" : "");
-        model.addAttribute("selectedMeme", category.equalsIgnoreCase("Meme") ? "selected" : "");
-        model.addAttribute("selectedFootball", category.equalsIgnoreCase("Football") ? "selected" : "");
-        model.addAttribute("selectedParty", category.equalsIgnoreCase("Party") ? "selected" : "");
+        // Ajustar la lógica de selección para el dropdown
+        model.addAttribute("selectedAll", category.equals("all"));
+        for (Category cat : allCategories) {
+            model.addAttribute("selected" + cat.getName(), category.equalsIgnoreCase(cat.getName()));
+        }
 
         return "start";
     }
@@ -366,14 +371,14 @@ public class SoundController {
         }
     }
 
-        @PostMapping("/sounds/{id}/delete")
+        @PostMapping("/sounds/{soundId}/delete")
     public String deleteSound(
-            @PathVariable long id, // ID del sonido a eliminar
+            @PathVariable long soundId, // ID del sonido a eliminar
             HttpSession session, // Sesión del usuario
             RedirectAttributes redirectAttributes) { // Para enviar mensajes de retroalimentación
 
         // Obtener el ID del usuario actual desde la sesión
-        Long userId = (Long) session.getAttribute("userId");
+        Long userId = userService.getUserIdFromSession(session);
 
         // Verificar si el usuario está autenticado
         if (userId == null) {
@@ -382,7 +387,7 @@ public class SoundController {
         }
 
         // Buscar el sonido por su ID
-        Optional<Sound> soundOptional = soundService.findSoundById(id);
+        Optional<Sound> soundOptional = soundService.findSoundById(soundId);
 
         // Verificar si el sonido existe
         if (!soundOptional.isPresent()) {
@@ -394,17 +399,34 @@ public class SoundController {
 
         // Verificar permisos: el usuario debe ser el propietario o un administrador
         boolean isOwner = sound.getUserId() == userId;
-        boolean isAdmin = "admin".equals(session.getAttribute("role"));
 
-        if (!isOwner && !isAdmin) {
+        if (!isOwner) {
             redirectAttributes.addFlashAttribute("error", "No tienes permisos para eliminar este sonido.");
-            return "redirect:/sounds/" + id; // Redirigir a la página del sonido si no tiene permisos
+            return "redirect:/sounds/" + soundId; // Redirigir a la página del sonido si no tiene permisos
         }
 
         // Eliminar el sonido
-        soundService.deleteSound(id);
+        soundService.deleteSound(soundId);
         redirectAttributes.addFlashAttribute("success", "El sonido se ha eliminado correctamente.");
 
-        return "redirect:/dashboard"; // Redirigir al dashboard después de eliminar
+        return "redirect:/start"; // Redirigir al dashboard después de eliminar
     }
+
+        /* @PostMapping("/sounds/{id}/delete")
+        public String deleteSound(
+                @PathVariable Long id,
+                HttpSession session,
+                Model model) {
+
+            Long userId = userService.getUserIdFromSession(session);
+            Optional<Sound> sound = soundService.findSoundById(id);
+
+            if (userId == null || !sound.isPresent() || sound.get().getUserId() != userId) {
+                model.addAttribute("error", "No tienes permisos para esta acción");
+                return "redirect:/start";
+            }
+
+            soundService.deleteSound(id);
+            return "redirect:/start";
+        } */
 }
