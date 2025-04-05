@@ -7,11 +7,19 @@ import jakarta.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.mpatric.mp3agic.InvalidDataException;
+import com.mpatric.mp3agic.Mp3File;
+import com.mpatric.mp3agic.UnsupportedTagException;
+
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -98,4 +106,28 @@ public class SoundService {
         sounds.add(updatedSound);
     }
 
+
+    public String calculateDuration(MultipartFile audioFile) throws IOException {
+        File audioTempFile = Files.createTempFile("audio", ".mp3").toFile();
+        try (InputStream inputStream = audioFile.getInputStream()) {
+            Files.copy(inputStream, audioTempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        String duration = "0"; // fallback por si algo falla
+        try {
+            Mp3File mp3file = new Mp3File(audioTempFile);
+            long totalSeconds = mp3file.getLengthInSeconds();
+            long minutes = totalSeconds / 60;
+            long seconds = totalSeconds % 60;
+            duration = String.format("%02d:%02d", minutes, seconds);
+        } catch (UnsupportedTagException | InvalidDataException e) {
+            e.printStackTrace();
+        } finally {
+            audioTempFile.delete();
+        }
+        return duration;
+    }
 }
+
+
+

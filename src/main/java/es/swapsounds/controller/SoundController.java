@@ -65,7 +65,7 @@ public class SoundController {
 
         // Obtener todos los sonidos almacenados localmente
         List<Sound> allSounds = soundService.getAllSounds();
-        
+
         allSounds.forEach(sound -> System.out.println("Sound: " + sound.getTitle() + ", Categories: " +
                 (sound.getCategories() != null
                         ? sound.getCategories().stream().map(Category::getName).collect(Collectors.toList())
@@ -139,8 +139,7 @@ public class SoundController {
     public String uploadSound(
             @RequestParam String title,
             @RequestParam String description,
-            @RequestParam List<String> categories, // Lista de nombres de categorías
-            @RequestParam String duration,
+            @RequestParam List<String> categories,
             @RequestParam MultipartFile audioFile,
             @RequestParam MultipartFile imageFile,
             HttpSession session,
@@ -159,12 +158,15 @@ public class SoundController {
             return "redirect:/login";
         }
 
+        // Calcular duración
+        String duration = soundService.calculateDuration(audioFile);
+
         // Guardar archivos
         String username = user.get().getUsername();
         String audioPath = storage.saveFile(username, audioFile, "sounds");
         String imagePath = storage.saveFile(username, imageFile, "images");
 
-        // Crear el sonido
+        // Crear el sonido con duración calculada
         Sound sound = new Sound(
                 0,
                 title,
@@ -172,25 +174,22 @@ public class SoundController {
                 audioPath,
                 imagePath,
                 user.get(),
-                new ArrayList<>(), // Categorías vacías inicialmente
+                new ArrayList<>(),
                 duration);
 
         // Procesar categorías
         for (String categoryName : categories) {
             Category category = categoryService.findOrCreateCategory(categoryName);
             sound.getCategories().add(category);
-            category.getSounds().add(sound); // Relación bidireccional
+            category.getSounds().add(sound);
         }
-
-        List<Category> allCategories = categoryService.getAllCategories();
-
-        model.addAttribute("allCategories", allCategories);
 
         soundService.addSound(sound);
 
         model.addAttribute("success", "¡Sonido subido con éxito!");
         return "redirect:/sounds/" + sound.getSoundId();
     }
+
 
     @GetMapping("/sounds/download")
     public String showDownloadSounds(
