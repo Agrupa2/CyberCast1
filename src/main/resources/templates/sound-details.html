@@ -81,46 +81,49 @@
         <div class="sound-actions">
             <details>
                 <summary>Editar Sonido</summary>
-                <form action="/sounds/{{soundId}}/edit" method="post" enctype="multipart/form-data">
+                <form id="editForm" action="/sounds/{{soundId}}/edit" method="post" enctype="multipart/form-data">
                     <div class="form-group">
                         <label>Título:</label>
                         <input type="text" name="title" value="{{sound.title}}" required>
                     </div>
-
                     <div class="form-group">
                         <label>Descripción:</label>
                         <textarea name="description">{{sound.description}}</textarea>
                     </div>
-
                     <div class="form-group">
                         <label>Categorías:</label>
                         <div class="categories-checkbox-group">
                             {{#allCategories}}
                             <div class="category-checkbox">
                                 <label>
-                                    <input type="checkbox" 
-                                           name="categories" 
-                                           value="{{name}}"
-                                           {{#selected}}checked{{/selected}}>
+                                    <input type="checkbox" name="categories" value="{{name}}"
+                                        {{#selected}}checked{{/selected}}>
                                     {{name}}
                                 </label>
                             </div>
                             {{/allCategories}}
                         </div>
                     </div>
-
                     <div class="form-group">
                         <label>Nuevo archivo de audio (opcional):</label>
                         <input type="file" name="audioFile" accept="audio/*">
                     </div>
-
                     <div class="form-group">
                         <label>Nueva imagen (opcional):</label>
                         <input type="file" name="imageFile" accept="image/*">
                     </div>
-
                     <button type="submit">Guardar Cambios</button>
                 </form>
+                <form action="/sounds/{{soundId}}/delete" method="post"
+                    onsubmit="return confirm('¿Seguro que quieres eliminar este sonido?')">
+                    <button type="submit" class="danger">Eliminar Sonido</button>
+                </form>
+                <script>
+                    function toggleEditForm() {
+                        const form = document.getElementById('editForm');
+                        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+                    }
+                </script>
             </details>
         </div>
         {{/isOwner}}

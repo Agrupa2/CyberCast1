@@ -181,8 +181,29 @@ P {
 }
 
 .sound-actions {
-    display: flex;
-    gap: 1rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap; /* esto ayuda en pantallas pequeñas */
+}
+
+.sound-actions a,
+.sound-actions form {
+  flex-shrink: 0;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
 }
 
 .stats {
