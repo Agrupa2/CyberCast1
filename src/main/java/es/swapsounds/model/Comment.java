@@ -1,6 +1,7 @@
 package es.swapsounds.model;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Comment {
     private long commentId; // comment identification
@@ -52,6 +53,11 @@ public class Comment {
 
     public LocalDateTime getCreated() {
         return created;
+    }
+
+    public String getFormattedCreated() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        return created.format(formatter);
     }
 
     public void setCreated(LocalDateTime created) {

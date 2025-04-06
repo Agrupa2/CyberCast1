@@ -1,7 +1,5 @@
 package es.swapsounds.dto;
 
-import java.time.LocalDateTime;
-
 import es.swapsounds.model.Comment;
 import es.swapsounds.model.User;
 
@@ -9,14 +7,14 @@ public class CommentView {
     private long id;
     private String content;
     private User user;
-    private LocalDateTime created;
+    private String created;
     private boolean isCommentOwner;
 
     public CommentView(Comment comment, boolean isCommentOwner) {
         this.id = comment.getCommentId();
         this.content = comment.getContent();
         this.user = comment.getUser();
-        this.created = comment.getCreated();
+        this.created = comment.getFormattedCreated();
         this.isCommentOwner = isCommentOwner;
     }
 
@@ -44,11 +42,11 @@ public class CommentView {
         this.user = user;
     }
 
-    public LocalDateTime getCreated() {
+    public String getCreated() {
         return created;
     }
 
-    public void setCreated(LocalDateTime created) {
+    public void setCreated(String created) {
         this.created = created;
     }
 
