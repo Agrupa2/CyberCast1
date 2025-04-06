@@ -118,5 +118,12 @@ public class CommentRepository {
             comments.removeIf(comment -> comment.getAuthorId() == userId)
         );
     }
+
+    public void deleteCommentsBySoundId(long soundId) {
+        commentsBySoundId.values().forEach(comments ->
+            comments.removeIf(comment -> comment.getSoundId() == soundId)
+        );
+    }
+    
     
 }
