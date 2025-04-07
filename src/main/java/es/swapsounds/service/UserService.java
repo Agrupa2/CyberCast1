@@ -23,11 +23,12 @@ public class UserService {
 
     private long idCounter = 1;
 
-    
     public UserService() {
         // Locally generated users for testing
         users.add(new User("user", "user@gmail.com", "user123", null, idCounter++, null));
-        users.add(new User("admin", "admin@gmail.com", "admin123", "https://imgs.search.brave.com/VuBfiTd2u6sg7kwHVE-LzZGF_uwTzV8Hssy42MikWg8/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9yZXNv/dXJjZXMudGlkYWwu/Y29tL2ltYWdlcy8w/MTRlYWYzMi84NjY5/LzRmYTkvYWRiZi8z/ODRjZmUzMjRmZTYv/NjQweDY0MC5qcGc", idCounter++, null));
+        users.add(new User("admin", "admin@gmail.com", "admin123",
+                "https://imgs.search.brave.com/VuBfiTd2u6sg7kwHVE-LzZGF_uwTzV8Hssy42MikWg8/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9yZXNv/dXJjZXMudGlkYWwu/Y29tL2ltYWdlcy8w/MTRlYWYzMi84NjY5/LzRmYTkvYWRiZi8z/ODRjZmUzMjRmZTYv/NjQweDY0MC5qcGc",
+                idCounter++, null));
     }
 
     public Long getUserIdFromSession(HttpSession session) {
@@ -77,42 +78,47 @@ public class UserService {
     }
 
     public void deleteUser(long userId) {
-        // Deletes the user from the list
-        users.removeIf(u -> u.getUserId() == userId);
+        // 1. Buscar el usuario antes de borrarlo
+        Optional<User> userOptional = users.stream()
+                .filter(u -> u.getUserId() == userId)
+                .findFirst();
 
-        // Deleting all the sounds of the user
+        // 2. Borrar sus sonidos y archivos relacionados
         List<Sound> userSounds = sounds.stream()
                 .filter(s -> s.getUserId() == userId)
                 .collect(Collectors.toList());
 
         userSounds.forEach(sound -> {
-            // Deletes the files stored locally
             try {
-                Path audioPath = Paths.get("uploads" + sound.getFilePath().replace("/uploads/", "/"));
+                // Eliminar archivo de audio
+                Path audioPath = Paths.get("uploads", sound.getFilePath().replace("/uploads/", ""));
                 Files.deleteIfExists(audioPath);
 
-                Path imagePath = Paths.get("uploads" + sound.getImagePath().replace("/uploads/", "/"));
+                // Eliminar imagen del sonido
+                Path imagePath = Paths.get("uploads", sound.getImagePath().replace("/uploads/", ""));
                 Files.deleteIfExists(imagePath);
             } catch (IOException e) {
-                System.err.println("Error eliminando archivos: " + e.getMessage());
+                System.err.println("Error eliminando archivos del sonido: " + e.getMessage());
             }
         });
+
+        // Quitar sonidos del sistema
         sounds.removeAll(userSounds);
 
-        // Profile Image deletion
-        users.stream()
-                .filter(u -> u.getUserId() == userId)
-                .findFirst()
-                .ifPresent(u -> {
-                    if (u.getProfilePicturePath() != null && !u.getProfilePicturePath().contains("default")) {
-                        try {
-                            Files.deleteIfExists(
-                                    Paths.get("uploads" + u.getProfilePicturePath().replace("/uploads/", "/")));
-                        } catch (IOException e) {
-                            System.err.println("Error eliminando avatar: " + e.getMessage());
-                        }
-                    }
-                });
+        // 3. Eliminar imagen de perfil si no es la default
+        userOptional.ifPresent(user -> {
+            if (user.getProfilePicturePath() != null && !user.getProfilePicturePath().contains("default")) {
+                try {
+                    Path avatarPath = Paths.get("uploads", user.getProfilePicturePath().replace("/uploads/", ""));
+                    Files.deleteIfExists(avatarPath);
+                } catch (IOException e) {
+                    System.err.println("Error eliminando imagen de perfil: " + e.getMessage());
+                }
+            }
+        });
+
+        // 4. Finalmente, eliminar el usuario
+        users.removeIf(u -> u.getUserId() == userId);
     }
 
     public void updateUsername(long userId, String newUsername) {

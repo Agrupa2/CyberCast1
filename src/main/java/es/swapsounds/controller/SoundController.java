@@ -36,7 +36,7 @@ public class SoundController {
     private CommentService commentService;
 
     @Autowired
-    private CategoryService categoryService; 
+    private CategoryService categoryService;
 
     @Autowired
     private SoundService soundService;
@@ -189,7 +189,6 @@ public class SoundController {
         model.addAttribute("success", "¡Sonido subido con éxito!");
         return "redirect:/sounds/" + sound.getSoundId();
     }
-
 
     @GetMapping("/sounds/download")
     public String showDownloadSounds(
