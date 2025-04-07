@@ -18,24 +18,27 @@
                     {{^username}} <!-- Shows this if there is no user logged in -->
                     <li><a href="/login">Login</a></li>
                     {{/username}}
-                    {{#username}} <!-- If a user is logged in it shows this new options -->
+                    {{#username}} <!-- Shows this if there is a user logged in -->
                     <li><a href="/sounds/upload?username={{username}}">Upload Sound</a></li>
+                    <li><a href="/sounds/download">Download Sound</a></li>
+                    <li><a href="/delete-account">Delete Account</a></li>
                     <li><a href="/logout">Logout</a></li>
+                    <li><a href="/profile/{{username}}">Ver perfil</a></li>
                     {{/username}}
                 </ul>
             </div>
         </nav>
 
         <!-- Search Bar -->
-        <form action="/download-sound" method="GET" class="search-container">
+        <form action="/start" method="GET" class="search-container">
             <input type="text" name="query" class="search-bar" placeholder="Searching for sounds..."
-                value="{{#query}}{{query}}{{/query}}"> <!-- remain value after the searching -->
+                value="{{#query}}{{query}}{{/query}}"> <!-- Maintain the value after searching -->
 
-            <select name="category" class="fold-out" onchange="this.form.submit()"> <!-- It will send it after changin the category, so the sounds will show up -->
+            <select name="category" class="fold-out" onchange="this.form.submit()">
                 <option value="all" {{#selectedAll}}selected{{/selectedAll}}>All Categories</option>
-                <option value="Meme" {{#selectedMeme}}selected{{/selectedMeme}}>Meme</option>
-                <option value="Football" {{#selectedFootball}}selected{{/selectedFootball}}>Football</option>
-                <option value="Party" {{#selectedParty}}selected{{/selectedParty}}>Party</option>
+                {{#allCategories}}
+                <option value="{{name}}" {{#selected}}selected{{/selected}}>{{name}}</option>
+                {{/allCategories}}
             </select>
 
             <!-- Hiden Button to submit with Enter  -->
@@ -44,7 +47,7 @@
 
         <!-- Sound Grid -->
         <div class="sound-grid" id="soundsContainer">
-            {{#sounds}} <!-- Shows the different characteristics of the sounds -->
+            {{#sounds}} <!-- Iterate over the list of sounds -->
             <div class="sound-card">
                 <div class="card-head">
                     <img src="{{imagePath}}" alt="{{title}}" class="card-img">
@@ -55,9 +58,13 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <h3 class="card-title"><a href="/sounds/{{id}}">{{title}}</a></h3>
+                    <h3 class="card-title"><a href="/sounds/{{soundId}}">{{title}}</a></h3>
                     <div class="card-info">
-                        <span class="category">{{category}}</span>
+                        <div class="categories">
+                            {{#categories}}
+                            <span class="category">{{name}}</span>
+                            {{/categories}}
+                        </div>
                         <span class="duration">{{duration}} min</span>
                     </div>
                     <div class="audio-container">
@@ -80,6 +87,53 @@
                 <div class="footer-brand">
                     <div class="logo">SwapSounds</div>
                     <p class="slogan">Experience the future of sounds</p>
+
+                    <div class="social-link">
+                        <a href="#"><ion-icon name="logo-facebook"></ion-icon></a>
+                        <a href="#"><ion-icon name="logo-twitter"></ion-icon></a>
+                        <a href="#"><ion-icon name="logo-instagram"></ion-icon></a>
+                        <a href="#"><ion-icon name="logo-tiktok"></ion-icon></a>
+                        <a href="#"><ion-icon name="logo-youtube"></ion-icon></a>
+                    </div>
+                </div>
+
+                <div class="footer-links">
+                    <ul>
+                        <h4 class="link-heading">SwapSounds</h4>
+                        <li class="link-item"><a href="#">About us</a></li>
+                        <li class="link-item"><a href="#">My profile</a></li>
+                        <li class="link-item"><a href="#">Pricing plans</a></li>
+                        <li class="link-item"><a href="#">Contacts</a></li>
+                    </ul>
+
+                    <ul>
+                        <h4 class="link-heading">Browse</h4>
+                        <li class="link-item"><a href="#">Categories</a></li>
+                        <li class="link-item"><a href="#">Production Sounds</a></li>
+                        <li class="link-item"><a href="#">Free-to-use</a></li>
+                        <li class="link-item"><a href="#">Favourites</a></li>
+                    </ul>
+
+                    <ul>
+                        <h4 class="link-heading">Help</h4>
+                        <li class="link-item"><a href="#">Account & Billing</a></li>
+                        <li class="link-item"><a href="#">Plans & Pricing</a></li>
+                        <li class="link-item"><a href="#">Supported Devices</a></li>
+                        <li class="link-item"><a href="#">Accessibility</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-copyright">
+                <div class="copyright">
+                    <p>&copy; Copyright 2025 SwapSounds</p>
+                </div>
+
+                <div class="wrapper">
+                    <a href="#">Privacy policy</a>
+                    <a href="#">Terms and conditions</a>
+                </div>
+            </div>
         </footer>
     </div>
 </body>
