@@ -36,7 +36,7 @@ public class SoundController {
     private CommentRepository commentRepository;
 
     @Autowired
-    private CategoryService categoryService; 
+    private CategoryService categoryService;
 
     @Autowired
     private SoundService soundService;
@@ -189,7 +189,6 @@ public class SoundController {
         model.addAttribute("success", "¡Sonido subido con éxito!");
         return "redirect:/sounds/" + sound.getSoundId();
     }
-
 
     @GetMapping("/sounds/download")
     public String showDownloadSounds(
@@ -370,7 +369,7 @@ public class SoundController {
         }
     }
 
-        @PostMapping("/sounds/{soundId}/delete")
+    @PostMapping("/sounds/{soundId}/delete")
     public String deleteSound(
             @PathVariable long soundId, // ID del sonido a eliminar
             HttpSession session, // Sesión del usuario
@@ -410,22 +409,4 @@ public class SoundController {
 
         return "redirect:/start"; // Redirigir al dashboard después de eliminar
     }
-
-        /* @PostMapping("/sounds/{id}/delete")
-        public String deleteSound(
-                @PathVariable Long id,
-                HttpSession session,
-                Model model) {
-
-            Long userId = userService.getUserIdFromSession(session);
-            Optional<Sound> sound = soundService.findSoundById(id);
-
-            if (userId == null || !sound.isPresent() || sound.get().getUserId() != userId) {
-                model.addAttribute("error", "No tienes permisos para esta acción");
-                return "redirect:/start";
-            }
-
-            soundService.deleteSound(id);
-            return "redirect:/start";
-        } */
 }
