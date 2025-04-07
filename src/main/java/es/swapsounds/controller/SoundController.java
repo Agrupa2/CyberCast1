@@ -25,7 +25,7 @@ import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
 import es.swapsounds.service.UserService;
 import es.swapsounds.service.CategoryService;
-import es.swapsounds.storage.CommentRepository;
+import es.swapsounds.service.CommentService;
 import es.swapsounds.storage.InMemoryStorage;
 import jakarta.servlet.http.HttpSession;
 
@@ -33,7 +33,7 @@ import jakarta.servlet.http.HttpSession;
 public class SoundController {
 
     @Autowired
-    private CommentRepository commentRepository;
+    private CommentService commentService;
 
     @Autowired
     private CategoryService categoryService; 
@@ -282,7 +282,7 @@ public class SoundController {
             model.addAttribute("uploader", null);
         }
 
-        List<Comment> comments = commentRepository.getCommentsBySoundId(soundId);
+        List<Comment> comments = commentService.getCommentsBySoundId(soundId);
 
         // Checking if the user is the owner of the sound
         Long currentUserId = (Long) session.getAttribute("userId");
@@ -370,7 +370,7 @@ public class SoundController {
         }
     }
 
-        @PostMapping("/sounds/{soundId}/delete")
+    @PostMapping("/sounds/{soundId}/delete")
     public String deleteSound(
             @PathVariable long soundId, // ID del sonido a eliminar
             HttpSession session, // Sesión del usuario
@@ -405,11 +405,13 @@ public class SoundController {
         }
 
         // Eliminar el sonido
+        commentService.deleteCommentsBySoundId(soundId);
         soundService.deleteSound(soundId);
         redirectAttributes.addFlashAttribute("success", "El sonido se ha eliminado correctamente.");
 
         return "redirect:/start"; // Redirigir al dashboard después de eliminar
     }
+}
 
         /* @PostMapping("/sounds/{id}/delete")
         public String deleteSound(
@@ -428,4 +430,4 @@ public class SoundController {
             soundService.deleteSound(id);
             return "redirect:/start";
         } */
-}
+

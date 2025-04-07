@@ -1,7 +1,7 @@
 package es.swapsounds.controller;
 
+import es.swapsounds.service.CommentService;
 import es.swapsounds.service.UserService;
-import es.swapsounds.storage.CommentRepository;
 import jakarta.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class UserController {
 
    @Autowired
-   private CommentRepository commentRepository;
+   private CommentService commentService;
 
    @Autowired
    private UserService userService;
@@ -47,7 +47,7 @@ public class UserController {
          return "redirect:/delete-account";
       }
 
-      commentRepository.deleteCommentsByUserId(userId);
+      commentService.deleteCommentsByUserId(userId);
       userService.deleteUser(userId);
       session.invalidate();
 

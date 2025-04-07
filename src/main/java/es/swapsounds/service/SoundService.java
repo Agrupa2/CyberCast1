@@ -2,7 +2,6 @@ package es.swapsounds.service;
 
 import es.swapsounds.model.Category;
 import es.swapsounds.model.Sound;
-import es.swapsounds.storage.CommentRepository;
 import jakarta.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +24,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class SoundService {
-
     @Autowired
     private CategoryService categoryService;
-
-    @Autowired
-    private CommentRepository commentRepository;
 
     @PostConstruct
     private void initializeDefaultSounds() {
@@ -93,9 +88,6 @@ public class SoundService {
             } catch (IOException e) {
                 System.err.println("Error eliminando archivos de sonido: " + e.getMessage());
             }
-
-            commentRepository.deleteCommentsBySoundId(soundId);
-
             // Eliminar de la lista de sonidos
             sounds.remove(sound);
         }
