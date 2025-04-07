@@ -1,7 +1,5 @@
 package es.swapsounds.storage;
 
-import es.swapsounds.model.User;
-
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -9,22 +7,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 public class InMemoryStorage {
-    private List<User> users = new ArrayList<>();
-    private long idCounter = 1;
-
-
-    public InMemoryStorage() {
-        // Locally generated users for testing
-        users.add(new User("user", "user@gmail.com", "user123", null, idCounter++, null));
-        users.add(new User("admin", "admin@gmail.com", "admin123", null, idCounter++, null));
-        
-    }
-
 
     public String saveProfileImage(MultipartFile file, String username) throws IOException {
         String uploadDir = "uploads/profiles/";
