@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,35 +36,33 @@ public class ProfileController {
     @Autowired
     private ProfileService profileService;
 
-    @GetMapping("/profile")
-    public String userProfile(HttpSession session, Model model) {
-        // Delegamos la obtención del ID de usuario a UserService
-        Long userId = userService.getUserIdFromSession(session);
-        if (userId == null) {
-            return "redirect:/login";
-        }
-
-        // Obtener el usuario y validar su existencia
-        Optional<User> userOpt = userService.getUserById(userId);
-        if (!userOpt.isPresent()) {
+    @GetMapping("/profile/{username}")
+    public String userProfile(@PathVariable("username") String username, HttpSession session, Model model) {
+        // Buscar el usuario del perfil
+        Optional<User> profileUserOpt = userService.findUserByUsername(username);
+        if (!profileUserOpt.isPresent()) {
             return "redirect:/start";
         }
-        User user = userOpt.get();
+        User profileUser = profileUserOpt.get();
 
-        // Obtener inicial del usuario (en caso de no tener avatar)
-        String userInitial = profileService.getUserInitial(user);
+        // Verificar si el usuario autenticado es el propietario
+        Long authenticatedUserId = userService.getUserIdFromSession(session);
+        boolean isOwner = authenticatedUserId != null && authenticatedUserId.equals(profileUser.getUserId());
 
-        // Obtener sonidos y comentarios del usuario usando SoundService y CommentService
-        List<Sound> userSounds = soundService.getSoundByUserId(userId);
-        List<Comment> userComments = commentService.getCommentsByUserId(userId);
+        // Obtener los sonidos del usuario del perfil
+        List<Sound> userSounds = soundService.getSoundByUserId(profileUser.getUserId());
+        List<Comment> userComments = commentService.getCommentsByUserId(profileUser.getUserId());
+        String userInitial = profileService.getUserInitial(profileUser);
 
-        // Agregar atributos al modelo
+        // Agregar datos al modelo
         model.addAttribute("comments", userComments);
-        model.addAttribute("profileImagePath", user.getProfilePicturePath());
+        model.addAttribute("profileImagePath", profileUser.getProfilePicturePath());
         model.addAttribute("userInitial", userInitial);
-        model.addAttribute("username", user.getUsername());
-        model.addAttribute("user", user);
+        model.addAttribute("username", profileUser.getUsername());
+        model.addAttribute("profileUser", profileUser);
+        model.addAttribute("isOwner", isOwner);
         model.addAttribute("sounds", userSounds);
+        model.addAttribute("user", profileUser);
 
         return "profile";
     }
@@ -104,5 +103,19 @@ public class ProfileController {
         }
 
         return "redirect:/profile";
+    }
+
+    @GetMapping("/profile")
+    public String redirectToOwnProfile(HttpSession session) {
+        Long userId = userService.getUserIdFromSession(session);
+        if (userId == null) {
+            return "redirect:/login"; 
+        }
+        Optional<User> userOpt = userService.getUserById(userId);
+        if (!userOpt.isPresent()) {
+            return "redirect:/start";
+        }
+        User user = userOpt.get();
+        return "redirect:/profile/" + user.getUsername();
     }
 }
