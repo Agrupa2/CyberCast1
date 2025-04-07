@@ -11,7 +11,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -33,6 +35,14 @@ public class UserService {
 
     public Long getUserIdFromSession(HttpSession session) {
         return (Long) session.getAttribute("userId");
+    }
+
+    public Optional<User> getUserFromSession(HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId != null) {
+            return findUserById(userId);
+        }
+        return Optional.empty();
     }
 
     public Optional<User> getUserById(Long userId) {
@@ -133,6 +143,21 @@ public class UserService {
                 .filter(u -> u.getUserId() == userId)
                 .findFirst()
                 .ifPresent(u -> u.setProfilePicturePath(imagePath));
+    }
+
+    public Map<String, String> getProfileInfo(User user) {
+        Map<String, String> info = new HashMap<>();
+        String profileImage = user.getProfilePicturePath();
+        String userInitial = "";
+        if (profileImage == null || profileImage.isEmpty()) {
+            // Si no hay imagen, se usa la inicial del nombre
+            userInitial = (user.getUsername() != null && !user.getUsername().isEmpty())
+                    ? user.getUsername().substring(0, 1).toUpperCase()
+                    : "?";
+        }
+        info.put("profileImagePath", profileImage);
+        info.put("userInitial", userInitial);
+        return info;
     }
 
 }
