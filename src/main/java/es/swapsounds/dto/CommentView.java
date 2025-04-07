@@ -14,7 +14,7 @@ public class CommentView {
         this.id = comment.getCommentId();
         this.content = comment.getContent();
         this.user = comment.getUser();
-        this.created = comment.getFormattedCreated();
+        this.created = comment.getCreated();
         this.isCommentOwner = isCommentOwner;
     }
 

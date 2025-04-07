@@ -13,7 +13,6 @@ public class Comment {
     private long soundId;
     private String soundTitle;
 
-
     public Comment(Long commentId, String content, User user) {
         this.commentId = commentId;
         this.content = content;
@@ -24,7 +23,6 @@ public class Comment {
 
     public Comment() {
     }
-
 
     // Getters
     public User getUser() {
@@ -51,11 +49,7 @@ public class Comment {
         this.commentId = commentId;
     }
 
-    public LocalDateTime getCreated() {
-        return created;
-    }
-
-    public String getFormattedCreated() {
+    public String getCreated() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
         return created.format(formatter);
     }
