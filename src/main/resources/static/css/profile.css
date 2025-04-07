@@ -220,6 +220,15 @@ P {
     flex: 1;
 }
 
+/* Indicador visual de perfil público */
+.public-profile .profile-actions {
+  display: none;
+}
+
+.public-profile .sound-actions form {
+  display: none;
+}
+
 nav {
     position: fixed;
     top: -250px;

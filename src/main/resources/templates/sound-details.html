@@ -45,7 +45,9 @@
                 </div>
                 <div class="user-info">
                     <span class="subido-por">Subido por:</span>
-                    <h3 class="username">{{username}}</h3>
+                    <div class="username">
+                        <a href="/profile/{{username}}">{{username}}</a>
+                    </div>
                 </div>
                 {{/uploader}}
             </div>
@@ -148,7 +150,9 @@
             <div class="comment">
                 <div class="comment-author">
                     <img src="{{user.profilePicturePath}}" alt="{{user.username}}" class="comment-avatar">
-                    <span>{{user.username}}</span>
+                    <div class="comment-author">
+                        <a href="/profile/{{user.username}}">{{user.username}}</a>
+                    </div>
                 </div>
                 <p class="comment-content">{{content}}</p>
                 <small class="comment-date">{{created}}</small>

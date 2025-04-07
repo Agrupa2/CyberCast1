@@ -37,6 +37,7 @@
             {{/profileImagePath}}
             <div class="profile-info">
                 <!-- Añadir esto después del bloque .profile-header -->
+                {{#isOwner}}
                 <div class="profile-actions">
                     <details class="profile-dropdown">
                         <summary class="dropdown-toggle">
@@ -87,6 +88,7 @@
                         </div>
                     </details>
                 </div>
+                {{/isOwner}}
                 <h1>{{user.username}}</h1>
                 <div class="stats">
                     <div class="stat-item">
@@ -106,8 +108,10 @@
         </div>
         <!-- Lista de sonidos -->
         <div class="sounds-list">
-            <h2>Tus sonidos subidos</h2>
-            
+            <h2>
+                {{#isOwner}}Tus sonidos subidos{{/isOwner}}
+                {{^isOwner}}Sonidos de {{user.username}}{{/isOwner}}
+            </h2>
             {{#sounds}}
             <div class="sound-item">
                 <img src="{{imagePath}}" class="sound-thumbnail" alt="{{title}}">
@@ -128,23 +132,32 @@
                 
                 <div class="sound-actions">
                     <a href="/sounds/{{soundId}}" class="btn">Ver</a>
+                    {{#isOwner}}
                     <form action="/sounds/{{soundId}}/delete" method="POST" style="display:inline;">
                         <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que quieres eliminar este sonido?')">Eliminar</button>
                     </form>
+                    {{/isOwner}}
                 </div>
             </div>
             {{/sounds}}
             {{^sounds}}
             <div class="empty-state">
+                {{#isOwner}}
                 <p>No has subido ningún sonido todavía</p>
                 <a href="/sounds/upload" class="btn">Subir primer sonido</a>
+                {{/isOwner}}
+                {{^isOwner}}
+                <p>{{user.username}} no ha subido ningún sonido todavía</p>
+                {{/isOwner}}
             </div>
             {{/sounds}}
         </div>
         <!-- Lista de comentarios -->
         <div class="comments-section">
-            <h2>Tus comentarios</h2>
-        
+            <h2>
+                {{#isOwner}}Tus comentarios{{/isOwner}}
+                {{^isOwner}}Comentarios de {{user.username}}{{/isOwner}}
+            </h2>
             {{#comments}} <!-- Itera sobre todos los comentarios -->
             <div class="comment-item">
                 <div class="comment-content">
@@ -153,20 +166,27 @@
                         <a href="/sounds/{{soundId}}">{{soundTitle}}</a>
                     </small>
                 </div>
+                {{#isOwner}}
                 <div class="comment-actions">
                     <form action="/sounds/{{soundId}}/comments/{{commentId}}/delete" method="POST">
                         <input type="hidden" name="_method" value="DELETE">
                         <button type="submit" class="btn-danger">Eliminar</button>
                     </form>
                 </div>
-            </div>
+                {{/isOwner}}
+                </div>
             {{/comments}}
-            {{^comments}} <!-- Si no hay comentarios -->
-            <div class="empty-state">
-                <p>No has realizado ningún comentario</p>
-            </div>
+            {{^comments}}
+                <div class="empty-state">
+                    {{#isOwner}}
+                    <p>No has subido ningún comentario todavía</p>
+                    {{/isOwner}}
+                    {{^isOwner}}
+                    <p>{{user.username}} no ha subido ningún comentario todavía</p>
+                    {{/isOwner}}
+                </div>
             {{/comments}}
-        </div>
-    </div>
+                </div>
+                </div>
 </body>
 </html>
