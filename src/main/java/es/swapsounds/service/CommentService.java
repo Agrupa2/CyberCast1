@@ -2,19 +2,16 @@ package es.swapsounds.service;
 
 import es.swapsounds.model.Comment;
 import es.swapsounds.model.User;
+import es.swapsounds.storage.CommentRepository;
+import jakarta.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
 
 @Service
 public class CommentService {
@@ -25,113 +22,102 @@ public class CommentService {
     @Autowired
     private UserService userService;
 
-    private final Map<Long, List<Comment>> commentsBySoundId = new ConcurrentHashMap<>();
+    @Autowired
+    private CommentRepository commentRepository;
 
     /**
      * Agrega un comentario a un sonido.
      */
+    @Transactional
     public Comment addComment(Long userId, long soundId, String content) {
         // Obtener el usuario actual
         User currentUser = userService.findUserById(userId)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        String soundTitle = soundService.findSoundById(soundId).get().getTitle();
-        // Obtener el sonido (para validación, si lo necesitas)
-        if (soundService.findSoundById(soundId).isEmpty()) {
-            throw new RuntimeException("Sonido no encontrado");
-        }
+        String soundTitle = soundService.findSoundById(soundId)
+            .orElseThrow(() -> new RuntimeException("Sonido no encontrado"))
+            .getTitle();
 
-        long commentId = Math.abs(UUID.randomUUID().getMostSignificantBits());
+        long commentId = Math.abs(UUID.randomUUID().getMostSignificantBits()); //generates a random Id for the comment
         Comment comment = new Comment(commentId, content, currentUser);
         comment.setSoundId(soundId);
         comment.setSoundTitle(soundTitle);
         comment.setCreated(LocalDateTime.now());
 
-        commentsBySoundId
-            .computeIfAbsent(soundId, k -> new CopyOnWriteArrayList<>())
-            .add(comment);
-        return comment;
+        return commentRepository.save(comment);
     }
 
     /**
      * Edita un comentario, verificando que el usuario sea el autor.
      */
+    @Transactional
     public boolean editComment(Long userId, long soundId, long commentId, String newContent) {
         User currentUser = userService.findUserById(userId)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
                 
-        List<Comment> commentList = commentsBySoundId.getOrDefault(soundId, Collections.emptyList());
-        Optional<Comment> optComment = commentList.stream()
-                .filter(comment -> comment.getCommentId() == commentId && comment.getUser().equals(currentUser))
-                .findFirst();
+        Optional<Comment> optComment = commentRepository.findById(commentId);
         if (optComment.isPresent()) {
             Comment comment = optComment.get();
-            comment.setContent(newContent);
-            comment.setModified(LocalDateTime.now());
-            return true;
+            if (comment.getUser().getUserId() == userId && comment.getSoundId() == soundId) {
+                comment.setContent(newContent);
+                comment.setModified(LocalDateTime.now());
+                commentRepository.save(comment);
+                return true;
+            }
+    }
+        return false;
+}
+
+    /**
+     * Elimina un comentario, validando que el usuario sea el autor.
+     */
+    @Transactional
+    public boolean deleteComment(Long userId, long soundId, long commentId) { //la función del comment repsoitory devuelve un boolean por eso cambuiio de void a boolean
+       
+        Optional<Comment> optComment = commentRepository.findById(commentId);
+        if (optComment.isPresent()) {
+            Comment comment = optComment.get();
+            if (comment.getUser().getUserId() == userId) {
+                commentRepository.delete(comment);
+                return true;
+            }
+            throw new SecurityException("No tienes permiso para eliminar este comentario");
         }
         return false;
     }
 
     /**
-     * Elimina un comentario, validando que el usuario sea el autor.
-     */
-    public boolean deleteComment(Long userId, long soundId, long commentId) { //la función del comment repsoitory devuelve un boolean por eso cambuiio de void a boolean
-        Comment comment = findCommentById(commentId)
-                .orElseThrow(() -> new RuntimeException("Comentario no encontrado"));
-
-        // Aquí delegamos la validación en el servicio, en lugar de en el controlador.
-        if (comment.getAuthorId() != userId) {
-            throw new SecurityException("No tienes permiso para eliminar este comentario");
-        }
-
-        boolean removed = false;
-        // Recorre todas las listas de comentarios
-        for (List<Comment> commentList : commentsBySoundId.values()) {
-            removed = commentList.removeIf(comments -> comments.getCommentId() == commentId) || removed; //he tenido que cambiar el nombre de la variable para que no diera error, ya que había una variable local llamada comment
-        }
-        return removed;
-    }
-
-    /**
      * Busca y devuelve un comentario por su ID.
      */
+
     public Optional<Comment> findCommentById(long commentId) {
-        return commentsBySoundId.values().stream()
-                .flatMap(List::stream)
-                .filter(comment -> comment.getCommentId() == commentId)
-                .findFirst();
+        return commentRepository.findById(commentId);
     }
 
     /**
      * Obtiene la lista de comentarios asociados a un sonido.
      */
     public List<Comment> getCommentsBySoundId(long soundId) {
-        return new ArrayList<>(commentsBySoundId.getOrDefault(soundId, Collections.emptyList()));
+        return commentRepository.findBySoundId(soundId);
     }
 
     /* Obtiene la lista de comentarios realizados por un usuario.*/
 
     public List<Comment> getCommentsByUserId(long userId) {
-        return commentsBySoundId.values().stream()
-            .flatMap(List::stream)
-            .filter(comment -> comment.getUser().getUserId() == userId) // Ahora usamos getUser().getUserId()
-            .collect(Collectors.toList());
+        return commentRepository.findByUserUserId(userId);
     }
 
     //*/Borra los comentarios dependiendo del tipo de usuario que seas */
 
+    @Transactional
     public void deleteCommentsByUserId(long userId) {
-        commentsBySoundId.values().forEach(comments -> 
-            comments.removeIf(comment -> comment.getAuthorId() == userId)
-        );
+        commentRepository.deleteByUserUserId(userId);
     }
 
     // Borra los comentarios de un sonido específico
 
+    @Transactional
     public void deleteCommentsBySoundId(long soundId) {
-        commentsBySoundId.values().forEach(comments ->
-            comments.removeIf(comment -> comment.getSoundId() == soundId)
-        );
+        commentRepository.deleteBySoundId(soundId);
     }
 }
