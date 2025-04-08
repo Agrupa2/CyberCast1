@@ -3,11 +3,24 @@ package es.swapsounds.model;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import jakarta.persistence.*;
+
+
+@Entity
 public class Comment {
+    
+    @Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
     private long commentId; // comment identification
+
+    @ManyToOne
     private User user; // user uploader of the comment
+
     private String content; // comment content
+
+    @ManyToOne
     private Sound sound; // sound to which the comment is related
+
     private LocalDateTime created; // comment upload date
     private LocalDateTime modified; // comment modification date
     private long soundId;

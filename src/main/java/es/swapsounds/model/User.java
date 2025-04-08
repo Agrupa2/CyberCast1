@@ -3,15 +3,29 @@ package es.swapsounds.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "users")
 public class User {
+
+    @Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
     private long userId;
     private String username;
     private String email;
     private String password;
     private String profilePicturePath;
+
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Comment> comments;
+
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Sound> sounds;
+
     private String role;
+
+    public User() {}
 
     public User(String username, String email, String password, String profilePicturePath, long userId, String role) {
         this.username = username;
@@ -50,6 +64,13 @@ public class User {
 
     public String getEmail() {
         return email;
+    }
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getPassword() {

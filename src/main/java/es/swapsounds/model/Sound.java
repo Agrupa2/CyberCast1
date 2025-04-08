@@ -1,21 +1,33 @@
 package es.swapsounds.model;
+import jakarta.persistence.*;
+
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
 public class Sound {
+
+    @Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
     private long soundId;
+
     private String title;
     private String description;
     private String filePath;
     private String imagePath;
     private long userId;
+
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Comment> comments;
+    
     private String duration;
     private LocalDateTime uploadDate;
 
+    @ManyToMany(mappedBy = "sounds")
     private List<Category> categories = new ArrayList<>();
+
 
     public Sound(String title, String description, String filePath, String imagePath, int userId, String Category,
             String duration) {

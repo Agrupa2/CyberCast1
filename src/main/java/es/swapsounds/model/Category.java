@@ -3,11 +3,18 @@ package es.swapsounds.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.*;
 
+
+@Entity
 public class Category {
 
+    @Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
     private String name;
+
+    @ManyToMany
     private List<Sound> sounds = new ArrayList<>(); // This is a list of sounds that belong to this category
 
 
