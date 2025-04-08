@@ -24,7 +24,7 @@ public class DataLoader implements CommandLineRunner {
     public void run(String... args) {
         if (userRepository.count() == 0 && soundRepository.count() == 0) {
             // Crear usuarios
-            /* User user1 = new User();
+            User user1 = new User();
             user1.setUsername("sofia");
             user1.setEmail("sofia@example.com");
             user1.setPassword("sofia123");
@@ -59,7 +59,7 @@ public class DataLoader implements CommandLineRunner {
 
             soundRepository.saveAll(List.of(sound1, sound2));
 
-            System.out.println("Usuarios y sonidos de prueba cargados."); */
+            System.out.println("Usuarios y sonidos de prueba cargados.");
         }
     }
 }
