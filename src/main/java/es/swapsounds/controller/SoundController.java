@@ -286,4 +286,5 @@ public class SoundController {
 
         return "redirect:/start"; // Redirigir al dashboard después de eliminar
     }
+
 }
