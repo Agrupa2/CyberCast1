@@ -77,9 +77,6 @@ public class SoundService {
         return soundRepository.save(sound);
     }
     
-    public List<Sound> getSoundsByCategory(String categoryName) {
-        return soundRepository.findByCategories_NameIgnoreCase(categoryName);
-    }
 
     public String calculateDuration(MultipartFile audioFile) throws IOException {
         // Código de cálculo de duración. (Es posible que lo mantengas igual.)

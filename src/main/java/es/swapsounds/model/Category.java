@@ -14,7 +14,7 @@ public class Category {
     private long id;
     private String name;
 
-    @ManyToMany
+    @ManyToMany(mappedBy = "categories")
     private List<Sound> sounds = new ArrayList<>(); // This is a list of sounds that belong to this category
 
 

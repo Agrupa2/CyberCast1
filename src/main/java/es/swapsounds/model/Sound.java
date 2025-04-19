@@ -25,7 +25,7 @@ public class Sound {
     private String duration;
     private LocalDateTime uploadDate;
 
-    @ManyToMany(mappedBy = "sounds")
+    @ManyToMany
     private List<Category> categories = new ArrayList<>();
 
 

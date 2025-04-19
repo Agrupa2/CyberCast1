@@ -62,7 +62,7 @@ public class DataLoader implements CommandLineRunner {
             sound1.setUploadDate(LocalDateTime.now());
             sound1.setUserId(user1.getUserId());
             sound1.setCategories(Arrays.asList(football));
-            football.getSounds().add(sound1); 
+             
 
             Sound sound2 = new Sound();
             sound2.setTitle("Betis");
@@ -73,7 +73,7 @@ public class DataLoader implements CommandLineRunner {
             sound2.setUploadDate(LocalDateTime.now());
             sound2.setUserId(user2.getUserId());
             sound2.setCategories(Arrays.asList(football));
-            football.getSounds().add(sound2);
+            
 
             Sound sound3 = new Sound();
             sound3.setTitle("El Diablo que malditos tenis");
@@ -84,7 +84,7 @@ public class DataLoader implements CommandLineRunner {
             sound3.setUploadDate(LocalDateTime.now());
             sound3.setUserId(user2.getUserId());
             sound3.setCategories(Arrays.asList(meme));
-            meme.getSounds().add(sound3);
+           
 
             Sound sound4 = new Sound();
             sound4.setTitle("El señor de la noche");
@@ -95,7 +95,7 @@ public class DataLoader implements CommandLineRunner {
             sound4.setUploadDate(LocalDateTime.now());
             sound4.setUserId(user1.getUserId());
             sound4.setCategories(Arrays.asList(meme, AI));
-            meme.getSounds().add(sound4);
+            
 
             soundRepository.saveAll(List.of(sound1, sound2, sound3, sound4));
 
