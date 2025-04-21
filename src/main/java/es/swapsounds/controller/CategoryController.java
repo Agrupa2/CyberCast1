@@ -10,18 +10,17 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Controller
-@RequestMapping("/categories")
 public class CategoryController {
 
     @Autowired
     private CategoryService categoryService;
 
-    // Mostrar todas las categorías
-    @GetMapping
+    // Show all categories
+    @GetMapping("/categories")
     public String getAllCategories(Model model) {
         List<Category> categories = categoryService.getAllCategories();
         model.addAttribute("categories", categories);
-        return "categories"; // Nombre de la vista para mostrar las categorías
+        return "categories"; 
     }
 
 }

@@ -17,9 +17,7 @@
                 {{^username}} <!-- This will appear if there isn´t a user logged in -->
                 <li><a href="/login">Login</a></li>
                 {{/username}}
-                <li><a href="/contact">Contact</a></li>
-                {{#username}}
-                <li><a href="/dashboard">Acceder al Dashboard</a></li>
+                {{#username}} 
                 <li><a href="/sounds/upload?username={{username}}">Upload Sound</a></li>
                 <li><a href="/logout">Logout</a></li>
                 {{/username}}

@@ -9,6 +9,6 @@ import es.swapsounds.model.Category;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long>{
-    Optional<Category> findByNameIgnoreCase(String name); // Buscar categoría por nombre (ignorar mayúsculas/minúsculas)
-    boolean existsByNameIgnoreCase(String name); // Verificar si existe una categoría por nombre
+    Optional<Category> findByNameIgnoreCase(String name); // Search for a category by name
+    boolean existsByNameIgnoreCase(String name); // Verify if a category exists by name
 }

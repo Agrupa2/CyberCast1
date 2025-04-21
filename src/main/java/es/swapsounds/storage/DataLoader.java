@@ -18,31 +18,28 @@ public class DataLoader implements CommandLineRunner {
 
     private final SoundRepository soundRepository;
     private final UserRepository userRepository;
-
-    
     private final CategoryService categoryService;
+
     public DataLoader(SoundRepository soundRepository, UserRepository userRepository, CategoryService categoryService){ 
         this.soundRepository = soundRepository;
         this.userRepository = userRepository;
         this.categoryService = categoryService;
     }
 
-   
+
     @Override
     public void run(String... args) {
         if (userRepository.count() == 0 && soundRepository.count() == 0) {
-            
-
+        
             Category football = categoryService.findOrCreateCategory("Football");
             Category meme = categoryService.findOrCreateCategory("Meme");
-            Category music = categoryService.findOrCreateCategory("Music");   
             Category AI = categoryService.findOrCreateCategory("AI");
 
             User user1 = new User();
             user1.setUsername("sofia");
             user1.setEmail("sofia@example.com");
             user1.setPassword("sofia123");
-            user1.setProfilePicturePath(null); // o una imagen por defecto
+            user1.setProfilePicturePath(null); 
 
             User user2 = new User();
             user2.setUsername("david");
@@ -52,7 +49,7 @@ public class DataLoader implements CommandLineRunner {
 
             userRepository.saveAll(List.of(user1, user2));
 
-            // Crear sonidos asociados a los usuarios
+            // Create sounds and associate them with users and categories
             Sound sound1 = new Sound();
             sound1.setTitle("CR7");
             sound1.setDescription("CR7 se va de los simpsons");
@@ -99,7 +96,7 @@ public class DataLoader implements CommandLineRunner {
 
             soundRepository.saveAll(List.of(sound1, sound2, sound3, sound4));
 
-            System.out.println("Usuarios y sonidos de prueba cargados.");
+            System.out.println("Usuarios, sonidos y categorias de prueba cargados.");
         }
     }
 }
