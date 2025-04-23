@@ -78,7 +78,7 @@ public class User {
     }
 
     public String getProfilePicturePath() {
-        return profilePicturePath != null ? profilePicturePath : "/uploads/profiles/default-avatar.png"; // If the user
+        return profilePicturePath != null ? profilePicturePath : "/profiles/default-avatar.png"; // If the user
                                                                                                          // profile
                                                                                                          // image is
                                                                                                          // set to null,
