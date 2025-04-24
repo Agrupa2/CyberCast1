@@ -197,6 +197,10 @@ public class SoundController {
 
         // Obtener comentarios asociados al sonido
         List<Comment> comments = commentService.getCommentsBySoundId(soundId);
+        for (Comment comment : comments) {
+            boolean owner = (currentUserId != null && currentUserId.equals(comment.getUser().getUserId()));
+            comment.setCommentOwner(owner);
+        }
         model.addAttribute("comments", comments);
 
         // Obtener todas las categorías para el dropdown
@@ -210,8 +214,13 @@ public class SoundController {
         model.addAttribute("isOwner", currentUserId != null && currentUserId.equals(sound.getUserId()));
         model.addAttribute("username", username);
 
+        //Marcar si el usuario es el propietario de algun comentario
+        /*List <Comment> userComments = commentService.getCommentsByUserId(currentUserId);
+        model.addAttribute("isCommentOwner", userComments);*/
+
         return "sound-details";
-    }
+
+}
 
     @PostMapping("/sounds/{soundId}/edit")
     public String editSound(
