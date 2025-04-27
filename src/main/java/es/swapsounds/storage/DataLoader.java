@@ -39,13 +39,13 @@ public class DataLoader implements CommandLineRunner {
             user1.setUsername("sofia");
             user1.setEmail("sofia@example.com");
             user1.setPassword("sofia123");
-            user1.setProfilePicturePath(null); 
+            user1.setProfilePicture(null); 
 
             User user2 = new User();
             user2.setUsername("david");
             user2.setEmail("david@example.com");
             user2.setPassword("david123");
-            user2.setProfilePicturePath(null);
+            user2.setProfilePicture(null);
 
             userRepository.saveAll(List.of(user1, user2));
 
