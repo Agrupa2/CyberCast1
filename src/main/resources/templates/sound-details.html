@@ -17,9 +17,7 @@
                 {{^username}} <!-- This will appear if there isn´t a user logged in -->
                 <li><a href="/login">Login</a></li>
                 {{/username}}
-                <li><a href="/contact">Contact</a></li>
-                {{#username}}
-                <li><a href="/dashboard">Acceder al Dashboard</a></li>
+                {{#username}} 
                 <li><a href="/sounds/upload?username={{username}}">Upload Sound</a></li>
                 <li><a href="/logout">Logout</a></li>
                 {{/username}}
@@ -168,12 +166,12 @@
                             </svg>
                         </summary>
                         <div class="dropdown-content">
-                            <form action="/sounds/{{soundId}}/comments/{{id}}/edit" method="POST">
+                            <form action="/sounds/{{soundId}}/comments/{{commentId}}/edit" method="POST">
                                 <input type="hidden" name="_method" value="PUT">
                                 <textarea name="content">{{content}}</textarea>
                                 <button type="submit">Guardar</button>
                             </form>
-                            <form action="/sounds/{{soundId}}/comments/{{id}}/delete" method="POST">
+                            <form action="/sounds/{{soundId}}/comments/{{commentId}}/delete" method="POST">
                                 <input type="hidden" name="_method" value="DELETE">
                                 <button type="submit" class="danger">Eliminar</button>
                             </form>

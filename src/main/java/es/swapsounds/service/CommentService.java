@@ -1,6 +1,7 @@
 package es.swapsounds.service;
 
 import es.swapsounds.model.Comment;
+import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
 import es.swapsounds.storage.CommentRepository;
 import jakarta.transaction.Transactional;
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class CommentService {
@@ -34,12 +34,16 @@ public class CommentService {
         User currentUser = userService.findUserById(userId)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        String soundTitle = soundService.findSoundById(soundId)
-            .orElseThrow(() -> new RuntimeException("Sonido no encontrado"))
-            .getTitle();
+        Sound sound = soundService.findSoundById(soundId)
+            .orElseThrow(() -> new RuntimeException("Sonido no encontrado"));
 
-        long commentId = Math.abs(UUID.randomUUID().getMostSignificantBits()); //generates a random Id for the comment
-        Comment comment = new Comment(commentId, content, currentUser);
+        String soundTitle = sound.getTitle(); // Obtener el título del sonido
+
+        //Crea un nuevo commentId pero no lo hace maualmente, lo hace la base de datos
+        Comment comment = new Comment();
+        comment.setContent(content); // Asignar el contenido al comentario
+        comment.setUser(currentUser); // Asignar el usuario al comentario
+        comment.setSound(sound); // Asignar el sonido al comentario
         comment.setSoundId(soundId);
         comment.setSoundTitle(soundTitle);
         comment.setCreated(LocalDateTime.now());

@@ -1,34 +1,45 @@
 package es.swapsounds.storage;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
+
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import es.swapsounds.model.Category;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
+import es.swapsounds.service.CategoryService;
 
 @Component
 public class DataLoader implements CommandLineRunner {
 
     private final SoundRepository soundRepository;
     private final UserRepository userRepository;
+    private final CategoryService categoryService;
 
-    public DataLoader(SoundRepository soundRepository, UserRepository userRepository) {
+    public DataLoader(SoundRepository soundRepository, UserRepository userRepository, CategoryService categoryService){ 
         this.soundRepository = soundRepository;
         this.userRepository = userRepository;
+        this.categoryService = categoryService;
     }
+
 
     @Override
     public void run(String... args) {
         if (userRepository.count() == 0 && soundRepository.count() == 0) {
-            // Crear usuarios
+        
+            Category football = categoryService.findOrCreateCategory("Football");
+            Category meme = categoryService.findOrCreateCategory("Meme");
+            Category AI = categoryService.findOrCreateCategory("AI");
+
             User user1 = new User();
             user1.setUsername("sofia");
             user1.setEmail("sofia@example.com");
             user1.setPassword("sofia123");
-            user1.setProfilePicturePath(null); // o una imagen por defecto
+            user1.setProfilePicturePath(null); 
 
             User user2 = new User();
             user2.setUsername("david");
@@ -38,7 +49,7 @@ public class DataLoader implements CommandLineRunner {
 
             userRepository.saveAll(List.of(user1, user2));
 
-            // Crear sonidos asociados a los usuarios
+            // Create sounds and associate them with users and categories
             Sound sound1 = new Sound();
             sound1.setTitle("CR7");
             sound1.setDescription("CR7 se va de los simpsons");
@@ -47,6 +58,8 @@ public class DataLoader implements CommandLineRunner {
             sound1.setDuration("3:15");
             sound1.setUploadDate(LocalDateTime.now());
             sound1.setUserId(user1.getUserId());
+            sound1.setCategories(Arrays.asList(football));
+             
 
             Sound sound2 = new Sound();
             sound2.setTitle("Betis");
@@ -56,6 +69,8 @@ public class DataLoader implements CommandLineRunner {
             sound2.setDuration("5:00");
             sound2.setUploadDate(LocalDateTime.now());
             sound2.setUserId(user2.getUserId());
+            sound2.setCategories(Arrays.asList(football));
+            
 
             Sound sound3 = new Sound();
             sound3.setTitle("El Diablo que malditos tenis");
@@ -65,6 +80,8 @@ public class DataLoader implements CommandLineRunner {
             sound3.setDuration("3:00");
             sound3.setUploadDate(LocalDateTime.now());
             sound3.setUserId(user2.getUserId());
+            sound3.setCategories(Arrays.asList(meme));
+           
 
             Sound sound4 = new Sound();
             sound4.setTitle("El señor de la noche");
@@ -74,10 +91,12 @@ public class DataLoader implements CommandLineRunner {
             sound4.setDuration("3:00");
             sound4.setUploadDate(LocalDateTime.now());
             sound4.setUserId(user1.getUserId());
+            sound4.setCategories(Arrays.asList(meme, AI));
+            
 
             soundRepository.saveAll(List.of(sound1, sound2, sound3, sound4));
 
-            System.out.println("Usuarios y sonidos de prueba cargados.");
+            System.out.println("Usuarios, sonidos y categorias de prueba cargados.");
         }
     }
 }

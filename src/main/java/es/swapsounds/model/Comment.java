@@ -26,6 +26,9 @@ public class Comment {
     private long soundId;
     private String soundTitle;
 
+    @Transient
+    private boolean CommentOwner;
+
     public Comment(Long commentId, String content, User user) {
         this.commentId = commentId;
         this.content = content;
@@ -101,5 +104,17 @@ public class Comment {
 
     public void setSoundTitle(String soundTitle) {
         this.soundTitle = soundTitle;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public boolean isCommentOwner() {
+        return CommentOwner;
+    }
+
+    public void setCommentOwner(boolean CommentOwner) {
+        this.CommentOwner = CommentOwner;
     }
 }
