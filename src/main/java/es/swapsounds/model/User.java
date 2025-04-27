@@ -1,6 +1,6 @@
 package es.swapsounds.model;
 
-import java.util.ArrayList;
+import java.sql.Blob;
 import java.util.List;
 
 import jakarta.persistence.*;
@@ -15,7 +15,10 @@ public class User {
     private String username;
     private String email;
     private String password;
-    private String profilePicturePath;
+
+    @Lob
+    private Blob profilePicture;
+
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<Comment> comments;
@@ -27,22 +30,10 @@ public class User {
 
     public User() {}
 
-    public User(String username, String email, String password, String profilePicturePath, long userId, String role) {
+    public User(String username, String email, String user_password) {
         this.username = username;
         this.email = email;
-        this.password = password;
-        this.profilePicturePath = profilePicturePath;
-        this.comments = new ArrayList<>();
-        this.sounds = new ArrayList<>();
-        this.userId = userId;
-        this.role = role;
-    }
-
-    public User(String username2, String email2, String user_password, String photoPath) {
-        this.username = username2;
-        this.email = email2;
         this.password = user_password;
-        this.profilePicturePath = photoPath;
     }
 
     public String getRole() {
@@ -77,19 +68,12 @@ public class User {
         return password;
     }
 
-    public String getProfilePicturePath() {
-        return profilePicturePath != null ? profilePicturePath : "/profiles/default-avatar.png"; // If the user
-                                                                                                         // profile
-                                                                                                         // image is
-                                                                                                         // set to null,
-                                                                                                         // use the
-                                                                                                         // default
-                                                                                                         // profile
-                                                                                                         // image
+    public Blob getProfilePicture() {
+        return profilePicture;
     }
 
-    public void setProfilePicturePath(String profilePicturePath) {
-        this.profilePicturePath = profilePicturePath;
+    public void setProfilePicture(Blob profilePicture) {
+        this.profilePicture = profilePicture;
     }
 
     public List<Comment> getComments() {
