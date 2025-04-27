@@ -9,8 +9,14 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Blob;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -124,4 +130,51 @@ public class CommentService {
     public void deleteCommentsBySoundId(long soundId) {
         commentRepository.deleteBySoundId(soundId);
     }
+
+    /**
+     * Obtiene los comentarios de un sonido con imágenes de perfil en Base64 y datos adicionales.
+     */
+    public List<Map<String, Object>> getCommentsWithImagesBySoundId(long soundId, Long currentUserId) {
+        List<Comment> comments = commentRepository.findBySoundId(soundId);
+        List<Map<String, Object>> commentsWithImages = new ArrayList<>();
+
+        for (Comment comment : comments) {
+            // Determinar si el usuario actual es el propietario del comentario
+            boolean owner = (currentUserId != null && currentUserId.equals(comment.getUser().getUserId()));
+            comment.setCommentOwner(owner);
+
+            // Convertir la imagen de perfil (Blob) a Base64
+            String profileImageBase64 = "";
+            Blob profilePicture = comment.getUser().getProfilePicture();
+            if (profilePicture != null) {
+                try {
+                    byte[] imageBytes = profilePicture.getBytes(1, (int) profilePicture.length());
+                    profileImageBase64 = "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(imageBytes);
+                } catch (SQLException e) {
+                    System.err.println("Error al convertir el Blob a Base64: " + e.getMessage());
+                }
+            }
+
+            // Calcular la inicial del usuario
+            String userInitial = comment.getUser().getUsername() != null && !comment.getUser().getUsername().isEmpty()
+                    ? comment.getUser().getUsername().substring(0, 1).toUpperCase()
+                    : "?";
+
+            // Crear un mapa con los datos del comentario
+            Map<String, Object> commentData = new HashMap<>();
+            commentData.put("commentId", comment.getCommentId());
+            commentData.put("user", comment.getUser());
+            commentData.put("content", comment.getContent());
+            commentData.put("created", comment.getCreated());
+            commentData.put("isCommentOwner", comment.isCommentOwner());
+            commentData.put("profileImageBase64", profileImageBase64);
+            commentData.put("userInitial", userInitial);
+            commentData.put("soundId", soundId);
+
+            commentsWithImages.add(commentData);
+        }
+
+        return commentsWithImages;
+    }
 }
+
