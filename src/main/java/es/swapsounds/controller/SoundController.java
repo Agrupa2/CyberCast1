@@ -18,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import es.swapsounds.model.Category;
-import es.swapsounds.model.Comment;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
 import es.swapsounds.service.UserService;
@@ -171,11 +170,9 @@ public class SoundController {
 
     @GetMapping("/sounds/{soundId}")
     public String soundDetails(@PathVariable long soundId, HttpSession session, Model model) {
-        // Obtener usuario de la sesión mediante UserService
         Long currentUserId = userService.getUserIdFromSession(session);
         String username = (String) session.getAttribute("username");
 
-        // Buscar el sonido
         Optional<Sound> soundOpt = soundService.findSoundById(soundId);
         if (soundOpt.isEmpty()) {
             return "redirect:/start";
@@ -183,44 +180,32 @@ public class SoundController {
         Sound sound = soundOpt.get();
         model.addAttribute("sound", sound);
 
-        // Obtener el usuario que subió el sonido (uploader)
         Optional<User> uploaderOpt = userService.findUserById(sound.getUserId());
         if (uploaderOpt.isPresent()) {
             User uploader = uploaderOpt.get();
             Map<String, String> profileInfo = userService.getProfileInfo(uploader);
             model.addAttribute("uploader", uploader);
-            model.addAttribute("profileImagePath", profileInfo.get("profileImagePath"));
+            model.addAttribute("profileImageBase64", profileInfo.get("profileImageBase64"));
             model.addAttribute("userInitial", profileInfo.get("userInitial"));
         } else {
             model.addAttribute("uploader", null);
         }
 
-        // Obtener comentarios asociados al sonido
-        List<Comment> comments = commentService.getCommentsBySoundId(soundId);
-        for (Comment comment : comments) {
-            boolean owner = (currentUserId != null && currentUserId.equals(comment.getUser().getUserId()));
-            comment.setCommentOwner(owner);
-        }
-        model.addAttribute("comments", comments);
+        // Obtener comentarios con imágenes procesadas desde CommentService
+        List<Map<String, Object>> commentsWithImages = commentService.getCommentsWithImagesBySoundId(soundId,
+                currentUserId);
+        model.addAttribute("comments", commentsWithImages);
 
-        // Obtener todas las categorías para el dropdown
         List<Category> allCategories = categoryService.getAllCategories();
         model.addAttribute("allCategories", allCategories);
-        // Calcular las categorías seleccionadas para este sonido
         Set<String> selectedCategories = soundService.getSelectedCategoryNames(sound);
         model.addAttribute("selectedCategories", selectedCategories);
 
-        // Marcar si el usuario actual es el propietario del sonido
         model.addAttribute("isOwner", currentUserId != null && currentUserId.equals(sound.getUserId()));
         model.addAttribute("username", username);
 
-        //Marcar si el usuario es el propietario de algun comentario
-        /*List <Comment> userComments = commentService.getCommentsByUserId(currentUserId);
-        model.addAttribute("isCommentOwner", userComments);*/
-
         return "sound-details";
-
-}
+    }
 
     @PostMapping("/sounds/{soundId}/edit")
     public String editSound(

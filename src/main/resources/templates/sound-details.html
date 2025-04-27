@@ -32,14 +32,14 @@
             <div class="user-profile">
                 {{#uploader}}
                 <div class="avatar-container">
-                    {{#profileImagePath}}
-                    <img src="{{profileImagePath}}" alt="Perfil de {{username}}" class="profile-avatar">
-                    {{/profileImagePath}}
-                    {{^profileImagePath}}
+                    {{#profileImageBase64}}
+                    <img src="{{profileImageBase64}}" alt="Perfil de {{username}}" class="profile-avatar">
+                    {{/profileImageBase64}}
+                    {{^profileImageBase64}}
                     <div class="default-avatar">
                         {{userInitial}}
                     </div>
-                    {{/profileImagePath}}
+                    {{/profileImageBase64}}
                 </div>
                 <div class="user-info">
                     <span class="subido-por">Subido por:</span>
@@ -143,45 +143,52 @@
         {{/username}}
 
         <!-- Lista de comentarios -->
-        <div class="comments-list">
-            {{#comments}}
-            <div class="comment">
-                <div class="comment-author">
-                    <img src="{{user.profilePicturePath}}" alt="{{user.username}}" class="comment-avatar">
-                    <div class="comment-author">
-                        <a href="/profile/{{user.username}}">{{user.username}}</a>
-                    </div>
-                </div>
-                <p class="comment-content">{{content}}</p>
-                <small class="comment-date">{{created}}</small>
-
-                <!-- Botones de editar/eliminar (solo dueño del comentario) -->
-                {{#isCommentOwner}}
-                <div class="comment-actions">
-                    <details class="dropdown">
-                        <summary class="dropdown-toggle">
-                            <svg class="icon" viewBox="0 0 24 24">
-                                <path
-                                    d="M12 18a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm-7 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm14 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4z" />
-                            </svg>
-                        </summary>
-                        <div class="dropdown-content">
-                            <form action="/sounds/{{soundId}}/comments/{{commentId}}/edit" method="POST">
-                                <input type="hidden" name="_method" value="PUT">
-                                <textarea name="content">{{content}}</textarea>
-                                <button type="submit">Guardar</button>
-                            </form>
-                            <form action="/sounds/{{soundId}}/comments/{{commentId}}/delete" method="POST">
-                                <input type="hidden" name="_method" value="DELETE">
-                                <button type="submit" class="danger">Eliminar</button>
-                            </form>
-                        </div>
-                    </details>
-                </div>
-                {{/isCommentOwner}}
+<div class="comments-list">
+    {{#comments}}
+    <div class="comment">
+        <div class="comment-author">
+            {{#profileImageBase64}}
+            <img src="{{profileImageBase64}}" alt="{{user.username}}" class="comment-avatar">
+            {{/profileImageBase64}}
+            {{^profileImageBase64}}
+            <div class="default-avatar">
+                {{userInitial}}
             </div>
-            {{/comments}}
+            {{/profileImageBase64}}
+            <div class="comment-author">
+                <a href="/profile/{{user.username}}">{{user.username}}</a>
+            </div>
         </div>
+        <p class="comment-content">{{content}}</p>
+        <small class="comment-date">{{created}}</small>
+
+        <!-- Botones de editar/eliminar (solo dueño del comentario) -->
+        {{#isCommentOwner}}
+        <div class="comment-actions">
+            <details class="dropdown">
+                <summary class="dropdown-toggle">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path
+                            d="M12 18a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm-7 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm14 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4z" />
+                    </svg>
+                </summary>
+                <div class="dropdown-content">
+                    <form action="/sounds/{{soundId}}/comments/{{commentId}}/edit" method="POST">
+                        <input type="hidden" name="_method" value="PUT">
+                        <textarea name="content">{{content}}</textarea>
+                        <button type="submit">Guardar</button>
+                    </form>
+                    <form action="/sounds/{{soundId}}/comments/{{commentId}}/delete" method="POST">
+                        <input type="hidden" name="_method" value="DELETE">
+                        <button type="submit" class="danger">Eliminar</button>
+                    </form>
+                </div>
+            </details>
+        </div>
+        {{/isCommentOwner}}
+    </div>
+    {{/comments}}
+</div>
     </div>
 
 </body>
