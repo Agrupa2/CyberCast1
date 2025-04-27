@@ -26,14 +26,14 @@
     <div class="profile-container">
         <!-- Header del perfil -->
         <div class="profile-header">
-            {{#profileImagePath}}
-            <img src="{{profileImagePath}}" alt="Perfil de {{username}}" class="profile-avatar">
-            {{/profileImagePath}}
-            {{^profileImagePath}}
+            {{#profileImageBase64}}
+            <img src="{{profileImageBase64}}" alt="Perfil de {{username}}" class="profile-avatar">
+            {{/profileImageBase64}}
+            {{^profileImageBase64}}
                 <div class="profile-avatar">
                     {{userInitial}}
                 </div>
-            {{/profileImagePath}}
+            {{/profileImageBase64}}
             <div class="profile-info">
                 <!-- Añadir esto después del bloque .profile-header -->
                 {{#isOwner}}
