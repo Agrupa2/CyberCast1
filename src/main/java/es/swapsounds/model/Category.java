@@ -17,13 +17,6 @@ public class Category {
     @ManyToMany(mappedBy = "categories")
     private List<Sound> sounds = new ArrayList<>(); // This is a list of sounds that belong to this category
 
-
-    public Category(Long id, String name) {
-        this.id = id;
-        this.name = name;
-        this.sounds = new ArrayList<>(); // Eliminar null
-    }
-
     public Category(String name) {
         this.name = name;
         this.sounds = new ArrayList<>(); // Eliminar null

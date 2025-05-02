@@ -29,14 +29,6 @@ public class Comment {
     @Transient
     private boolean CommentOwner;
 
-    public Comment(Long commentId, String content, User user) {
-        this.commentId = commentId;
-        this.content = content;
-        this.user = user;
-        this.created = LocalDateTime.now();
-        this.modified = null;
-    }
-
     public Comment() {
     }
 
