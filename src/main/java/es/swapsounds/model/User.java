@@ -28,12 +28,14 @@ public class User {
 
     private String role;
 
-    public User() {}
+    public User() {
+    }
 
-    public User(String username, String email, String user_password) {
+    public User(String username, String email, String user_password, Blob profilePicture) {
         this.username = username;
         this.email = email;
         this.password = user_password;
+        this.profilePicture = profilePicture;
     }
 
     public String getRole() {
