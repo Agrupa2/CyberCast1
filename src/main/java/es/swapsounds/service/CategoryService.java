@@ -25,7 +25,7 @@ public class CategoryService {
         }
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public Category findOrCreateCategory(String name) {
         return categoryRepository.findByNameIgnoreCase(name.trim())
             .orElseGet(() -> {
@@ -34,7 +34,7 @@ public class CategoryService {
             });
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public List<Category> getAllCategories() {
         return categoryRepository.findAll();
     }
