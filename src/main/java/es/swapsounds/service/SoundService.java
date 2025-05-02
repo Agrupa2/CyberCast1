@@ -3,10 +3,8 @@ package es.swapsounds.service;
 import es.swapsounds.model.Category;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
-import es.swapsounds.storage.InMemoryStorage;
 import es.swapsounds.storage.SoundRepository;
 import jakarta.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,14 +13,20 @@ import com.mpatric.mp3agic.InvalidDataException;
 import com.mpatric.mp3agic.Mp3File;
 import com.mpatric.mp3agic.UnsupportedTagException;
 
+import javax.sql.rowset.serial.SerialBlob;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.sql.Blob;
+import java.sql.SQLException;
 
 @Service
 public class SoundService {
@@ -30,28 +34,19 @@ public class SoundService {
     private CategoryService categoryService;
 
     @Autowired
-    private InMemoryStorage storage;
-
-    @Autowired
     private SoundRepository soundRepository;
+
+    private Long lastInsertedSoundId;
+
+    public Long getLastInsertedSoundId() {
+        return lastInsertedSoundId;
+    }
 
     @PostConstruct
     private void initializeDefaultSounds() {
-
-        Category football = categoryService.findOrCreateCategory("Football");
-        Category meme = categoryService.findOrCreateCategory("Meme");
-
-        sounds.add(new Sound(idCounter++, "Betis Anthem", "Relaxing forest ambiance", "/audio/betis.mp3",
-                "/images/betis.png", Arrays.asList(football), "0:07"));
-        sounds.add(new Sound(idCounter++, "CR7", "Soothing ocean waves", "/audio/CR7.mp3", "/images/CR7.jpg",
-                Arrays.asList(football), "0:06"));
-        sounds.add(new Sound(idCounter++, "El diablo que malditos tenis", "Peaceful rain for sleep",
-                "/audio/el-diablo-que-malditos-tenis.mp3", "/images/el-diablo-que-malditos-tenis.png",
-                Arrays.asList(meme), "0:04"));
+        if (soundRepository.count() == 0) {
+        }
     }
-
-    private final List<Sound> sounds = new ArrayList<>();
-    private long idCounter = 1;
 
     public List<Sound> getSoundByUserId(long userId) {
         return soundRepository.findByUserId(userId);
@@ -66,7 +61,9 @@ public class SoundService {
     }
 
     public Sound addSound(Sound sound) {
-        return soundRepository.save(sound);
+        Sound savedSound = soundRepository.save(sound);
+        this.lastInsertedSoundId = savedSound.getSoundId();
+        return savedSound;
     }
 
     public void deleteSound(long soundId) {
@@ -76,13 +73,11 @@ public class SoundService {
     public Sound updateSound(Sound sound) {
         return soundRepository.save(sound);
     }
-    
 
     public String calculateDuration(MultipartFile audioFile) throws IOException {
-        // Código de cálculo de duración. (Es posible que lo mantengas igual.)
         File audioTempFile = Files.createTempFile("audio", ".mp3").toFile();
         try (InputStream inputStream = audioFile.getInputStream()) {
-            Files.copy(inputStream, audioTempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(inputStream, audioTempFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
         }
 
         String duration = "00:00";
@@ -101,38 +96,38 @@ public class SoundService {
     }
 
     public Sound createSound(String title,
-            String description,
-            List<String> categoryNames,
-            MultipartFile audioFile,
-            MultipartFile imageFile,
-            User user) throws IOException {
-        // 1. Calcular duración
-        String duration = calculateDuration(audioFile);
+                            String description,
+                            List<String> categoryNames,
+                            MultipartFile audioFile,
+                            MultipartFile imageFile,
+                            User user) throws IOException {
+        try {
+            // 1. Calcular duración
+            String duration = calculateDuration(audioFile);
 
-        // 2. Guardar archivos
-        String audioPath = storage.saveFile(user.getUsername(), audioFile, "sounds");
-        String imagePath = storage.saveFile(user.getUsername(), imageFile, "images");
+            // 2. Convertir MultipartFile a Blob
+            Blob audioBlob = new SerialBlob(audioFile.getBytes());
+            Blob imageBlob = new SerialBlob(imageFile.getBytes());
 
-        // 3. Crear el objeto Sound sin asignar manualmente el ID (JPA lo generará)
-        Sound sound = new Sound();
-        sound.setTitle(title);
-        sound.setDescription(description);
-        sound.setFilePath(audioPath);
-        sound.setImagePath(imagePath);
-        sound.setUserId(user.getUserId());
-        sound.setDuration(duration);
-        sound.setUploadDate(LocalDateTime.now());
-        sound.setCategories(new ArrayList<>());
+            // 3. Crear el objeto Sound
+            Sound sound = new Sound(title, description, audioBlob, imageBlob, user.getUserId(), new ArrayList<>(), duration);
+            sound.setUploadDate(LocalDateTime.now());
 
-        // 4. Procesar categorías
-        for (String catName : categoryNames) {
-            Category category = categoryService.findOrCreateCategory(catName);
-            sound.addCategory(category);
-            category.getSounds().add(sound);
+            // 4. Procesar categorías
+            for (String catName : categoryNames) {
+                Category category = categoryService.findOrCreateCategory(catName);
+                sound.addCategory(category);
+                category.getSounds().add(sound);
+            }
+
+            // 5. Guardar el sonido en la base de datos
+            Sound savedSound = soundRepository.save(sound);
+            this.lastInsertedSoundId = savedSound.getSoundId();
+            return savedSound;
+
+        } catch (SQLException e) {
+            throw new IOException("Error al guardar los archivos en la base de datos", e);
         }
-
-        // 5. Guardar el sonido en la base de datos
-        return soundRepository.save(sound);
     }
 
     public List<Sound> getFilteredSounds(String query, String category) {
@@ -142,12 +137,12 @@ public class SoundService {
             boolean matchesCategory = true;
             if (!"all".equalsIgnoreCase(category)) {
                 matchesCategory = sound.getCategories() != null &&
-                        sound.getCategories().stream()
-                                .anyMatch(cat -> cat.getName().equalsIgnoreCase(category));
+                                  sound.getCategories().stream()
+                                          .anyMatch(cat -> cat.getName().equalsIgnoreCase(category));
             }
             // Filtro de búsqueda
             boolean matchesQuery = (query == null || query.trim().isEmpty())
-                    || sound.getTitle().toLowerCase().contains(query.toLowerCase());
+                                   || sound.getTitle().toLowerCase().contains(query.toLowerCase());
             return matchesCategory && matchesQuery;
         }).collect(Collectors.toList());
     }
@@ -193,17 +188,23 @@ public class SoundService {
         }
 
         // 4. Manejar archivos opcionales
-        if (audioFile != null && !audioFile.isEmpty()) {
-            String newAudioPath = storage.saveFile(username, audioFile, "sounds");
-            sound.setFilePath(newAudioPath);
-        }
-        if (imageFile != null && !imageFile.isEmpty()) {
-            String newImagePath = storage.saveFile(username, imageFile, "images");
-            sound.setImagePath(newImagePath);
-        }
+        try {
+            if (audioFile != null && !audioFile.isEmpty()) {
+                Blob audioBlob = new SerialBlob(audioFile.getBytes());
+                sound.setAudioBlob(audioBlob);
+                // Recalcular la duración si se actualiza el audio
+                sound.setDuration(calculateDuration(audioFile));
+            }
+            if (imageFile != null && !imageFile.isEmpty()) {
+                Blob imageBlob = new SerialBlob(imageFile.getBytes());
+                sound.setImageBlob(imageBlob);
+            }
 
-        // 5. Actualizar en la BD
-        soundRepository.save(sound);
+            // 5. Actualizar en la BD
+            soundRepository.save(sound);
+
+        } catch (SQLException e) {
+            throw new IOException("Error al actualizar los archivos en la base de datos", e);
+        }
     }
-
 }
