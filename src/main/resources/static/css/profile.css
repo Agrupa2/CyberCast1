@@ -127,8 +127,31 @@ P {
     width: 120px;
     height: 120px;
     border-radius: 50%;
-    object-fit: cover;
+    overflow: hidden;
     border: 3px solid var(--light-azure);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Estilos para la imagen del avatar */
+.profile-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Estilos para la inicial del usuario */
+.default-avatar {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, #ff6b6b, #4834d4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 3rem; /* Ajustado para 120x120px */
 }
 
 .profile-info {
