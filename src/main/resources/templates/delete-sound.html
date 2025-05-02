@@ -96,7 +96,7 @@
             {{#sounds}} <!-- Shows the atributes of the sounds -->
             <div class="sound-card">
                 <div class="card-head">
-                    <img src="{{imagePath}}" alt="{{title}}" class="card-img">
+                    <img src="/sounds/image/{{id}}" alt="{{title}}" class="card-img">
                     <div class="card-overlay">
                         <div class="play">
                             <ion-icon name="play-circle-outline"></ion-icon>
@@ -112,7 +112,7 @@
                     <!-- Personal control of the sound repro -->
                     <div class="audio-container">
                         <audio class="custom-audio" id="audio-{{id}}">
-                            <source src="{{filePath}}" type="audio/mpeg">
+                            <source src="/sounds/audio/{{id}}" type="audio/mpeg">
                             Tu navegador no soporta el elemento de audio.
                         </audio>
                         <div class="audio-controls">

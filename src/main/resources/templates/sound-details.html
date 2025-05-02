@@ -63,11 +63,11 @@
             </div>
         </div>
 
-        <img src="{{sound.imagePath}}" alt="{{sound.title}}" class="sound-image">
+        <img src="/sounds/image/{{sound.soundId}}" alt="{{sound.title}}" class="sound-image">
 
         <div class="sound-player">
             <audio controls style="width: 100%">
-                <source src="{{sound.filePath}}" type="audio/mpeg">
+                <source src="/sounds/audio/{{sound.soundId}}" type="audio/mpeg">
                 Tu navegador no soporta audio HTML5.
             </audio>
         </div>
