@@ -1,7 +1,7 @@
 package es.swapsounds.model;
+
 import jakarta.persistence.*;
-
-
+import java.sql.Blob;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,84 +10,44 @@ import java.util.List;
 public class Sound {
 
     @Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long soundId;
 
     private String title;
     private String description;
-    private String filePath;
-    private String imagePath;
     private long userId;
+
+    @Lob
+    private Blob imageBlob; // Para almacenar la imagen como BLOB
+    @Lob
+    private Blob audioBlob; // Para almacenar el archivo de audio como BLOB
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<Comment> comments;
-    
-    private String duration;
-    private LocalDateTime uploadDate;
+
+    private String duration; // Duración del audio (en formato "min:seg")
+    private LocalDateTime uploadDate; // Fecha de subida
 
     @ManyToMany
-    private List<Category> categories = new ArrayList<>();
+    private List<Category> categories = new ArrayList<>(); // Categorías asociadas al sonido
 
-
-    public Sound(String title, String description, String filePath, String imagePath, int userId, String Category,
-            String duration) {
+    // Constructor con todos los parámetros necesarios (para inicializar todos los campos)
+    public Sound(String title, String description, Blob audioBlob, Blob imageBlob, long userId, List<Category> categories, String duration) {
         this.title = title;
         this.description = description;
-        this.filePath = filePath;
-        this.imagePath = imagePath;
+        this.audioBlob = audioBlob;
+        this.imageBlob = imageBlob;
         this.userId = userId;
         this.comments = new ArrayList<>();
-        this.duration = duration;
-        this.uploadDate = LocalDateTime.now();
-    }
-
-    public Sound(long soundId, String title, String description, String filePath, String imagePath, String category,
-                 long userId) {
-        this.title = title;
-        this.soundId = soundId;
-        this.description = description;
-        this.filePath = filePath;
-        this.imagePath = imagePath;
-        this.userId = userId;
-        this.uploadDate = LocalDateTime.now();
-    }
-
-    public Sound(long id, String title, String description, String filePath, String imagePath, List<Category> categories, String duration) {
-        this.soundId = id;
-        this.title = title;
-        this.description = description;
-        this.filePath = filePath;
-        this.imagePath = imagePath;
         this.categories = categories != null ? categories : new ArrayList<>();
         this.duration = duration;
+        this.uploadDate = LocalDateTime.now(); // Fecha de carga en el momento de creación
     }
 
-    public Sound() {
-    }
+    // Constructor vacío
+    public Sound() {}
 
-    public Sound(long soundId, String title2, String description2, String audioPath, String imagePath2, long userId2,
-            String category2, String duration2) {
-        this.soundId = soundId;
-        this.title = title2;
-        this.description = description2;
-        this.filePath = audioPath;
-        this.imagePath = imagePath2;
-        this.userId = userId2;
-        this.duration = duration2;
-        this.uploadDate = LocalDateTime.now();
-    }
-
-    public Sound(long i, String title2, String description2, String audioPath, String imagePath2, User user,
-            Object object, String duration2) {
-        this.soundId = i;
-        this.title = title2;
-        this.description = description2;
-        this.filePath = audioPath;
-        this.imagePath = imagePath2;
-        this.userId = user.getUserId();
-        this.duration = duration2;
-        this.uploadDate = LocalDateTime.now();
-    }
+    // Getters y Setters
 
     public String getTitle() {
         return title;
@@ -97,12 +57,12 @@ public class Sound {
         return description;
     }
 
-    public String getFilePath() {
-        return filePath;
+    public Blob getAudioBlob() {
+        return audioBlob;
     }
 
-    public String getImagePath() {
-        return imagePath;
+    public Blob getImageBlob() {
+        return imageBlob;
     }
 
     public long getUserId() {
@@ -117,9 +77,16 @@ public class Sound {
         return soundId;
     }
 
-
     public String getDuration() {
         return duration;
+    }
+
+    public LocalDateTime getUploadDate() {
+        return uploadDate;
+    }
+
+    public List<Category> getCategories() {
+        return categories;
     }
 
     public void setSoundId(long soundId) {
@@ -134,12 +101,12 @@ public class Sound {
         this.description = description;
     }
 
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
+    public void setAudioBlob(Blob audioBlob) {
+        this.audioBlob = audioBlob;
     }
 
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
+    public void setImageBlob(Blob imageBlob) {
+        this.imageBlob = imageBlob;
     }
 
     public void setUserId(long userId) {
@@ -150,13 +117,8 @@ public class Sound {
         this.comments = comments;
     }
 
-
     public void setDuration(String duration) {
         this.duration = duration;
-    }
-
-    public LocalDateTime getUploadDate() {
-        return uploadDate;
     }
 
     public void setUploadDate(LocalDateTime uploadDate) {
@@ -165,11 +127,6 @@ public class Sound {
 
     public void addCategory(Category category) {
         categories.add(category);
-    }
-
-    // Getters
-    public List<Category> getCategories() {
-        return categories;
     }
 
     public void setCategories(List<Category> categories) {
