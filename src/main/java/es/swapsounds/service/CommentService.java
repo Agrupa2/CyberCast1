@@ -29,6 +29,9 @@ public class CommentService {
     private UserService userService;
 
     @Autowired
+    private ProfileService profileService;
+
+    @Autowired
     private CommentRepository commentRepository;
 
     /**
@@ -137,29 +140,29 @@ public class CommentService {
     public List<Map<String, Object>> getCommentsWithImagesBySoundId(long soundId, Long currentUserId) {
         List<Comment> comments = commentRepository.findBySoundId(soundId);
         List<Map<String, Object>> commentsWithImages = new ArrayList<>();
-
+    
         for (Comment comment : comments) {
             // Determinar si el usuario actual es el propietario del comentario
             boolean owner = (currentUserId != null && currentUserId.equals(comment.getUser().getUserId()));
             comment.setCommentOwner(owner);
-
+    
             // Convertir la imagen de perfil (Blob) a Base64
-            String profileImageBase64 = "";
+            String profileImageBase64 = null; // Cambiado de "" a null
+            boolean hasProfilePicture = false;
             Blob profilePicture = comment.getUser().getProfilePicture();
             if (profilePicture != null) {
                 try {
                     byte[] imageBytes = profilePicture.getBytes(1, (int) profilePicture.length());
                     profileImageBase64 = "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(imageBytes);
+                    hasProfilePicture = true;
                 } catch (SQLException e) {
                     System.err.println("Error al convertir el Blob a Base64: " + e.getMessage());
                 }
             }
-
+    
             // Calcular la inicial del usuario
-            String userInitial = comment.getUser().getUsername() != null && !comment.getUser().getUsername().isEmpty()
-                    ? comment.getUser().getUsername().substring(0, 1).toUpperCase()
-                    : "?";
-
+            String userInitial = profileService.getUserInitial(comment.getUser());
+    
             // Crear un mapa con los datos del comentario
             Map<String, Object> commentData = new HashMap<>();
             commentData.put("commentId", comment.getCommentId());
@@ -169,11 +172,13 @@ public class CommentService {
             commentData.put("isCommentOwner", comment.isCommentOwner());
             commentData.put("profileImageBase64", profileImageBase64);
             commentData.put("userInitial", userInitial);
+            commentData.put("hasProfilePicture", hasProfilePicture); // Nueva bandera
             commentData.put("soundId", soundId);
-
+            commentData.put("username", comment.getUser().getUsername()); // Añadido para {{username}} en HTML
+    
             commentsWithImages.add(commentData);
         }
-
+    
         return commentsWithImages;
     }
 }

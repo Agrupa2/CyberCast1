@@ -9,8 +9,8 @@ import java.sql.Blob;
 public class ProfileService {
 
     public String getUserInitial(User user) {
-        Blob profileImagePath = user.getProfilePicture();
-        if (profileImagePath == null) {
+        Blob profileImage = user.getProfilePicture();
+        if (profileImage == null) {
             return user.getUsername().substring(0, 1).toUpperCase();
         }
         return "";
