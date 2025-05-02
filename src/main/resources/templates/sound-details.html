@@ -17,7 +17,7 @@
                 {{^username}} <!-- This will appear if there isn´t a user logged in -->
                 <li><a href="/login">Login</a></li>
                 {{/username}}
-                {{#username}} 
+                {{#username}}
                 <li><a href="/sounds/upload?username={{username}}">Upload Sound</a></li>
                 <li><a href="/logout">Logout</a></li>
                 {{/username}}
@@ -143,52 +143,54 @@
         {{/username}}
 
         <!-- Lista de comentarios -->
-<div class="comments-list">
-    {{#comments}}
-    <div class="comment">
-        <div class="comment-author">
-            {{#profileImageBase64}}
-            <img src="{{profileImageBase64}}" alt="{{user.username}}" class="comment-avatar">
-            {{/profileImageBase64}}
-            {{^profileImageBase64}}
-            <div class="default-avatar">
-                {{userInitial}}
-            </div>
-            {{/profileImageBase64}}
-            <div class="comment-author">
-                <a href="/profile/{{user.username}}">{{user.username}}</a>
-            </div>
-        </div>
-        <p class="comment-content">{{content}}</p>
-        <small class="comment-date">{{created}}</small>
-
-        <!-- Botones de editar/eliminar (solo dueño del comentario) -->
-        {{#isCommentOwner}}
-        <div class="comment-actions">
-            <details class="dropdown">
-                <summary class="dropdown-toggle">
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <path
-                            d="M12 18a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm-7 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm14 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4z" />
-                    </svg>
-                </summary>
-                <div class="dropdown-content">
-                    <form action="/sounds/{{soundId}}/comments/{{commentId}}/edit" method="POST">
-                        <input type="hidden" name="_method" value="PUT">
-                        <textarea name="content">{{content}}</textarea>
-                        <button type="submit">Guardar</button>
-                    </form>
-                    <form action="/sounds/{{soundId}}/comments/{{commentId}}/delete" method="POST">
-                        <input type="hidden" name="_method" value="DELETE">
-                        <button type="submit" class="danger">Eliminar</button>
-                    </form>
+        <div class="comments-list">
+            {{#comments}}
+            <div class="comment">
+                <div class="comment-author">
+                    <div class="comment-avatar-container">
+                        {{#hasProfilePicture}}
+                        <img src="{{profileImageBase64}}" alt="{{username}}" class="comment-avatar">
+                        {{/hasProfilePicture}}
+                        {{^hasProfilePicture}}
+                        <div class="default-avatar-comment">
+                            {{userInitial}}
+                        </div>
+                        {{/hasProfilePicture}}
+                    </div>
+                    <div class="comment-author">
+                        <a href="/profile/{{user.username}}">{{user.username}}</a>
+                    </div>
                 </div>
-            </details>
+                <p class="comment-content">{{content}}</p>
+                <small class="comment-date">{{created}}</small>
+
+                <!-- Botones de editar/eliminar (solo dueño del comentario) -->
+                {{#isCommentOwner}}
+                <div class="comment-actions">
+                    <details class="dropdown">
+                        <summary class="dropdown-toggle">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 18a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm-7 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm14 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4z" />
+                            </svg>
+                        </summary>
+                        <div class="dropdown-content">
+                            <form action="/sounds/{{soundId}}/comments/{{commentId}}/edit" method="POST">
+                                <input type="hidden" name="_method" value="PUT">
+                                <textarea name="content">{{content}}</textarea>
+                                <button type="submit">Guardar</button>
+                            </form>
+                            <form action="/sounds/{{soundId}}/comments/{{commentId}}/delete" method="POST">
+                                <input type="hidden" name="_method" value="DELETE">
+                                <button type="submit" class="danger">Eliminar</button>
+                            </form>
+                        </div>
+                    </details>
+                </div>
+                {{/isCommentOwner}}
+            </div>
+            {{/comments}}
         </div>
-        {{/isCommentOwner}}
-    </div>
-    {{/comments}}
-</div>
     </div>
 
 </body>

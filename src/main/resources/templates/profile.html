@@ -26,14 +26,16 @@
     <div class="profile-container">
         <!-- Header del perfil -->
         <div class="profile-header">
-            {{#profileImageBase64}}
-            <img src="{{profileImageBase64}}" alt="Perfil de {{username}}" class="profile-avatar">
-            {{/profileImageBase64}}
-            {{^profileImageBase64}}
-                <div class="profile-avatar">
+            <div class="profile-avatar">
+                {{#hasProfilePicture}}
+                <img src="{{profileImageBase64}}" alt="Perfil de {{username}}" class="profile-avatar-img">
+                {{/hasProfilePicture}}
+                {{^hasProfilePicture}}
+                <div class="default-avatar">
                     {{userInitial}}
                 </div>
-            {{/profileImageBase64}}
+                {{/hasProfilePicture}}
+            </div>
             <div class="profile-info">
                 <!-- Añadir esto después del bloque .profile-header -->
                 {{#isOwner}}
@@ -113,7 +115,7 @@
             </h2>
             {{#sounds}}
             <div class="sound-item">
-                <img src="{{imagePath}}" class="sound-thumbnail" alt="{{title}}">
+                <img src="{{imageBase64}}" class="sound-thumbnail" alt="{{title}}">
                 
                 <div class="sound-info">
                     <h3>{{title}}</h3>
