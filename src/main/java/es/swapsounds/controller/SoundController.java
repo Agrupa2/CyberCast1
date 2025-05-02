@@ -1,6 +1,9 @@
 package es.swapsounds.controller;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Blob;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -8,6 +11,8 @@ import java.util.Set;
 
 import es.swapsounds.service.SoundService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -127,12 +132,10 @@ public class SoundController {
             return "redirect:/login";
         }
 
-        Sound sound = soundService.createSound(title, description, categories, audioFile, imageFile, uploader);
-
-        soundService.addSound(sound);
+        soundService.createSound(title, description, categories, audioFile, imageFile, uploader);
 
         model.addAttribute("success", "¡Sonido subido con éxito!");
-        return "redirect:/sounds/" + sound.getSoundId();
+        return "redirect:/sounds/" + soundService.getLastInsertedSoundId();
     }
 
     @GetMapping("/sounds/download")
@@ -260,13 +263,13 @@ public class SoundController {
         // Verificar si el sonido existe
         if (!soundOptional.isPresent()) {
             redirectAttributes.addFlashAttribute("error", "El sonido no existe.");
-            return "redirect:/dashboard"; // Redirigir al dashboard si el sonido no existe
+            return "redirect:/start"; // Redirigir al dashboard si el sonido no existe
         }
 
         Sound sound = soundOptional.get();
 
-        // Verificar permisos: el usuario debe ser el propietario o un administrador
-        boolean isOwner = sound.getUserId() == userId;
+        // Verificar permisos: el usuario debe ser el propietario
+        boolean isOwner = userId != null && userId.equals(sound.getUserId());
 
         if (!isOwner) {
             redirectAttributes.addFlashAttribute("error", "No tienes permisos para eliminar este sonido.");
@@ -281,4 +284,45 @@ public class SoundController {
         return "redirect:/start"; // Redirigir al dashboard después de eliminar
     }
 
+    @GetMapping("/sounds/audio/{id}")
+    public ResponseEntity<byte[]> getAudio(@PathVariable Long id) {
+        Optional<Sound> soundOptional = soundService.findSoundById(id);
+        if (soundOptional.isPresent()) {
+            Sound sound = soundOptional.get();
+            try {
+                Blob audioBlob = sound.getAudioBlob();
+                if (audioBlob != null) {
+                    InputStream inputStream = audioBlob.getBinaryStream();
+                    byte[] audioBytes = inputStream.readAllBytes();
+                    return ResponseEntity.ok()
+                            .contentType(MediaType.parseMediaType("audio/mpeg")) // Ajusta el tipo de medio si es diferente
+                            .body(audioBytes);
+                }
+            } catch (SQLException | IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/sounds/image/{id}")
+    public ResponseEntity<byte[]> getImage(@PathVariable Long id) {
+        Optional<Sound> soundOptional = soundService.findSoundById(id);
+        if (soundOptional.isPresent()) {
+            Sound sound = soundOptional.get();
+            try {
+                Blob imageBlob = sound.getImageBlob();
+                if (imageBlob != null) {
+                    InputStream inputStream = imageBlob.getBinaryStream();
+                    byte[] imageBytes = inputStream.readAllBytes();
+                    return ResponseEntity.ok()
+                            .contentType(MediaType.IMAGE_JPEG) // Ajusta el tipo de medio si es diferente (image/png, etc.)
+                            .body(imageBytes);
+                }
+            } catch (SQLException | IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return ResponseEntity.notFound().build();
+    }
 }

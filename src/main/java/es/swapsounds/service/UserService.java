@@ -4,7 +4,6 @@ import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
 import es.swapsounds.storage.SoundRepository;
 import es.swapsounds.storage.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,16 +12,18 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.Blob;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import javax.sql.rowset.serial.SerialBlob;
 
 @Service
 public class UserService {
 
-    @Autowired
     private final UserRepository userRepository;
-    @Autowired
     private final SoundRepository soundRepository;
 
     public UserService(UserRepository userRepository, SoundRepository soundRepository) {
@@ -100,11 +101,11 @@ public class UserService {
         Optional<User> userOptional = userRepository.findById(userId);
 
         if (userOptional.isPresent()) {
-            // 1. Borrar sonidos del usuario y archivos
+            // 1. Borrar sonidos del usuario
             List<Sound> userSounds = soundRepository.findByUserId(userId);
             soundRepository.deleteAll(userSounds);
 
-            // 3. Borrar usuario
+            // 2. Borrar el usuario
             userRepository.deleteById(userId);
         }
     }
@@ -131,7 +132,7 @@ public class UserService {
                     ? user.getUsername().substring(0, 1).toUpperCase()
                     : "?";
         }
-    
+
         info.put("profileImageBase64", profileImageBase64);
         info.put("userInitial", userInitial);
         info.put("hasProfilePicture", hasProfilePicture);

@@ -86,7 +86,7 @@
             {{#sounds}} <!-- Iterate over the list of sounds -->
             <div class="sound-card">
                 <div class="card-head">
-                    <img src="{{imagePath}}" alt="{{title}}" class="card-img">
+                    <img src="/sounds/image/{{soundId}}" alt="{{title}}" class="card-img">
                     <div class="card-overlay">
                         <div class="play">
                             <ion-icon name="play-circle-outline"></ion-icon>
@@ -106,7 +106,7 @@
                     <div class="audio-container">
                         <!-- Hidden audio media player -->
                         <audio class="custom-audio">
-                            <source src="{{filePath}}" type="audio/mpeg">
+                            <source src="/sounds/audio/{{soundId}}" type="audio/mpeg">
                             Your browser does not support the audio element.
                         </audio>
                         <!-- Custom controls -->
