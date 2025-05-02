@@ -186,7 +186,7 @@ public class SoundController {
         Optional<User> uploaderOpt = userService.findUserById(sound.getUserId());
         if (uploaderOpt.isPresent()) {
             User uploader = uploaderOpt.get();
-            Map<String, String> profileInfo = userService.getProfileInfo(uploader);
+            Map<String, Object> profileInfo = userService.getProfileInfo(uploader);
             model.addAttribute("uploader", uploader);
             model.addAttribute("profileImageBase64", profileInfo.get("profileImageBase64"));
             model.addAttribute("userInitial", profileInfo.get("userInitial"));

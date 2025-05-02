@@ -45,8 +45,6 @@ public class ProfileController {
         boolean isOwner = authenticatedUserId != null && authenticatedUserId.equals(profileUser.getUserId());
 
         List<Sound> userSounds = soundService.getSoundByUserId(profileUser.getUserId());
-        List<Map<String, Object>> soundsWithImages = soundService.prepareSoundsWithImages(userSounds);
-
         List<Comment> userComments = commentService.getCommentsByUserId(profileUser.getUserId());
 
         Map<String, Object> profileInfo = userService.getProfileInfo(profileUser);
@@ -57,7 +55,7 @@ public class ProfileController {
         model.addAttribute("username", profileUser.getUsername());
         model.addAttribute("profileUser", profileUser);
         model.addAttribute("isOwner", isOwner);
-        model.addAttribute("sounds", soundsWithImages);
+        model.addAttribute("sounds", userSounds);
         model.addAttribute("user", profileUser);
 
         return "profile";
