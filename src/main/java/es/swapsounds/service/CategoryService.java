@@ -1,7 +1,8 @@
 package es.swapsounds.service;
 
 import es.swapsounds.model.Category;
-import es.swapsounds.storage.CategoryRepository;
+import es.swapsounds.repository.CategoryRepository;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

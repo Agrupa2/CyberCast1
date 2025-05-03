@@ -1,7 +1,8 @@
 package es.swapsounds.service;
 
 import es.swapsounds.model.User;
-import es.swapsounds.storage.UserRepository;
+import es.swapsounds.repository.UserRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

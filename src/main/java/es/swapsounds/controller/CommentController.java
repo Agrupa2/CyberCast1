@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
-public class CommentApiController {
+public class CommentController {
 
     @Autowired
     private CommentService commentService;

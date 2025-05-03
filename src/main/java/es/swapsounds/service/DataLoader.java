@@ -1,4 +1,4 @@
-package es.swapsounds.storage;
+package es.swapsounds.service;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,7 +16,8 @@ import org.springframework.stereotype.Component;
 import es.swapsounds.model.Category;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
-import es.swapsounds.service.CategoryService;
+import es.swapsounds.repository.SoundRepository;
+import es.swapsounds.repository.UserRepository;
 
 
 @Component

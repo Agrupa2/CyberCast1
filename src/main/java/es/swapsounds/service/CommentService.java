@@ -3,7 +3,7 @@ package es.swapsounds.service;
 import es.swapsounds.model.Comment;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
-import es.swapsounds.storage.CommentRepository;
+import es.swapsounds.repository.CommentRepository;
 import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +29,6 @@ public class CommentService {
     private UserService userService;
 
     @Autowired
-    private ProfileService profileService;
-
-    @Autowired
     private CommentRepository commentRepository;
 
     /**
@@ -44,11 +41,11 @@ public class CommentService {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         Sound sound = soundService.findSoundById(soundId)
-            .orElseThrow(() -> new RuntimeException("Sonido no encontrado"));
+                .orElseThrow(() -> new RuntimeException("Sonido no encontrado"));
 
         String soundTitle = sound.getTitle(); // Obtener el título del sonido
 
-        //Crea un nuevo commentId pero no lo hace maualmente, lo hace la base de datos
+        // Crea un nuevo commentId pero no lo hace maualmente, lo hace la base de datos
         Comment comment = new Comment();
         comment.setContent(content); // Asignar el contenido al comentario
         comment.setUser(currentUser); // Asignar el usuario al comentario
@@ -65,9 +62,7 @@ public class CommentService {
      */
     @Transactional
     public boolean editComment(Long userId, long soundId, long commentId, String newContent) {
-        User currentUser = userService.findUserById(userId)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-                
+
         Optional<Comment> optComment = commentRepository.findById(commentId);
         if (optComment.isPresent()) {
             Comment comment = optComment.get();
@@ -77,16 +72,18 @@ public class CommentService {
                 commentRepository.save(comment);
                 return true;
             }
-    }
+        }
         return false;
-}
+    }
 
     /**
      * Elimina un comentario, validando que el usuario sea el autor.
      */
     @Transactional
-    public boolean deleteComment(Long userId, long soundId, long commentId) { //la función del comment repsoitory devuelve un boolean por eso cambuiio de void a boolean
-       
+    public boolean deleteComment(Long userId, long soundId, long commentId) { // la función del comment repsoitory
+                                                                              // devuelve un boolean por eso cambuiio de
+                                                                              // void a boolean
+
         Optional<Comment> optComment = commentRepository.findById(commentId);
         if (optComment.isPresent()) {
             Comment comment = optComment.get();
@@ -114,13 +111,13 @@ public class CommentService {
         return commentRepository.findBySoundId(soundId);
     }
 
-    /* Obtiene la lista de comentarios realizados por un usuario.*/
+    /* Obtiene la lista de comentarios realizados por un usuario. */
 
     public List<Comment> getCommentsByUserId(long userId) {
         return commentRepository.findByUserUserId(userId);
     }
 
-    //*/Borra los comentarios dependiendo del tipo de usuario que seas */
+    // */Borra los comentarios dependiendo del tipo de usuario que seas */
 
     @Transactional
     public void deleteCommentsByUserId(long userId) {
@@ -135,17 +132,18 @@ public class CommentService {
     }
 
     /**
-     * Obtiene los comentarios de un sonido con imágenes de perfil en Base64 y datos adicionales.
+     * Obtiene los comentarios de un sonido con imágenes de perfil en Base64 y datos
+     * adicionales.
      */
     public List<Map<String, Object>> getCommentsWithImagesBySoundId(long soundId, Long currentUserId) {
         List<Comment> comments = commentRepository.findBySoundId(soundId);
         List<Map<String, Object>> commentsWithImages = new ArrayList<>();
-    
+
         for (Comment comment : comments) {
             // Determinar si el usuario actual es el propietario del comentario
             boolean owner = (currentUserId != null && currentUserId.equals(comment.getUser().getUserId()));
             comment.setCommentOwner(owner);
-    
+
             // Convertir la imagen de perfil (Blob) a Base64
             String profileImageBase64 = null; // Cambiado de "" a null
             boolean hasProfilePicture = false;
@@ -159,10 +157,11 @@ public class CommentService {
                     System.err.println("Error al convertir el Blob a Base64: " + e.getMessage());
                 }
             }
-    
+
             // Calcular la inicial del usuario
-            String userInitial = profileService.getUserInitial(comment.getUser());
-    
+            Map<String, Object> profileInfo = userService.getProfileInfo(comment.getUser());
+            String userInitial = (String) profileInfo.get("userInitial");
+
             // Crear un mapa con los datos del comentario
             Map<String, Object> commentData = new HashMap<>();
             commentData.put("commentId", comment.getCommentId());
@@ -175,11 +174,10 @@ public class CommentService {
             commentData.put("hasProfilePicture", hasProfilePicture); // Nueva bandera
             commentData.put("soundId", soundId);
             commentData.put("username", comment.getUser().getUsername()); // Añadido para {{username}} en HTML
-    
+
             commentsWithImages.add(commentData);
         }
-    
+
         return commentsWithImages;
     }
 }
-

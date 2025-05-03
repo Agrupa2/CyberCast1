@@ -1,4 +1,4 @@
-package es.swapsounds.storage;
+package es.swapsounds.repository;
 
 import java.util.List;
 

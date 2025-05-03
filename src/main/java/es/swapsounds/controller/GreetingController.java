@@ -11,10 +11,4 @@ public class GreetingController {
     public String landingPage(Model model) {
         return "landing-page";
     }
-
-    @GetMapping("/contact")
-    public String contact(Model model) {
-        return "contact";
-    }
-
 }

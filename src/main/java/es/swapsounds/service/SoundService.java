@@ -3,7 +3,7 @@ package es.swapsounds.service;
 import es.swapsounds.model.Category;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
-import es.swapsounds.storage.SoundRepository;
+import es.swapsounds.repository.SoundRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
