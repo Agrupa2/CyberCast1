@@ -45,7 +45,7 @@ public class SoundController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/start")
+    @GetMapping("/sounds")
     public String showSounds(
             @RequestParam(name = "query", required = false) String query,
             @RequestParam(name = "category", defaultValue = "all") String category,
@@ -75,7 +75,7 @@ public class SoundController {
             model.addAttribute("selected" + cat.getName(), category.equalsIgnoreCase(cat.getName()));
         }
 
-        return "start";
+        return "sounds";
     }
 
     @GetMapping("/sounds/upload")
@@ -178,7 +178,7 @@ public class SoundController {
 
         Optional<Sound> soundOpt = soundService.findSoundById(soundId);
         if (soundOpt.isEmpty()) {
-            return "redirect:/start";
+            return "redirect:/sounds";
         }
         Sound sound = soundOpt.get();
         model.addAttribute("sound", sound);
@@ -263,7 +263,7 @@ public class SoundController {
         // Verificar si el sonido existe
         if (!soundOptional.isPresent()) {
             redirectAttributes.addFlashAttribute("error", "El sonido no existe.");
-            return "redirect:/start"; // Redirigir al dashboard si el sonido no existe
+            return "redirect:/sounds"; // Redirigir al dashboard si el sonido no existe
         }
 
         Sound sound = soundOptional.get();
@@ -281,7 +281,7 @@ public class SoundController {
         soundService.deleteSound(soundId);
         redirectAttributes.addFlashAttribute("success", "El sonido se ha eliminado correctamente.");
 
-        return "redirect:/start"; // Redirigir al dashboard después de eliminar
+        return "redirect:/sounds"; // Redirigir al dashboard después de eliminar
     }
 
     @GetMapping("/sounds/audio/{id}")

@@ -37,7 +37,7 @@ public class ProfileController {
     public String userProfile(@PathVariable("username") String username, HttpSession session, Model model) {
         Optional<User> profileUserOpt = userService.findUserByUsername(username);
         if (!profileUserOpt.isPresent()) {
-            return "redirect:/start";
+            return "redirect:/sounds";
         }
         User profileUser = profileUserOpt.get();
 
@@ -107,7 +107,7 @@ public class ProfileController {
         }
         Optional<User> userOpt = userService.getUserById(userId);
         if (!userOpt.isPresent()) {
-            return "redirect:/start";
+            return "redirect:/sounds";
         }
         User user = userOpt.get();
         return "redirect:/profile/" + user.getUsername();
