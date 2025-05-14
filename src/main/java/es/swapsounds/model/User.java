@@ -19,32 +19,33 @@ public class User {
     @Lob
     private Blob profilePicture;
 
-
     @OneToMany(cascade = CascadeType.ALL)
     private List<Comment> comments;
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<Sound> sounds;
 
-    private String role;
+    @ElementCollection(fetch = FetchType.EAGER)
+	private List<String> roles;
 
     public User() {
     }
 
-    public User(String username, String email, String user_password, Blob profilePicture) {
+    public User(String username, String email, String user_password, Blob profilePicture, String... roles) {
         this.username = username;
         this.email = email;
         this.password = user_password;
         this.profilePicture = profilePicture;
+        this.roles = List.of(roles);
     }
 
-    public String getRole() {
-        return this.role;
-    }
+    public List<String> getRoles() {
+		return roles;
+	}
 
-    public void setRole(String role) {
-        this.role = role;
-    }
+	public void setRoles(List<String> roles) {
+		this.roles = roles;
+	}
 
     // Otros getters y setters
     public String getUsername() {
