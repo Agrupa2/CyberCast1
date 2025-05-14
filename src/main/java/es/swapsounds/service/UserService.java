@@ -1,12 +1,18 @@
 package es.swapsounds.service;
 
+import es.swapsounds.dto.UserDTO;
+import es.swapsounds.dto.UserMapper;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
 import es.swapsounds.repository.SoundRepository;
 import es.swapsounds.repository.UserRepository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -26,10 +32,12 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final SoundRepository soundRepository;
+    private final UserMapper mapper;
 
-    public UserService(UserRepository userRepository, SoundRepository soundRepository) {
+    public UserService(UserRepository userRepository, SoundRepository soundRepository, UserMapper mapper) {
         this.userRepository = userRepository;
         this.soundRepository = soundRepository;
+        this.mapper = mapper;
     }
 
     public Long getUserIdFromSession(HttpSession session) {
@@ -50,6 +58,28 @@ public class UserService {
             user.setUsername(newUsername);
             userRepository.save(user);
         });
+    }
+
+    public void changeUsername(Long sessionUserId, String pathUsername, String newUsername) {
+        if (newUsername == null || newUsername.isBlank()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "El nombre no puede estar vacío");
+        }
+
+        User u = userRepository.findById(sessionUserId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED,
+                        "No autenticado"));
+
+        if (!u.getUsername().equals(pathUsername)) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "No tienes permiso para modificar este usuario");
+        }
+
+        u.setUsername(newUsername.trim());
+        userRepository.save(u);
     }
 
     public void updateProfilePicture(long userId, MultipartFile profilePhoto) throws IOException {
@@ -85,6 +115,12 @@ public class UserService {
         return userRepository.findByUsername(username);
     }
 
+    public UserDTO findByUsernameDTO(String username) {
+        User u = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+        return mapper.toDto(u);
+    }
+
     public Optional<User> authenticate(String emailOrUsername, String password) {
         return userRepository.findByEmailOrUsername(emailOrUsername, emailOrUsername)
                 .filter(user -> user.getPassword().equals(password));
@@ -92,6 +128,11 @@ public class UserService {
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    public Page<UserDTO> findAllUsersDTO(Pageable page) {
+        return userRepository.findAll(page)
+                .map(mapper::toDto);
     }
 
     public Optional<User> findUserById(long userId) {
@@ -111,12 +152,34 @@ public class UserService {
         }
     }
 
+
+public void deleteAccount(Long sessionUserId, String confirmation) {
+    if (confirmation == null || !"ELIMINAR CUENTA".equals(confirmation.trim())) {
+        throw new ResponseStatusException(
+            HttpStatus.BAD_REQUEST,
+            "Debes confirmar escribiendo 'ELIMINAR CUENTA'"
+        );
+    }
+
+    // Puedes comprobar también que el usuario existe antes de borrar, si quieres
+    if (!userRepository.existsById(sessionUserId)) {
+        throw new ResponseStatusException(
+            HttpStatus.NOT_FOUND,
+            "Usuario no encontrado"
+        );
+    }
+
+    soundRepository.deleteAll(soundRepository.findByUserId(sessionUserId));
+    userRepository.deleteById(sessionUserId);
+}
+
+
     public Map<String, Object> getProfileInfo(User user) {
         Map<String, Object> info = new HashMap<>();
         String profileImageBase64 = null; // Cambia a null en lugar de ""
         String userInitial = null;
         boolean hasProfilePicture = false;
-    
+
         Blob profilePicture = user.getProfilePicture();
         if (profilePicture != null) {
             try {
@@ -127,7 +190,7 @@ public class UserService {
                 System.err.println("Error al convertir el Blob a Base64: " + e.getMessage());
             }
         }
-    
+
         if (!hasProfilePicture) {
             userInitial = (user.getUsername() != null && !user.getUsername().isEmpty())
                     ? user.getUsername().substring(0, 1).toUpperCase()
