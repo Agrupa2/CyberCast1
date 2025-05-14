@@ -6,41 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sound Library</title>
     <link rel="stylesheet" href="/css/start.css">
-    <style>
-        .custom-audio {
-            display: none;
-        }
-
-        .audio-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .play-pause-btn {
-            background: #007bff;
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 50%;
-            cursor: pointer;
-        }
-
-        .progress-bar {
-            flex-grow: 1;
-            height: 5px;
-            background: #ddd;
-            position: relative;
-            cursor: pointer;
-        }
-
-        .progress {
-            height: 100%;
-            background: #007bff;
-            width: 0;
-        }
-    </style>
 </head>
 
 <body>
@@ -50,10 +15,10 @@
             <div class="navbar-container">
                 <div class="logo">Sound Library</div>
                 <ul class="nav-links">
-                    {{^username}} <!-- Shows this if there is no user logged in -->
+                    {{^username}}
                     <li><a href="/login">Login</a></li>
                     {{/username}}
-                    {{#username}} <!-- Shows this if there is a user logged in -->
+                    {{#username}}
                     <li><a href="/sounds/upload?username={{username}}">Upload Sound</a></li>
                     <li><a href="/sounds/download">Download Sound</a></li>
                     <li><a href="/delete-account">Delete Account</a></li>
@@ -67,23 +32,19 @@
         <!-- Search Bar -->
         <form action="/start" method="GET" class="search-container">
             <input type="text" name="query" class="search-bar" placeholder="Searching for sounds..."
-                value="{{#query}}{{query}}{{/query}}"> <!-- Maintain the value after searching -->
-
+                value="{{#query}}{{query}}{{/query}}">
             <select name="category" class="fold-out" onchange="this.form.submit()">
                 <option value="all" {{#selectedAll}}selected{{/selectedAll}}>All Categories</option>
                 {{#allCategories}}
                 <option value="{{name}}" {{#selected}}selected{{/selected}}>{{name}}</option>
                 {{/allCategories}}
             </select>
-
-
-            <!-- Hiden Button to submit with Enter -->
             <button type="submit" hidden></button>
         </form>
 
         <!-- Sound Grid -->
         <div class="sound-grid" id="soundsContainer">
-            {{#sounds}} <!-- Iterate over the list of sounds -->
+            {{#sounds}}
             <div class="sound-card">
                 <div class="card-head">
                     <img src="/sounds/image/{{soundId}}" alt="{{title}}" class="card-img">
@@ -104,12 +65,10 @@
                         <span class="duration">{{duration}} min</span>
                     </div>
                     <div class="audio-container">
-                        <!-- Hidden audio media player -->
                         <audio class="custom-audio">
                             <source src="/sounds/audio/{{soundId}}" type="audio/mpeg">
                             Your browser does not support the audio element.
                         </audio>
-                        <!-- Custom controls -->
                         <div class="audio-controls">
                             <button class="play-pause-btn">▶️</button>
                             <div class="progress-bar">
@@ -120,7 +79,7 @@
                 </div>
             </div>
             {{/sounds}}
-            {{^sounds}} <!-- If no sounds are found -->
+            {{^sounds}}
             <p>No sounds found.</p>
             {{/sounds}}
         </div>
@@ -131,7 +90,6 @@
                 <div class="footer-brand">
                     <div class="logo">SwapSounds</div>
                     <p class="slogan">Experience the future of sounds</p>
-
                     <div class="social-link">
                         <a href="#"><ion-icon name="logo-facebook"></ion-icon></a>
                         <a href="#"><ion-icon name="logo-twitter"></ion-icon></a>
@@ -140,7 +98,6 @@
                         <a href="#"><ion-icon name="logo-youtube"></ion-icon></a>
                     </div>
                 </div>
-
                 <div class="footer-links">
                     <ul>
                         <h4 class="link-heading">SwapSounds</h4>
@@ -149,7 +106,6 @@
                         <li class="link-item"><a href="#">Pricing plans</a></li>
                         <li class="link-item"><a href="#">Contacts</a></li>
                     </ul>
-
                     <ul>
                         <h4 class="link-heading">Browse</h4>
                         <li class="link-item"><a href="#">Categories</a></li>
@@ -157,7 +113,6 @@
                         <li class="link-item"><a href="#">Free-to-use</a></li>
                         <li class="link-item"><a href="#">Favourites</a></li>
                     </ul>
-
                     <ul>
                         <h4 class="link-heading">Help</h4>
                         <li class="link-item"><a href="#">Account & Billing</a></li>
@@ -167,12 +122,10 @@
                     </ul>
                 </div>
             </div>
-
             <div class="footer-copyright">
                 <div class="copyright">
-                    <p>&copy; Copyright 2025 SwapSounds</p>
+                    <p>© Copyright 2025 SwapSounds</p>
                 </div>
-
                 <div class="wrapper">
                     <a href="#">Privacy policy</a>
                     <a href="#">Terms and conditions</a>
@@ -182,14 +135,12 @@
     </div>
 
     <script>
-        // Script to handle custom controls
         document.querySelectorAll('.sound-card').forEach(card => {
             const audio = card.querySelector('audio');
             const playPauseBtn = card.querySelector('.play-pause-btn');
             const progressBar = card.querySelector('.progress-bar');
             const progress = card.querySelector('.progress');
 
-            // Play or pause audio
             playPauseBtn.addEventListener('click', () => {
                 if (audio.paused) {
                     audio.play();
@@ -200,13 +151,11 @@
                 }
             });
 
-            // Update progress bar
             audio.addEventListener('timeupdate', () => {
                 const percent = (audio.currentTime / audio.duration) * 100;
                 progress.style.width = percent + '%';
             });
 
-            // Jump to a specific part of the audio
             progressBar.addEventListener('click', (e) => {
                 const rect = progressBar.getBoundingClientRect();
                 const clickX = e.clientX - rect.left;
@@ -215,7 +164,6 @@
             });
         });
 
-        // Disable context menu on audio elements
         document.addEventListener('contextmenu', function (e) {
             if (e.target.tagName === 'AUDIO') {
                 e.preventDefault();

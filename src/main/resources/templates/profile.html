@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Perfil de {{user.username}}</title>
     <link rel="stylesheet" href="/css/profile.css">
 </head>
@@ -12,10 +13,10 @@
                 <a href="/start">Sound Library</a>
             </div>
             <ul class="nav-links">
-                {{^username}} <!-- Muestra esto si NO hay usuario logueado -->
+                {{^username}}
                 <li><a href="/login">Login</a></li>
                 {{/username}}
-                {{#username}} <!-- Muestra esto si hay usuario logueado -->
+                {{#username}}
                 <li><a href="/sounds/upload?username={{username}}">Upload Sound</a></li>
                 <li><a href="/sounds/download">Download Sound</a></li>
                 <li><a href="/logout">Logout</a></li>
@@ -24,72 +25,40 @@
         </div>
     </nav>
     <div class="profile-container">
-        <!-- Header del perfil -->
         <div class="profile-header">
             <div class="profile-avatar">
                 {{#hasProfilePicture}}
-                <img src="{{profileImageBase64}}" alt="Perfil de {{username}}" class="profile-avatar-img">
+                <img src="{{profileImageBase64}}" alt="Perfil de {{user.username}}" class="profile-avatar-img">
                 {{/hasProfilePicture}}
                 {{^hasProfilePicture}}
-                <div class="default-avatar">
-                    {{userInitial}}
-                </div>
+                <div class="default-avatar">{{userInitial}}</div>
                 {{/hasProfilePicture}}
             </div>
-            <div class="profile-info">
-                <!-- Añadir esto después del bloque .profile-header -->
-                {{#isOwner}}
+            {{#isOwner}}
                 <div class="profile-actions">
                     <details class="profile-dropdown">
-                        <summary class="dropdown-toggle">
-                            <svg class="dropdown-icon" viewBox="0 0 24 24">
-                                <path
-                                    d="M12 16a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm-7 0a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm14 0a2 2 0 1 1 0 4 2 2 0 0 1 0-4z" />
-                            </svg>
-                        </summary>
-            
+                        <summary class="dropdown-toggle"></summary>
                         <div class="dropdown-content">
-                            <!-- Formulario Cambiar Nombre -->
                             <form action="/profile/update-username" method="POST">
                                 <div class="form-group">
-                                    <input type="text" name="newUsername" value="{{user.username}}" required>
+                                    <label for="newUsername">Nuevo nombre:</label>
+                                    <input type="text" id="newUsername" name="newUsername" value="{{user.username}}" required>
                                 </div>
-                                <button type="submit" class="btn-icon">
-                                    <svg viewBox="0 0 24 24">
-                                        <path
-                                            d="M21 10v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h8l2 2h4a2 2 0 0 1 2 2zm-9.4 6.6L19 8l-1.4-1.4-6.6 6.6-2.6-2.6-1.4 1.4 4 4z" />
-                                    </svg>
-                                    Guardar nombre
-                                </button>
+                                <button type="submit" class="btn-icon">Guardar nombre</button>
                             </form>
-            
-                            <!-- Separador -->
                             <div class="dropdown-divider"></div>
-            
-                            <!-- Formulario Cambiar Avatar -->
                             <form action="/profile/update-avatar" method="POST" enctype="multipart/form-data">
                                 <div class="form-group">
-                                    <input type="file" name="avatar" accept="image/*" id="avatarInput" hidden>
-                                    <label for="avatarInput" class="btn-icon">
-                                        <svg viewBox="0 0 24 24">
-                                            <path
-                                                d="M4 5h13v7h2V5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h6v-2H4V5zm14 8v3h-3v2h3v3h2v-3h3v-2h-3v-3h-2z" />
-                                        </svg>
-                                        Seleccionar imagen
-                                    </label>
+                                    <label for="avatarInput">Nuevo avatar:</label>
+                                    <input type="file" id="avatarInput" name="avatar" accept="image/*">
                                 </div>
-                                <button type="submit" class="btn-icon">
-                                    <svg viewBox="0 0 24 24">
-                                        <path
-                                            d="M5 21h14c1.1 0 2-.9 2-2V8l-5-5H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2zM9 13h6v2H9v-2z" />
-                                    </svg>
-                                    Subir avatar
-                                </button>
+                                <button type="submit" class="btn-icon">Subir avatar</button>
                             </form>
                         </div>
                     </details>
                 </div>
                 {{/isOwner}}
+            <div class="profile-info">
                 <h1>{{user.username}}</h1>
                 <div class="stats">
                     <div class="stat-item">
@@ -107,7 +76,6 @@
                 </div>
             </div>
         </div>
-        <!-- Lista de sonidos -->
         <div class="sounds-list">
             <h2>
                 {{#isOwner}}Tus sonidos subidos{{/isOwner}}
@@ -116,12 +84,10 @@
             {{#sounds}}
             <div class="sound-item">
                 <img src="/sounds/image/{{soundId}}" class="sound-thumbnail" alt="{{title}}">
-                
                 <div class="sound-info">
                     <h3>{{title}}</h3>
                     <p class="description">{{description}}</p>
                 </div>
-                
                 <div class="sound-meta">
                     <div class="categories-container">
                         {{#categories}}
@@ -130,11 +96,10 @@
                     </div>
                     <span class="duration">{{duration}} min</span>
                 </div>
-                
                 <div class="sound-actions">
                     <a href="/sounds/{{soundId}}" class="btn">Ver</a>
                     {{#isOwner}}
-                    <form action="/sounds/{{soundId}}/delete" method="POST" style="display:inline;">
+                    <form action="/sounds/{{soundId}}/delete" method="POST">
                         <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que quieres eliminar este sonido?')">Eliminar</button>
                     </form>
                     {{/isOwner}}
@@ -153,19 +118,16 @@
             </div>
             {{/sounds}}
         </div>
-        <!-- Lista de comentarios -->
         <div class="comments-section">
             <h2>
                 {{#isOwner}}Tus comentarios{{/isOwner}}
                 {{^isOwner}}Comentarios de {{user.username}}{{/isOwner}}
             </h2>
-            {{#comments}} <!-- Itera sobre todos los comentarios -->
+            {{#comments}}
             <div class="comment-item">
                 <div class="comment-content">
                     <p>{{content}}</p>
-                    <small class="comment-date">{{created}} en
-                        <a href="/sounds/{{soundId}}">{{soundTitle}}</a>
-                    </small>
+                    <small class="comment-date">{{created}} en <a href="/sounds/{{soundId}}">{{soundTitle}}</a></small>
                 </div>
                 {{#isOwner}}
                 <div class="comment-actions">
@@ -175,19 +137,19 @@
                     </form>
                 </div>
                 {{/isOwner}}
-                </div>
+            </div>
             {{/comments}}
             {{^comments}}
-                <div class="empty-state">
-                    {{#isOwner}}
-                    <p>No has subido ningún comentario todavía</p>
-                    {{/isOwner}}
-                    {{^isOwner}}
-                    <p>{{user.username}} no ha subido ningún comentario todavía</p>
-                    {{/isOwner}}
-                </div>
+            <div class="empty-state">
+                {{#isOwner}}
+                <p>No has subido ningún comentario todavía</p>
+                {{/isOwner}}
+                {{^isOwner}}
+                <p>{{user.username}} no ha subido ningún comentario todavía</p>
+                {{/isOwner}}
+            </div>
             {{/comments}}
-                </div>
-                </div>
+        </div>
+    </div>
 </body>
 </html>
