@@ -42,7 +42,7 @@ public class AuthController {
             session.setAttribute("userId", user.getUserId());
             session.setAttribute("username", user.getUsername());
             redirectAttributes.addFlashAttribute("success", "¡Registro exitoso!");
-            return "redirect:/start";
+            return "redirect:/sounds";
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/signup";
@@ -69,7 +69,7 @@ public class AuthController {
             User actualUser = user.get();
             session.setAttribute("username", actualUser.getUsername());
             session.setAttribute("userId", actualUser.getUserId());
-            return "redirect:/start";
+            return "redirect:/sounds";
         } else {
             model.addAttribute("error", "Invalid username or password");
             return "login";
