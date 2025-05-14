@@ -25,21 +25,9 @@ body {
   flex-direction: column;
   font-family: "Montserrat", sans-serif;
   height: 100vh;
-  margin: -20px 0 50px;
+  margin: 0;
+  padding: 20px;
 }
-
-form {
-    background-color: var(--glass-bg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    padding: 0 50px;
-    height: 90%;
-    text-align: center;
-
-}
-
 
 h1 {
   margin: 0 0 30px 0;
@@ -47,44 +35,66 @@ h1 {
   color: white;
 }
 
-/* Estilos para el input de texto, email, contraseña, etc. */
+form {
+  background-color: var(--glass-bg);
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  width: 100%;
+  max-width: 600px;
+  text-align: left;
+}
+
+form>div {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  color: white;
+}
+
 input[type="text"],
-input[type="password"],
-input[type="date"],
-input[type="datetime"],
-input[type="email"],
-input[type="number"],
-input[type="search"],
-input[type="tel"],
-input[type="time"],
-input[type="url"],
-input[type="file"],
 textarea,
-select {
+input[type="file"] {
   background-color: var(--shadow-input);
-  border-radius: 10px;;
-  border-color: var(--shadow-btn);
-  padding: 12px 15px;
-  margin: 8px 0;
+  border: 1px solid var(--shadow-btn);
+  border-radius: 5px;
+  padding: 10px;
   width: 100%;
   color: white;
 }
 
-input[type="radio"],
-input[type="checkbox"] {
-  margin: 0 4px 8px 0;
+textarea {
+  resize: vertical;
 }
-small {
+
+.categories-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.category-option {
+  background-color: var(--shadow-input);
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: var(--shadow);
+}
+
+.category-option label {
+  display: flex;
+  align-items: center;
   color: white;
 }
-select {
-  padding: 6px;
-  height: 32px;
-  border-radius: 2px;
+
+.category-option input[type="checkbox"] {
+  margin-right: 10px;
 }
 
-
-/* Botón normal */
 button {
   border-radius: 20px;
   border: 1px solid #001f3f;
@@ -95,11 +105,9 @@ button {
   padding: 12px 45px;
   letter-spacing: 1px;
   text-transform: uppercase;
-  transition: transform 80ms ease-in, background-color 0.3s, color 0.3s,
-    border 0.3s;
-  width: 100%;
+  transition: transform 80ms ease-in, background-color 0.3s, color 0.3s, border 0.3s;
   cursor: pointer;
-  margin-bottom: 20px;
+  margin-top: 20px;
 }
 
 button:hover {
@@ -107,39 +115,18 @@ button:hover {
   color: #001f3f;
 }
 
-fieldset {
-  margin-bottom: 30px;
-  border: none;
+a {
+  color: var(--light-azure);
+  text-decoration: none;
+  margin-top: 20px;
 }
 
-legend {
-  font-size: 1.4em;
-  margin-bottom: 10px;
-  color: white;
-}
-
-label {
-  display: block;
-  margin-bottom: 8px;
-  color: white;
-}
-
-.number {
-  background-color: #ff6b6b;
-  color: #fff;
-  height: 30px;
-  width: 30px;
-  display: inline-block;
-  font-size: 0.8em;
-  margin-right: 4px;
-  line-height: 30px;
-  text-align: center;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.2);
-  border-radius: 100%;
+a:hover {
+  text-decoration: underline;
 }
 
 @media screen and (min-width: 480px) {
   form {
-    max-width: 480px;
+    padding: 40px;
   }
 }

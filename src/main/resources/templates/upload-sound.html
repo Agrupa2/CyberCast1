@@ -8,7 +8,7 @@
     <title>Upload Sound</title>
 </head>
 
-<body> <!-- This shows the different field to fill to upload a sound -->
+<body>
     <h1>Upload a New Sound</h1>
     <form action="/sounds/upload" method="post" enctype="multipart/form-data">
         <div>
@@ -19,28 +19,22 @@
             <label for="description">Description:</label>
             <textarea id="description" name="description" required></textarea>
         </div>
-        <div>
-            <label for="category">Category:</label>
-            
-            <!-- Campo de categorías múltiples -->
-            <!-- Reemplazar el bloque de categorías original con este -->
-            <div class="form-group">
-                <label>Categorías:</label>
-                <div class="categories-container">
-                    {{#allCategories}}
-                    <div class="category-option">
-                        <label>
-                            <input type="checkbox" name="categories" value="{{name}}">
-                            {{name}}
-                        </label>
-                    </div>
-                    {{/allCategories}}
-                    {{^allCategories}}
-                    <p>No hay categorías disponibles</p>
-                    {{/allCategories}}
+        <div class="form-group">
+            <label>Categorías:</label>
+            <div class="categories-container">
+                {{#allCategories}}
+                <div class="category-option">
+                    <label>
+                        <input type="checkbox" name="categories" value="{{name}}">
+                        {{name}}
+                    </label>
                 </div>
+                {{/allCategories}}
+                {{^allCategories}}
+                <p>No hay categorías disponibles</p>
+                {{/allCategories}}
             </div>
-            </div>
+        </div>
         <div>
             <label for="audioFile">Audio File:</label>
             <input type="file" id="audioFile" name="audioFile" accept="audio/*" required>
@@ -51,10 +45,10 @@
         </div>
         <button type="submit">Upload Sound</button>
         {{#error}}
-        <p style="color: red;">{{error}}</p> <!-- Shows the error message -->
+        <p style="color: red;">{{error}}</p>
         {{/error}}
         {{#success}}
-        <p style="color: green;">{{success}}</p> <!-- Shows the success message -->
+        <p style="color: green;">{{success}}</p>
         {{/success}}
     </form>
     <a href="/sounds">Back to Sounds</a>
