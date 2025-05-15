@@ -1,9 +1,8 @@
-package es.swapsounds.dto;
+package es.swapsounds.DTO;
 
 import java.util.List;
 
 import org.mapstruct.Mapper;
-
 
 import es.swapsounds.model.User;
 
@@ -11,6 +10,7 @@ import es.swapsounds.model.User;
 public interface UserMapper {
 
     UserDTO toDto(User user);
+
     List<UserDTO> toDtoList(List<User> users);
-    
+
 }
