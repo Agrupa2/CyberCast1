@@ -1,7 +1,8 @@
 package es.swapsounds.service;
 
-import es.swapsounds.dto.UserDTO;
-import es.swapsounds.dto.UserMapper;
+import es.swapsounds.DTO.UserDTO;
+import es.swapsounds.DTO.UserMapper;
+import es.swapsounds.DTO.UserRegistrationDTO;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
 import es.swapsounds.repository.SoundRepository;
@@ -38,6 +39,7 @@ public class UserService {
         this.userRepository = userRepository;
         this.soundRepository = soundRepository;
         this.mapper = mapper;
+
     }
 
     public Long getUserIdFromSession(HttpSession session) {
@@ -103,12 +105,36 @@ public class UserService {
         });
     }
 
-    public void addUser(User user) {
-        userRepository.save(user);
-    }
+    public void updateAvatar(Long userId, String pathUsername, MultipartFile file) {
+        if (userId == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No autenticado");
+        }
 
-    public Optional<User> findUserByEmail(String email) {
-        return userRepository.findByEmail(email);
+        User u = userRepository.findById(userId)
+            .orElseThrow(() -> 
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado")
+            );
+
+        if (!u.getUsername().equals(pathUsername)) {
+            throw new ResponseStatusException(
+                HttpStatus.FORBIDDEN, 
+                "No tienes permiso para modificar este avatar"
+            );
+        }
+
+        try {
+            Blob blob = (file != null && !file.isEmpty())
+                ? new SerialBlob(file.getBytes())
+                : null;
+            u.setProfilePicture(blob);
+            userRepository.save(u);
+        } catch (SQLException | IOException e) {
+            throw new ResponseStatusException(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "Error al subir avatar",
+                e
+            );
+        }
     }
 
     public Optional<User> findUserByUsername(String username) {
@@ -119,11 +145,6 @@ public class UserService {
         User u = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
         return mapper.toDto(u);
-    }
-
-    public Optional<User> authenticate(String emailOrUsername, String password) {
-        return userRepository.findByEmailOrUsername(emailOrUsername, emailOrUsername)
-                .filter(user -> user.getPassword().equals(password));
     }
 
     public List<User> getAllUsers() {
@@ -152,27 +173,23 @@ public class UserService {
         }
     }
 
+    public void deleteAccount(Long sessionUserId, String confirmation) {
+        if (confirmation == null || !"ELIMINAR CUENTA".equals(confirmation.trim())) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Debes confirmar escribiendo 'ELIMINAR CUENTA'");
+        }
 
-public void deleteAccount(Long sessionUserId, String confirmation) {
-    if (confirmation == null || !"ELIMINAR CUENTA".equals(confirmation.trim())) {
-        throw new ResponseStatusException(
-            HttpStatus.BAD_REQUEST,
-            "Debes confirmar escribiendo 'ELIMINAR CUENTA'"
-        );
+        // Puedes comprobar también que el usuario existe antes de borrar, si quieres
+        if (!userRepository.existsById(sessionUserId)) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Usuario no encontrado");
+        }
+
+        soundRepository.deleteAll(soundRepository.findByUserId(sessionUserId));
+        userRepository.deleteById(sessionUserId);
     }
-
-    // Puedes comprobar también que el usuario existe antes de borrar, si quieres
-    if (!userRepository.existsById(sessionUserId)) {
-        throw new ResponseStatusException(
-            HttpStatus.NOT_FOUND,
-            "Usuario no encontrado"
-        );
-    }
-
-    soundRepository.deleteAll(soundRepository.findByUserId(sessionUserId));
-    userRepository.deleteById(sessionUserId);
-}
-
 
     public Map<String, Object> getProfileInfo(User user) {
         Map<String, Object> info = new HashMap<>();
@@ -202,4 +219,22 @@ public void deleteAccount(Long sessionUserId, String confirmation) {
         info.put("hasProfilePicture", hasProfilePicture);
         return info;
     }
+
+    public UserDTO saveDTO(UserRegistrationDTO dto) {
+        if (userRepository.existsByUsername(dto.username())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "El nombre de usuario ya está en uso");
+        }
+        if (userRepository.existsByEmail(dto.email())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "El email ya está registrado");
+        }
+
+        User user = new User();
+        user.setUsername(dto.username());
+        user.setEmail(dto.email());
+        user.setPassword(dto.password());
+        user.setRoles(List.of("ROLE_USER"));
+
+        return mapper.toDto(userRepository.save(user));
+    }
+
 }
