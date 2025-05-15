@@ -4,9 +4,12 @@ import es.swapsounds.model.Comment;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
 import es.swapsounds.repository.CommentRepository;
+import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.sql.Blob;
@@ -75,6 +78,22 @@ public class CommentService {
         }
         return false;
     }
+
+    @Transactional
+    public Comment commentEdition(Long userId, long soundId, long commentId, String newContent) {
+    Comment comment = commentRepository.findById(commentId)
+            .orElseThrow(() -> new RuntimeException("Comentario no encontrado"));
+
+    if (comment.getUser().getUserId() != userId || comment.getSoundId() != soundId) {
+        throw new SecurityException("No autorizado para editar este comentario");
+    }
+
+    comment.setContent(newContent);
+    comment.setModified(LocalDateTime.now());
+
+    return commentRepository.save(comment);
+}
+
 
     /**
      * Elimina un comentario, validando que el usuario sea el autor.
@@ -180,4 +199,8 @@ public class CommentService {
 
         return commentsWithImages;
     }
+
+    public Page<Comment> findBySoundId(long soundId, Pageable pageable, HttpSession session) {
+    return commentRepository.findBySound_SoundIdOrderByCreatedDesc(soundId, pageable);
+}
 }
