@@ -1,8 +1,11 @@
 package es.swapsounds.RestController;
 
-import es.swapsounds.dto.SoundDTO;
+import es.swapsounds.DTO.SoundDTO;
 import es.swapsounds.model.User;
 import es.swapsounds.service.SoundService;
+import es.swapsounds.service.UserService;
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
 import javax.sql.rowset.serial.SerialException;
 import java.sql.SQLException;
 
@@ -21,9 +26,11 @@ import java.sql.SQLException;
 public class SoundRestController {
 
     private final SoundService svc;
+    private final UserService usvc;
 
-    public SoundRestController(SoundService svc) {
+    public SoundRestController(SoundService svc, UserService usvc) {
         this.svc = svc;
+        this.usvc = usvc;
     }
 
     @GetMapping
@@ -44,15 +51,18 @@ public class SoundRestController {
         return ResponseEntity.ok(dto);
     }
 
-    @PostMapping
+    @PostMapping("/")
     public ResponseEntity<Map<String, String>> create(
             @RequestParam String title,
             @RequestParam String description,
             @RequestParam List<String> categories,
             @RequestParam MultipartFile audioFile,
             @RequestParam(required = false) MultipartFile imageFile,
-            @RequestHeader("X-User-Id") User userId) throws IOException {
-        
+            HttpSession session) throws IOException {
+
+        Long id = usvc.getUserIdFromSession(session);
+        Optional<User> user = usvc.getUserById(id);
+        User userId = user.get();
         svc.createSound(title, description, categories, audioFile, imageFile, userId);
         return ResponseEntity.ok(Map.of("success", "Sonido creado exitosamente"));
     }
