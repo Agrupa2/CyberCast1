@@ -7,10 +7,14 @@ import es.swapsounds.repository.CommentRepository;
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Safelist;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.Blob;
 import java.sql.SQLException;
@@ -37,26 +41,46 @@ public class CommentService {
     /**
      * Agrega un comentario a un sonido.
      */
-    @Transactional
+     @Transactional
     public Comment addComment(Long userId, long soundId, String content) {
-        // Obtener el usuario actual
+        // Validar entrada
+        if (content == null || content.trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El contenido del comentario no puede estar vacío");
+        }
+        if (content.length() > 150) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El comentario es demasiado largo (máximo 150 caracteres)");
+        }
+
+        // Configurar lista segura para sanitización
+        Safelist safelist = Safelist.relaxed()
+                .addTags("h1", "h2", "code")
+                .addAttributes("a", "href", "target")
+                .addAttributes(":all", "class")
+                .addProtocols("a", "href", "http", "https");
+
+        // Sanitizar el contenido
+        String cleanContent = Jsoup.clean(content, safelist);
+
+        // Obtener el usuario
         User currentUser = userService.findUserById(userId)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
 
+        // Obtener el sonido
         Sound sound = soundService.findSoundById(soundId)
-                .orElseThrow(() -> new RuntimeException("Sonido no encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sonido no encontrado"));
 
-        String soundTitle = sound.getTitle(); // Obtener el título del sonido
+        String soundTitle = sound.getTitle();
 
-        // Crea un nuevo commentId pero no lo hace maualmente, lo hace la base de datos
+        // Crear el comentario
         Comment comment = new Comment();
-        comment.setContent(content); // Asignar el contenido al comentario
-        comment.setUser(currentUser); // Asignar el usuario al comentario
-        comment.setSound(sound); // Asignar el sonido al comentario
+        comment.setContent(cleanContent);
+        comment.setUser(currentUser);
+        comment.setSound(sound);
         comment.setSoundId(soundId);
         comment.setSoundTitle(soundTitle);
         comment.setCreated(LocalDateTime.now());
 
+        // Guardar y devolver
         return commentRepository.save(comment);
     }
 
@@ -81,19 +105,18 @@ public class CommentService {
 
     @Transactional
     public Comment commentEdition(Long userId, long soundId, long commentId, String newContent) {
-    Comment comment = commentRepository.findById(commentId)
-            .orElseThrow(() -> new RuntimeException("Comentario no encontrado"));
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("Comentario no encontrado"));
 
-    if (comment.getUser().getUserId() != userId || comment.getSoundId() != soundId) {
-        throw new SecurityException("No autorizado para editar este comentario");
+        if (comment.getUser().getUserId() != userId || comment.getSoundId() != soundId) {
+            throw new SecurityException("No autorizado para editar este comentario");
+        }
+
+        comment.setContent(newContent);
+        comment.setModified(LocalDateTime.now());
+
+        return commentRepository.save(comment);
     }
-
-    comment.setContent(newContent);
-    comment.setModified(LocalDateTime.now());
-
-    return commentRepository.save(comment);
-}
-
 
     /**
      * Elimina un comentario, validando que el usuario sea el autor.
@@ -201,6 +224,6 @@ public class CommentService {
     }
 
     public Page<Comment> findBySoundId(long soundId, Pageable pageable, HttpSession session) {
-    return commentRepository.findBySound_SoundIdOrderByCreatedDesc(soundId, pageable);
-}
+        return commentRepository.findBySound_SoundIdOrderByCreatedDesc(soundId, pageable);
+    }
 }
