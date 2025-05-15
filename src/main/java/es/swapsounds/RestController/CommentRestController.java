@@ -10,8 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import es.swapsounds.dto.CommentDTO;
-import es.swapsounds.dto.CommentMapper;
+import es.swapsounds.DTO.CommentDTO;
+import es.swapsounds.DTO.CommentMapper;
 import es.swapsounds.model.Comment;
 import es.swapsounds.service.CommentService;
 import es.swapsounds.service.UserService;

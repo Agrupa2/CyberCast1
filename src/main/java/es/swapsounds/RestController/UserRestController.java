@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import es.swapsounds.dto.UserDTO;
-import es.swapsounds.dto.UserRegistrationDTO;
+import es.swapsounds.DTO.UserDTO;
+import es.swapsounds.DTO.UserRegistrationDTO;
 import es.swapsounds.service.UserService;
 import jakarta.servlet.http.HttpSession;
 

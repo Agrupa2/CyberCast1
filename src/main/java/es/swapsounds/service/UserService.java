@@ -1,8 +1,8 @@
 package es.swapsounds.service;
 
-import es.swapsounds.dto.UserDTO;
-import es.swapsounds.dto.UserMapper;
-import es.swapsounds.dto.UserRegistrationDTO;
+import es.swapsounds.DTO.UserDTO;
+import es.swapsounds.DTO.UserMapper;
+import es.swapsounds.DTO.UserRegistrationDTO;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
 import es.swapsounds.repository.SoundRepository;

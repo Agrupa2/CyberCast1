@@ -1,7 +1,7 @@
 package es.swapsounds.service;
 
-import es.swapsounds.dto.SoundDTO;
-import es.swapsounds.dto.SoundMapper;
+import es.swapsounds.DTO.SoundDTO;
+import es.swapsounds.DTO.SoundMapper;
 import es.swapsounds.model.Category;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
