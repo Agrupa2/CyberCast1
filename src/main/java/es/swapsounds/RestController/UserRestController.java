@@ -84,7 +84,7 @@ public class UserRestController {
             @RequestParam String confirmation,
             HttpSession session) {
         Long id = svc.getUserIdFromSession(session);
-        svc.deleteAccount(id, confirmation);
+        svc.deleteAccount(id, username, confirmation);
         session.invalidate();
         return ResponseEntity.ok(Map.of("success", "Cuenta eliminada"));
     }

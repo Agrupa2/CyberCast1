@@ -42,8 +42,9 @@ public class DataLoader implements CommandLineRunner {
             Category ai = categoryService.findOrCreateCategory("AI");
 
             User user1 = new User("sofia", "sofia@example.com", "sofia123", null);
+            user1.setRoles(List.of("ROLE_USER"));
             User user2 = new User("david", "david@example.com", "david123", null);
-            
+            user2.setRoles(List.of("ROLE_USER"));
             
             Blob adminProfilePictureBlob = null;
             try (InputStream adminImageStream = getClass().getResourceAsStream("/static/images/ozuna.jpeg")) {
@@ -58,7 +59,7 @@ public class DataLoader implements CommandLineRunner {
             }
 
             User user3 = new User("admin", "tete@example.com", "admin", adminProfilePictureBlob);
-
+            user3.setRoles(List.of("ROLE_ADMIN", "ROLE_USER"));
 
             userRepository.saveAll(List.of(user1, user2, user3));
 

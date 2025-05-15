@@ -173,23 +173,42 @@ public class UserService {
         }
     }
 
-    public void deleteAccount(Long sessionUserId, String confirmation) {
-        if (confirmation == null || !"ELIMINAR CUENTA".equals(confirmation.trim())) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Debes confirmar escribiendo 'ELIMINAR CUENTA'");
-        }
-
-        // Puedes comprobar también que el usuario existe antes de borrar, si quieres
-        if (!userRepository.existsById(sessionUserId)) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Usuario no encontrado");
-        }
-
-        soundRepository.deleteAll(soundRepository.findByUserId(sessionUserId));
-        userRepository.deleteById(sessionUserId);
+    public void deleteAccount(Long sessionUserId, String pathUsername, String confirmation) {
+    // 1. Autenticación
+    if (sessionUserId == null) {
+        throw new ResponseStatusException(
+            HttpStatus.UNAUTHORIZED,
+            "No autenticado"
+        );
     }
+
+    // 2. Confirmación textual
+    if (confirmation == null || !"ELIMINAR CUENTA".equals(confirmation.trim())) {
+        throw new ResponseStatusException(
+            HttpStatus.BAD_REQUEST,
+            "Debes confirmar escribiendo 'ELIMINAR CUENTA'"
+        );
+    }
+
+    // 3. Obtener usuario y verificar autorización
+    User u = userRepository.findById(sessionUserId)
+        .orElseThrow(() -> new ResponseStatusException(
+            HttpStatus.NOT_FOUND,
+            "Usuario no encontrado"
+        ));
+
+    if (!u.getUsername().equals(pathUsername)) {
+        throw new ResponseStatusException(
+            HttpStatus.FORBIDDEN,
+            "No tienes permiso para eliminar esta cuenta"
+        );
+    }
+
+    // 4. Borrado de sonidos y usuario
+    soundRepository.deleteAll(soundRepository.findByUserId(sessionUserId));
+    userRepository.deleteById(sessionUserId);
+}
+
 
     public Map<String, Object> getProfileInfo(User user) {
         Map<String, Object> info = new HashMap<>();
