@@ -2,7 +2,7 @@ package es.swapsounds.DTO;
 
 public record SoundDTO(
         long soundId,
-        String name,
+        String title,
         String description,
         String duration
 ) 

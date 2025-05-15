@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import es.swapsounds.DTO.CategoryDTO;
 import es.swapsounds.DTO.SoundDTO;
@@ -56,16 +58,18 @@ public class CategoryRestController {
     /**
      * Busca (o crea) una categoría y devuelve sus datos con sonidos.
      */
-    /* @GetMapping("/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<CategoryDTO> getById(@PathVariable Long id) {
-        Category cat = (categoryService.getCategoryById(id))
-                .orElseThrow(() -> new ResourceNotFoundException("Categoría no encontrada"));
+        Category cat = categoryService.getCategoryById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Categoría no encontrada"));
         List<SoundDTO> sounds = cat.getSounds().stream()
-                .map(soundMapper::toDto)
+                .map(soundMapper::toDTO)
                 .collect(Collectors.toList());
         CategoryDTO dto = new CategoryDTO(cat.getId(), cat.getName(), sounds);
         return ResponseEntity.ok(dto);
-    } */
+    }
 
     /**
      * Busca o crea por nombre.
