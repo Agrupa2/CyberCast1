@@ -7,7 +7,7 @@ import org.mapstruct.Mapper;
 import es.swapsounds.model.Sound;
 
 @Mapper(componentModel = "spring")
-public interface SoundMapped {
+public interface SoundMapper {
 
     SoundDTO toDTO(Sound sound);
 
