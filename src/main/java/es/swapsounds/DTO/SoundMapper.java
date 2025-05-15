@@ -1,4 +1,4 @@
-package es.swapsounds.DTO;
+package es.swapsounds.dto;
 
 import java.util.List;
 
@@ -7,7 +7,7 @@ import org.mapstruct.Mapper;
 import es.swapsounds.model.Sound;
 
 @Mapper(componentModel = "spring")
-public interface SoundMapped {
+public interface SoundMapper {
 
     SoundDTO toDTO(Sound sound);
 
