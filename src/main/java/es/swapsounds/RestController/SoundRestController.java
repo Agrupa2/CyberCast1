@@ -70,9 +70,10 @@ public class SoundRestController {
     @PostMapping("/{id}/audio")
     public ResponseEntity<Map<String, String>> updateAudio(
             @PathVariable Long id,
-            @RequestParam MultipartFile audioFile,
-            @RequestHeader("X-User-Id") Long userId) throws IOException {
-        
+            @RequestParam("audioFile") MultipartFile audioFile,
+            HttpSession session) throws IOException {
+
+        Long userId = usvc.getUserIdFromSession(session);
         svc.updateAudio(id, audioFile, userId);
         return ResponseEntity.ok(Map.of("success", "Audio actualizado"));
     }
@@ -81,8 +82,9 @@ public class SoundRestController {
     public ResponseEntity<Map<String, String>> updateImage(
             @PathVariable Long id,
             @RequestParam MultipartFile imageFile,
-            @RequestHeader("X-User-Id") Long userId) throws IOException, SerialException, SQLException {
+           HttpSession session) throws IOException, SerialException, SQLException {
 
+        Long userId = usvc.getUserIdFromSession(session);
         svc.updateImage(id, imageFile, userId);
         return ResponseEntity.ok(Map.of("success", "Imagen actualizada"));
     }
@@ -90,8 +92,9 @@ public class SoundRestController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, String>> delete(
             @PathVariable Long id,
-            @RequestHeader("X-User-Id") Long userId) {
+            HttpSession session) {
         
+        Long userId = usvc.getUserIdFromSession(session);
         svc.deleteSound(id, userId);
         return ResponseEntity.ok(Map.of("success", "Sonido eliminado"));
     }
