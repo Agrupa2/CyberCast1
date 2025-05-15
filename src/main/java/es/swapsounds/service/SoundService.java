@@ -1,11 +1,16 @@
 package es.swapsounds.service;
 
+import es.swapsounds.dto.SoundDTO;
+import es.swapsounds.dto.SoundMapper;
 import es.swapsounds.model.Category;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
 import es.swapsounds.repository.SoundRepository;
 import jakarta.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,6 +19,8 @@ import com.mpatric.mp3agic.Mp3File;
 import com.mpatric.mp3agic.UnsupportedTagException;
 
 import javax.sql.rowset.serial.SerialBlob;
+import javax.sql.rowset.serial.SerialException;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,6 +42,9 @@ public class SoundService {
 
     @Autowired
     private SoundRepository soundRepository;
+
+    @Autowired
+    private SoundMapper mapper;
 
     private Long lastInsertedSoundId;
 
@@ -206,5 +216,137 @@ public class SoundService {
         } catch (SQLException e) {
             throw new IOException("Error al actualizar los archivos en la base de datos", e);
         }
+    }
+
+public Optional<byte[]> getAudioContent(Long soundId) {
+    return soundRepository.findById(soundId)
+        .map(sound -> {
+            try {
+                Blob audioBlob = sound.getAudioBlob();
+                return audioBlob != null ? audioBlob.getBinaryStream().readAllBytes() : null;
+            } catch (SQLException | IOException e) {
+                throw new RuntimeException("Error al leer el audio", e);
+            }
+        });
+}
+
+public Optional<byte[]> getImageContent(Long soundId) {
+    return soundRepository.findById(soundId)
+        .map(sound -> {
+            try {
+                Blob imageBlob = sound.getImageBlob();
+                return imageBlob != null ? imageBlob.getBinaryStream().readAllBytes() : null;
+            } catch (SQLException | IOException e) {
+                throw new RuntimeException("Error al leer la imagen", e);
+            }
+        });
+}
+
+   public Page<SoundDTO> findAllSoundsDTO(Pageable page) {
+        return soundRepository.findAll(page).map(mapper::toDTO);
+    }
+
+    public SoundDTO findSoundByIdDTO(Long id) {
+        Sound sound = soundRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Sonido no encontrado"));
+        return mapper.toDTO(sound);
+    }
+
+    
+    public void updateAudio(Long soundId, MultipartFile audioFile, Long userId) throws IOException {
+    // 1. Validar que el archivo no esté vacío
+    if (audioFile == null || audioFile.isEmpty()) {
+        throw new IllegalArgumentException("El archivo de audio no puede estar vacío");
+    }
+
+    // 2. Validar el tipo de archivo (opcional)
+    String contentType = audioFile.getContentType();
+    if (contentType == null || !contentType.startsWith("audio/")) {
+        throw new IllegalArgumentException("Tipo de archivo no válido. Se esperaba un archivo de audio");
+    }
+
+    // 3. Buscar el sonido y validar propiedad
+    Sound sound = soundRepository.findById(soundId)
+        .orElseThrow(() -> new SoundNotFoundException(soundId));
+
+    if (!Long.valueOf(userId).equals(sound.getUserId())) {
+        throw new UnauthorizedAccessException("No tienes permiso para modificar este sonido");
+    }
+
+    // 4. Validar tamaño máximo (ejemplo: 10MB)
+    long maxSize = 10 * 1024 * 1024; // 10MB
+    if (audioFile.getSize() > maxSize) {
+        throw new IllegalArgumentException("El archivo excede el tamaño máximo permitido (10MB)");
+    }
+
+    // 5. Convertir y guardar el audio
+    try {
+        byte[] audioBytes = audioFile.getBytes();
+        Blob audioBlob = new SerialBlob(audioBytes);
+        sound.setAudioBlob(audioBlob);
+        
+        soundRepository.save(sound);
+        
+    } catch (SQLException e) {
+        throw new AudioProcessingException("Error al procesar el archivo de audio", e);
+    }
+}
+
+public void updateImage(Long soundId, MultipartFile imageFile, Long userId) throws IOException, SerialException, SQLException {
+    // Validate the sound exists
+    Sound sound = soundRepository.findById(soundId)
+            .orElseThrow(() -> new SoundNotFoundException(soundId));
+
+    // Validate the user is authorized to update the sound
+    if (!Long.valueOf(userId).equals(sound.getUserId())) {
+        throw new UnauthorizedAccessException("User is not authorized to update this sound");
+    }
+
+    // Validate the image file size (example: 5MB max)
+    long maxSize = 5 * 1024 * 1024; // 5MB
+    if (imageFile.getSize() > maxSize) {
+        throw new IllegalArgumentException("The image file exceeds the maximum allowed size (5MB)");
+    }
+
+    // Save the image file as a byte array or Blob
+    byte[] imageBytes = imageFile.getBytes();
+    sound.setImageBlob(new SerialBlob(imageBytes));
+
+    // Save the updated sound entity
+    soundRepository.save(sound);
+}
+
+public void deleteSound(Long id, Long userId) {
+    // Validate the sound exists
+    Sound sound = soundRepository.findById(id)
+            .orElseThrow(() -> new SoundNotFoundException(id));
+
+    // Validate the user is authorized to delete the sound
+    if (!Long.valueOf(userId).equals(sound.getUserId())) {
+        throw new UnauthorizedAccessException("User is not authorized to delete this sound");
+    }
+
+    // Delete the sound
+    soundRepository.delete(sound);
+}
+
+public class SoundNotFoundException extends RuntimeException {
+    public SoundNotFoundException(Long soundId) {
+        super("Spundido no encontrado con ID: " + soundId);
+    }
+}
+
+
+public class UnauthorizedAccessException extends RuntimeException {
+    public UnauthorizedAccessException(String message) {
+        super(message);
+    }
+}
+
+public class AudioProcessingException extends RuntimeException {
+    public AudioProcessingException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
     }
 }
