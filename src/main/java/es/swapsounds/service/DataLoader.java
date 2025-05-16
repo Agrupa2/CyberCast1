@@ -11,6 +11,7 @@ import java.util.List;
 import javax.sql.rowset.serial.SerialBlob;
 
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import es.swapsounds.model.Category;
@@ -23,14 +24,17 @@ import es.swapsounds.repository.UserRepository;
 @Component
 public class DataLoader implements CommandLineRunner {
 
+
     private final SoundRepository soundRepository;
     private final UserRepository userRepository;
     private final CategoryService categoryService;
+    private final PasswordEncoder passwordEncoder;
 
-    public DataLoader(SoundRepository soundRepository, UserRepository userRepository, CategoryService categoryService) {
+    public DataLoader(SoundRepository soundRepository, UserRepository userRepository, CategoryService categoryService, PasswordEncoder passwordEncoder) {
         this.soundRepository = soundRepository;
         this.userRepository = userRepository;
         this.categoryService = categoryService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -41,10 +45,10 @@ public class DataLoader implements CommandLineRunner {
             Category meme = categoryService.findOrCreateCategory("Meme");
             Category ai = categoryService.findOrCreateCategory("AI");
 
-            User user1 = new User("sofia", "sofia@example.com", "sofia123", null);
-            user1.setRoles(List.of("ROLE_USER"));
-            User user2 = new User("david", "david@example.com", "david123", null);
-            user2.setRoles(List.of("ROLE_USER"));
+            User user1 = new User("sofia", "sofia@example.com", passwordEncoder.encode("sofia123"), null);
+            user1.setRoles(List.of("USER"));
+            User user2 = new User("david", "david@example.com", passwordEncoder.encode("david123"), null);
+            user2.setRoles(List.of("USER"));
             
             Blob adminProfilePictureBlob = null;
             try (InputStream adminImageStream = getClass().getResourceAsStream("/static/images/ozuna.jpeg")) {
@@ -58,8 +62,8 @@ public class DataLoader implements CommandLineRunner {
                 System.err.println("Error al convertir la imagen del admin a Blob: " + e.getMessage());
             }
 
-            User user3 = new User("admin", "tete@example.com", "admin", adminProfilePictureBlob);
-            user3.setRoles(List.of("ROLE_ADMIN", "ROLE_USER"));
+            User user3 = new User("admin", "tete@example.com", passwordEncoder.encode("admin"), adminProfilePictureBlob);
+            user3.setRoles(List.of("ADMIN", "USER"));
 
             userRepository.saveAll(List.of(user1, user2, user3));
 
