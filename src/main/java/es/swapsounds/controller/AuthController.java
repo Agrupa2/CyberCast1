@@ -2,15 +2,19 @@ package es.swapsounds.controller;
 
 import es.swapsounds.model.User;
 import es.swapsounds.service.AuthService;
-import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.util.Optional;
-
+import java.security.Principal;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,21 +32,33 @@ public class AuthController {
         return "signup";
     }
 
+    @Autowired
+    private AuthenticationManager authManager;
+
     @PostMapping("/signup")
     public String registerUser(
             @RequestParam String username,
             @RequestParam String email,
             @RequestParam String user_password,
             @RequestParam(required = false) MultipartFile profile_photo,
-            HttpSession session,
+            HttpServletRequest request,
             RedirectAttributes redirectAttributes) {
-
         try {
+            // 1) registrar
             User user = authService.registerUser(username, email, user_password, profile_photo);
-            session.setAttribute("userId", user.getUserId());
-            session.setAttribute("username", user.getUsername());
+
+            // 2) autenticar automáticamente
+            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username,
+                    user_password);
+            Authentication auth = authManager.authenticate(authToken);
+            SecurityContextHolder.getContext().setAuthentication(auth);
+
+            // 3) crear sesión (para que session.getAttribute("userId") siga funcionando si
+            // lo necesitas)
+            request.getSession().setAttribute("userId", user.getUserId());
+
             redirectAttributes.addFlashAttribute("success", "¡Registro exitoso!");
-            return "redirect:/sounds";
+            return "redirect:/login";
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/signup";
@@ -57,28 +73,14 @@ public class AuthController {
         return "login";
     }
 
-    @PostMapping("/login")
-    public String loginUser(
-            @RequestParam String username,
-            @RequestParam String user_password,
-            HttpSession session,
-            Model model) {
-
-        Optional<User> user = authService.authenticate(username, user_password);
-        if (user.isPresent()) {
-            User actualUser = user.get();
-            session.setAttribute("username", actualUser.getUsername());
-            session.setAttribute("userId", actualUser.getUserId());
-            return "redirect:/sounds";
-        } else {
-            model.addAttribute("error", "Invalid username or password");
-            return "login";
-        }
-    }
-
     @GetMapping("/logout")
-    public String logout(HttpSession session) {
-        session.invalidate();
+    public String logout(
+            Principal principal,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+
+        new SecurityContextLogoutHandler().logout(request, response, null);
         return "redirect:/login";
     }
+
 }

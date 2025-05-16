@@ -14,7 +14,7 @@ public class User {
     private long userId;
     private String username;
     private String email;
-    private String password;
+    private String encodedPassword;
 
     @Lob
     private Blob profilePicture;
@@ -31,10 +31,10 @@ public class User {
     public User() {
     }
 
-    public User(String username, String email, String user_password, Blob profilePicture, String... roles) {
+    public User(String username, String email, String encodedPassword, Blob profilePicture, String... roles) {
         this.username = username;
         this.email = email;
-        this.password = user_password;
+        this.encodedPassword = encodedPassword;
         this.profilePicture = profilePicture;
         this.roles = List.of(roles);
     }
@@ -63,13 +63,13 @@ public class User {
         this.email = email;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    public String getEncodedPassword() {
+		return encodedPassword;
+	}
 
-    public String getPassword() {
-        return password;
-    }
+	public void setEncodedPassword(String encodedPassword) {
+		this.encodedPassword = encodedPassword;
+	}
 
     public Blob getProfilePicture() {
         return profilePicture;

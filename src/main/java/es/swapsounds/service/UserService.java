@@ -11,6 +11,7 @@ import es.swapsounds.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -250,10 +251,24 @@ public class UserService {
         User user = new User();
         user.setUsername(dto.username());
         user.setEmail(dto.email());
-        user.setPassword(dto.password());
+        user.setEncodedPassword(dto.password());
         user.setRoles(List.of("ROLE_USER"));
 
         return mapper.toDto(userRepository.save(user));
+    }
+
+
+	public UserDTO getUser(String username) {
+		return mapper.toDto(userRepository.findByUsername(username).orElseThrow());
+	}
+
+	public User getLoggedUser() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findByUsername(username).get();
+    }
+
+	public UserDTO getLoggedUserDTO() {
+        return mapper.toDto(getLoggedUser());
     }
 
 }

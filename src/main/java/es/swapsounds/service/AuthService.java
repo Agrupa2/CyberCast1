@@ -2,8 +2,20 @@ package es.swapsounds.service;
 
 import es.swapsounds.model.User;
 import es.swapsounds.repository.UserRepository;
+import es.swapsounds.security.jwt.AuthResponse;
+import es.swapsounds.security.jwt.AuthResponse.Status;
+import es.swapsounds.security.jwt.LoginRequest;
+import es.swapsounds.security.jwt.UserLoginService;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,6 +32,15 @@ public class AuthService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private AuthenticationManager authManager;
+
+    @Autowired
+    private UserLoginService userService;
 
     /**
      * Registers a new user.
@@ -39,8 +60,12 @@ public class AuthService {
             throw new IllegalArgumentException("La contraseña debe tener al menos 8 caracteres");
         }
 
+        String encoded = passwordEncoder.encode(password);
+
+        String roles = "USER";
+
         // Crear el usuario
-        User user = new User(username, email, password, null);
+        User user = new User(username, email, encoded, null, roles);
 
         // Si se proporciona una foto de perfil, convertirla a Blob
         if (profilePhoto != null && !profilePhoto.isEmpty()) {
@@ -67,9 +92,10 @@ public class AuthService {
         Optional<User> userOptional = userRepository.findByEmailOrUsername(emailOrUsername, emailOrUsername);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-            System.out.println("Usuario encontrado: " + user.getUsername() + ", Contraseña en DB: " + user.getPassword()
-                    + ", Contraseña introducida: " + password);
-            if (user.getPassword().equals(password)) {
+            System.out.println(
+                    "Usuario encontrado: " + user.getUsername() + ", Contraseña en DB: " + user.getEncodedPassword()
+                            + ", Contraseña introducida: " + password);
+            if (user.getEncodedPassword().equals(password)) {
                 System.out.println("¡Contraseña coincide!");
                 return userOptional;
             } else {
@@ -79,6 +105,34 @@ public class AuthService {
         } else {
             System.out.println("No se encontró ningún usuario con el email o username: " + emailOrUsername);
             return Optional.empty();
+        }
+    }
+
+    public ResponseEntity<AuthResponse> signup(String username, String email, String password,
+            MultipartFile profilePhoto, HttpServletResponse response) {
+        try {
+            // 1. Registrar al usuario
+            User user = registerUser(username, email, password, profilePhoto);
+
+            // 2. Autenticar automáticamente al usuario
+            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username,
+                    password);
+            Authentication auth = authManager.authenticate(authToken);
+            SecurityContextHolder.getContext().setAuthentication(auth);
+
+            // 3. Generar respuesta con token
+            LoginRequest loginRequest = new LoginRequest(username, password);
+            return userService.login(response, loginRequest); // Reutilizamos la lógica de login
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new AuthResponse(Status.FAILURE, "Error en el registro: " + e.getMessage()));
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new AuthResponse(Status.FAILURE, "Error al subir la imagen de perfil"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new AuthResponse(Status.FAILURE, "Error inesperado: " + e.getMessage()));
         }
     }
 }

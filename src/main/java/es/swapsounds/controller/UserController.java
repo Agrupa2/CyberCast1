@@ -2,9 +2,14 @@ package es.swapsounds.controller;
 
 import es.swapsounds.service.CommentService;
 import es.swapsounds.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+import java.security.Principal;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,11 +40,12 @@ public class UserController {
    @PostMapping("/delete-account")
    public String processDelete(
          @RequestParam String confirmation,
-         HttpSession session,
+         Principal principal,
+         HttpServletRequest request,
+         HttpServletResponse response,
          RedirectAttributes ra) {
 
-      Long userId = (Long) session.getAttribute("userId");
-      if (userId == null)
+      if (principal == null)
          return "redirect:/login";
 
       if (!"ELIMINAR CUENTA".equals(confirmation.trim())) {
@@ -47,9 +53,11 @@ public class UserController {
          return "redirect:/delete-account";
       }
 
+      Long userId = userService.findUserByUsername(principal.getName()).get().getUserId();
+
       commentService.deleteCommentsByUserId(userId);
       userService.deleteUser(userId);
-      session.invalidate();
+      new SecurityContextLogoutHandler().logout(request, response, null);
 
       ra.addFlashAttribute("success", "¡Cuenta eliminada permanentemente!");
       return "redirect:/";
