@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Perfil de {{user.username}}</title>
     <link rel="stylesheet" href="/css/profile.css">
 </head>
+
 <body>
     <nav class="navbar">
         <div class="navbar-container">
@@ -35,29 +37,32 @@
                 {{/hasProfilePicture}}
             </div>
             {{#isOwner}}
-                <div class="profile-actions">
-                    <details class="profile-dropdown">
-                        <summary class="dropdown-toggle"></summary>
-                        <div class="dropdown-content">
-                            <form action="/profile/update-username" method="POST">
-                                <div class="form-group">
-                                    <label for="newUsername">Nuevo nombre:</label>
-                                    <input type="text" id="newUsername" name="newUsername" value="{{user.username}}" required>
-                                </div>
-                                <button type="submit" class="btn-icon">Guardar nombre</button>
-                            </form>
-                            <div class="dropdown-divider"></div>
-                            <form action="/profile/update-avatar" method="POST" enctype="multipart/form-data">
-                                <div class="form-group">
-                                    <label for="avatarInput">Nuevo avatar:</label>
-                                    <input type="file" id="avatarInput" name="avatar" accept="image/*">
-                                </div>
-                                <button type="submit" class="btn-icon">Subir avatar</button>
-                            </form>
-                        </div>
-                    </details>
-                </div>
-                {{/isOwner}}
+            <div class="profile-actions">
+                <details class="profile-dropdown">
+                    <summary class="dropdown-toggle"></summary>
+                    <div class="dropdown-content">
+                        <form action="/profile/update-username" method="POST">
+                            <div class="form-group">
+                                <label for="newUsername">Nuevo nombre:</label>
+                                <input type="text" id="newUsername" name="newUsername" value="{{user.username}}"
+                                    required>
+                                <input type="hidden" name="_csrf" value="{{token}}" />
+                            </div>
+                            <button type="submit" class="btn-icon">Guardar nombre</button>
+                        </form>
+                        <div class="dropdown-divider"></div>
+                        <form action="/profile/update-avatar" method="POST" enctype="multipart/form-data">
+                            <div class="form-group">
+                                <label for="avatarInput">Nuevo avatar:</label>
+                                <input type="file" id="avatarInput" name="avatar" accept="image/*">
+                                <input type="hidden" name="_csrf" value="{{token}}" />
+                            </div>
+                            <button type="submit" class="btn-icon">Subir avatar</button>
+                        </form>
+                    </div>
+                </details>
+            </div>
+            {{/isOwner}}
             <div class="profile-info">
                 <h1>{{user.username}}</h1>
                 <div class="stats">
@@ -100,7 +105,8 @@
                     <a href="/sounds/{{soundId}}" class="btn">Ver</a>
                     {{#isOwner}}
                     <form action="/sounds/{{soundId}}/delete" method="POST">
-                        <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que quieres eliminar este sonido?')">Eliminar</button>
+                        <button type="submit" class="btn btn-danger"
+                            onclick="return confirm('¿Estás seguro de que quieres eliminar este sonido?')">Eliminar</button>
                     </form>
                     {{/isOwner}}
                 </div>
@@ -126,7 +132,7 @@
             {{#comments}}
             <div class="comment-item">
                 <div class="comment-content">
-                    <p>{{content}}</p>
+                    <p>{{{content}}}</p>
                     <small class="comment-date">{{created}} en <a href="/sounds/{{soundId}}">{{soundTitle}}</a></small>
                 </div>
                 {{#isOwner}}
@@ -152,4 +158,5 @@
         </div>
     </div>
 </body>
+
 </html>

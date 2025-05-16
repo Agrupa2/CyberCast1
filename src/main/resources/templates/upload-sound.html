@@ -42,6 +42,7 @@
         <div>
             <label for="imageFile">Image File:</label>
             <input type="file" id="imageFile" name="imageFile" accept="image/*" required>
+            <input type="hidden" name="_csrf" value="{{token}}" />
         </div>
         <button type="submit">Upload Sound</button>
         {{#error}}

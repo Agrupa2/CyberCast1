@@ -29,6 +29,7 @@
 
                     <label for="photo">Profile Photo:</label>
                     <input type="file" id="photo" name="profile_photo" class="file-input" accept="image/*">
+                    <input type="hidden" name="_csrf" value="{{token}}" />
                     <small>(Optional) Select a profile image (JPEG, PNG)</small>
 
                 </fieldset>

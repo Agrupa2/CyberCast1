@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Eliminar Cuenta - SwapSounds</title>
     <link rel="stylesheet" href="/css/delete-account.css">
 </head>
-<body> 
+
+<body>
     <nav class="navbar">
         <div class="navbar-container">
             <div class="logo">Sound Library</div>
@@ -24,7 +26,7 @@
 
     <div class="delete-container"> <!-- This is the new content for the delete-account page -->
         <h1 class="warning-header">⚠️ Eliminación de Cuenta Permanente</h1>
-        
+
         <div class="warning-content">
             <p>Hola <strong>{{username}}</strong>, esta acción:</p>
             <ul>
@@ -32,24 +34,25 @@
                 <li>❌ Borrará tu imagen de perfil</li>
                 <li>❌ Eliminará permanentemente tu cuenta</li>
             </ul>
-            
+
             <p class="final-warning">Esta acción no se puede deshacer.</p>
         </div>
 
-        <form class="confirmation-form" action="/delete-account" method="post"> <!--if you write 'ELIMINAR CUENTA' you will delete the account-->
-            <input type="text" 
-                   class="confirmation-input"
-                   name="confirmation" 
-                   placeholder="Escribe 'ELIMINAR CUENTA'" 
-                   required
-                   pattern="ELIMINAR CUENTA">
-            
+        <form class="confirmation-form" action="/delete-account" method="post">
+            <!--if you write 'ELIMINAR CUENTA' you will delete the account-->
+            <input type="text" class="confirmation-input" name="confirmation" placeholder="Escribe 'ELIMINAR CUENTA'"
+                required pattern="ELIMINAR CUENTA">
+
             <button type="submit" class="btn-destruct">
                 Confirmar Eliminación Total
             </button>
+            <input type="hidden" name="_csrf" value="{{token}}" />
+
         </form>
 
-        <a href="/sounds" class="back-link">↩ Volver al inicio</a> <!-- This link will take you back to the start page after deleting the account -->
+        <a href="/sounds" class="back-link">↩ Volver al inicio</a>
+        <!-- This link will take you back to the start page after deleting the account -->
     </div>
 </body>
+
 </html>
