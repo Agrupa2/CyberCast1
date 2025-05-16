@@ -12,9 +12,4 @@ public interface SoundMapper {
     SoundDTO toDTO(Sound sound);
 
     List<SoundDTO> toDTOs(List<Sound> sounds);
-
-    Sound toDomain(SoundDTO soundDTO);
-    
 }
-    
-
