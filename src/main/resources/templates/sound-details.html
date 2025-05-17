@@ -44,7 +44,7 @@
                 {{#uploader}}
                 <div class="avatar-container">
                     {{#profileImageBase64}}
-                    <img src="{{profileImageBase64}}" alt="Perfil de {{username}}" class="profile-avatar">
+                    <img src="{{/users/{id}/avatar}}" alt="Perfil de {{username}}" class="profile-avatar">
                     {{/profileImageBase64}}
                     {{^profileImageBase64}}
                     <div class="default-avatar">{{userInitial}}</div>
@@ -84,6 +84,7 @@
         </div>
 
         {{#isOwner}}
+        {{#admin}}
         <div class="sound-actions">
             <details>
                 <summary>Editar Sonido</summary>
@@ -126,6 +127,7 @@
                 </form>
             </details>
         </div>
+        {{/admin}}
         {{/isOwner}}
         <a class="back-link" href="/sounds">Volver a todos los sonidos</a>
     </div>
@@ -133,6 +135,7 @@
     <div class="comments-section">
         <h2>Comentarios</h2>
         {{#username}}
+        {{#admin}}
         <div class="comment-form">
             <form action="/sounds/{{soundId}}/comments" method="post" id="comment-form">
                 <!-- Contenedor para el editor Quill -->
@@ -142,6 +145,7 @@
                 <button type="submit">Publicar</button>
             </form>
         </div>
+        {{/admin}}
         {{/username}}
         <div class="comments-list">
             {{#comments}}
@@ -149,7 +153,7 @@
                 <div class="comment-author">
                     <div class="comment-avatar-container">
                         {{#hasProfilePicture}}
-                        <img src="{{profileImageBase64}}" alt="{{username}}" class="comment-avatar">
+                        <img src="{{/users/{id}/avatar}}" alt="{{username}}" class="comment-avatar">
                         {{/hasProfilePicture}}
                         {{^hasProfilePicture}}
                         <div class="default-avatar-comment">{{userInitial}}</div>
@@ -162,6 +166,7 @@
                 <p class="comment-content">{{{content}}}</p>
                 <small class="comment-date">{{created}}</small>
                 {{#isCommentOwner}}
+                {{#admin}}
                 <div class="comment-actions">
                     <details class="dropdown">
                         <summary class="dropdown-toggle">
@@ -179,6 +184,7 @@
                         </div>
                     </details>
                 </div>
+                {{/admin}}
                 {{/isCommentOwner}}
             </div>
             {{/comments}}

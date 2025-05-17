@@ -38,13 +38,14 @@
         <div class="profile-header">
             <div class="profile-avatar">
                 {{#hasProfilePicture}}
-                <img src="{{profileImageBase64}}" alt="Perfil de {{user.username}}" class="profile-avatar-img">
+                <img src="{{/users/{id}/avatar}}" alt="Perfil de {{user.username}}" class="profile-avatar-img">
                 {{/hasProfilePicture}}
                 {{^hasProfilePicture}}
                 <div class="default-avatar">{{userInitial}}</div>
                 {{/hasProfilePicture}}
             </div>
             {{#isOwner}}
+            {{#admin}}
             <div class="profile-actions">
                 <details class="profile-dropdown">
                     <summary class="dropdown-toggle"></summary>
@@ -70,6 +71,7 @@
                     </div>
                 </details>
             </div>
+            {{/admin}}
             {{/isOwner}}
             <div class="profile-info">
                 <h1>{{user.username}}</h1>
@@ -112,10 +114,12 @@
                 <div class="sound-actions">
                     <a href="/sounds/{{soundId}}" class="btn">Ver</a>
                     {{#isOwner}}
+                    {{#admin}}
                     <form action="/sounds/{{soundId}}/delete" method="POST">
                         <button type="submit" class="btn btn-danger"
                             onclick="return confirm('¿Estás seguro de que quieres eliminar este sonido?')">Eliminar</button>
                     </form>
+                    {{/admin}}
                     {{/isOwner}}
                 </div>
             </div>
@@ -144,12 +148,14 @@
                     <small class="comment-date">{{created}} en <a href="/sounds/{{soundId}}">{{soundTitle}}</a></small>
                 </div>
                 {{#isOwner}}
+                {{#admin}}
                 <div class="comment-actions">
                     <form action="/sounds/{{soundId}}/comments/{{commentId}}/delete" method="POST">
                         <input type="hidden" name="_method" value="DELETE">
                         <button type="submit" class="btn-danger">Eliminar</button>
                     </form>
                 </div>
+                {{/admin}}
                 {{/isOwner}}
             </div>
             {{/comments}}

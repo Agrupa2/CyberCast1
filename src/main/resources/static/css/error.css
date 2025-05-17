@@ -1,0 +1,50 @@
+ /* Basic styles */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-image: url("https://sport.jotdown.es/wp-content/uploads/2023/11/7P8A5333.jpg");
+            background-size: cover; 
+            background-position: center; 
+            background-repeat: no-repeat; 
+            height: 100vh; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+        }
+
+        
+        .error-container {
+            background: rgba(0, 0, 0, 0.7); 
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 90%; 
+        }
+
+        
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        
+        p {
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        
+        a {
+            color: white;
+            text-decoration: none;
+            border: 1px solid white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        
+        a:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
