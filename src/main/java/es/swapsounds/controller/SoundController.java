@@ -28,6 +28,7 @@ import es.swapsounds.model.Category;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
 import es.swapsounds.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import es.swapsounds.service.CategoryService;
 import es.swapsounds.service.CommentService;
 
@@ -172,7 +173,7 @@ public class SoundController {
     }
 
     @GetMapping("/sounds/{soundId}")
-    public String soundDetails(@PathVariable long soundId, Principal principal, Model model) {
+    public String soundDetails(@PathVariable long soundId, Principal principal, Model model, HttpServletRequest request) {
         // Manejar usuario autenticado o no
         String username = principal != null ? principal.getName() : null;
         Long userId = null;
@@ -183,8 +184,7 @@ public class SoundController {
             if (userOpt.isPresent()) {
                 userId = userOpt.get().getUserId();
                 // Check if the user has the ADMIN role
-                isAdmin = SecurityContextHolder.getContext().getAuthentication()
-                        .getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
+                isAdmin = request.isUserInRole("ADMIN");
             } else {
                 throw new IllegalArgumentException("Usuario no encontrado");
             }

@@ -163,9 +163,11 @@ public class ProfileController {
             return "redirect:/sounds";
         }
 
+        Long sessionUserId = currentUser.getUserId();
+
         // Actualizar avatar
         try {
-            userService.updateProfilePicture(targetUserId, file);
+            userService.updateProfilePicture(sessionUserId, targetUserId, file);
             redirectAttributes.addFlashAttribute("success", "Avatar actualizado");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Error: " + e.getMessage());
