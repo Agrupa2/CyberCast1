@@ -18,13 +18,22 @@
                 <a href="/sounds">Sound Library</a>
             </div>
             <ul class="nav-links">
-                {{^username}}
+                {{^logged}}
                 <li><a href="/login">Login</a></li>
-                {{/username}}
-                {{#username}}
-                <li><a href="/sounds/upload?username={{username}}">Upload Sound</a></li>
+                {{/logged}}
+
+                {{#logged}}
+                <li><a href="/sounds/upload?username={{userName}}">Upload Sound</a></li>
+                <li><a href="/sounds/download">Download Sound</a></li>
+                <li><a href="/delete-account">Delete Account</a></li>
                 <li><a href="/logout">Logout</a></li>
-                {{/username}}
+                <li><a href="/profile/{{userName}}">Ver perfil</a></li>
+
+                {{#admin}}
+                <li><a href="/admin/users">Admin Panel</a></li>
+                {{/admin}}
+                {{/logged}}
+
             </ul>
         </div>
     </nav>

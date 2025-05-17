@@ -15,16 +15,22 @@
             <div class="navbar-container">
                 <div class="logo">Sound Library</div>
                 <ul class="nav-links">
-                    {{^username}} <!-- Shows this if there is no user logged in -->
+                    {{^logged}}
                     <li><a href="/login">Login</a></li>
-                    {{/username}}
-                    {{#username}} <!-- Shows this if there is a user logged in -->
-                    <li><a href="/sounds/upload?username={{username}}">Upload Sound</a></li>
+                    {{/logged}}
+
+                    {{#logged}}
+                    <li><a href="/sounds/upload?username={{userName}}">Upload Sound</a></li>
                     <li><a href="/sounds/download">Download Sound</a></li>
                     <li><a href="/delete-account">Delete Account</a></li>
                     <li><a href="/logout">Logout</a></li>
-                    <li><a href="/profile/{{username}}">Ver perfil</a></li>
-                    {{/username}}
+                    <li><a href="/profile/{{userName}}">Ver perfil</a></li>
+
+                    {{#admin}}
+                    <li><a href="/admin/users">Admin Panel</a></li>
+                    {{/admin}}
+                    {{/logged}}
+                    
                 </ul>
             </div>
         </nav>

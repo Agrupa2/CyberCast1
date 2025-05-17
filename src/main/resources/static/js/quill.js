@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
         try {
             const html = quill.root.innerHTML;
             if (html.length > 150) {
-                alert("El comentario es demasiado largo. Máximo 10,000 caracteres.");
+                alert("El comentario es demasiado largo. Máximo 150 caracteres.");
                 return;
             }
             const clean = DOMPurify.sanitize(html, purifyConfig);
