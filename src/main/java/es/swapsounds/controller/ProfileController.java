@@ -7,6 +7,8 @@ import es.swapsounds.service.CommentService;
 import es.swapsounds.service.SoundService;
 import es.swapsounds.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,7 +22,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.Principal;
+import java.sql.Blob;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -140,4 +146,28 @@ public class ProfileController {
         User user = userOpt.get();
         return "redirect:/profile/" + user.getUsername();
     }
+
+    @GetMapping("/users/{id}/avatar")
+    public ResponseEntity<byte[]> getUserAvatar(@PathVariable Long id) {
+        Optional<User> userOpt = userService.findUserById(id);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            try {
+                Blob picBlob = user.getProfilePicture();
+                if (picBlob != null) {
+                    try (InputStream in = picBlob.getBinaryStream()) {
+                        byte[] img = in.readAllBytes();
+                        return ResponseEntity.ok()
+                                .contentType(MediaType.IMAGE_JPEG) // o MediaType.IMAGE_PNG si fuera PNG
+                                .body(img);
+                    }
+                }
+            } catch (SQLException | IOException e) {
+                // Loguea el error si quieres
+                e.printStackTrace();
+            }
+        }
+        return ResponseEntity.notFound().build();
+    }
+
 }
