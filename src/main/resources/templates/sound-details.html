@@ -83,7 +83,7 @@
             <p>{{sound.description}}</p>
         </div>
 
-        {{#isOwner}}
+        {{#canEditSound}}
         <div class="sound-actions">
             <details>
                 <summary>Editar Sonido</summary>
@@ -130,7 +130,7 @@
                 </form>
             </details>
         </div>
-        {{/isOwner}}
+        {{/canEditSound}}
         <a class="back-link" href="/sounds">Volver a todos los sonidos</a>
     </div>
 
@@ -166,7 +166,7 @@
                 </div>
                 <p class="comment-content">{{{content}}}</p>
                 <small class="comment-date">{{created}}</small>
-                {{#isCommentOwner}}
+                {{#canEditComment}}
                 <div class="comment-actions">
                     <details class="dropdown">
                         <summary class="dropdown-toggle">
@@ -187,7 +187,7 @@
                         </div>
                     </details>
                 </div>
-                {{/isCommentOwner}}
+                {{/canEditComment}}
             </div>
             {{/comments}}
         </div>
