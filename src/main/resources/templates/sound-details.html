@@ -84,11 +84,12 @@
         </div>
 
         {{#isOwner}}
-        {{#admin}}
         <div class="sound-actions">
             <details>
                 <summary>Editar Sonido</summary>
                 <form id="editForm" action="/sounds/{{soundId}}/edit" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="_csrf" value="{{token}}" />
+
                     <div class="form-group">
                         <label>Título:</label>
                         <input type="text" name="title" value="{{sound.title}}" required>
@@ -124,10 +125,11 @@
                 <form action="/sounds/{{soundId}}/delete" method="post"
                     onsubmit="return confirm('¿Seguro que quieres eliminar este sonido?')">
                     <button type="submit" class="danger">Eliminar Sonido</button>
+                    <input type="hidden" name="_csrf" value="{{token}}" />
+
                 </form>
             </details>
         </div>
-        {{/admin}}
         {{/isOwner}}
         <a class="back-link" href="/sounds">Volver a todos los sonidos</a>
     </div>
@@ -135,17 +137,16 @@
     <div class="comments-section">
         <h2>Comentarios</h2>
         {{#username}}
-        {{#admin}}
         <div class="comment-form">
             <form action="/sounds/{{soundId}}/comments" method="post" id="comment-form">
                 <!-- Contenedor para el editor Quill -->
                 <div id="editor" style="min-height: 100px;"></div>
                 <!-- Input oculto para enviar el contenido sanitizado -->
                 <input type="hidden" name="content" id="content">
+                <input type="hidden" name="_csrf" value="{{token}}" />
                 <button type="submit">Publicar</button>
             </form>
         </div>
-        {{/admin}}
         {{/username}}
         <div class="comments-list">
             {{#comments}}
@@ -166,7 +167,6 @@
                 <p class="comment-content">{{{content}}}</p>
                 <small class="comment-date">{{created}}</small>
                 {{#isCommentOwner}}
-                {{#admin}}
                 <div class="comment-actions">
                     <details class="dropdown">
                         <summary class="dropdown-toggle">
@@ -176,15 +176,17 @@
                                 <input type="hidden" name="_method" value="PUT">
                                 <textarea name="content">{{content}}</textarea>
                                 <button type="submit">Guardar</button>
+                                <input type="hidden" name="_csrf" value="{{token}}" />
                             </form>
                             <form action="/sounds/{{soundId}}/comments/{{commentId}}/delete" method="POST">
                                 <input type="hidden" name="_method" value="DELETE">
                                 <button type="submit" class="danger">Eliminar</button>
+                                <input type="hidden" name="_csrf" value="{{token}}" />
+
                             </form>
                         </div>
                     </details>
                 </div>
-                {{/admin}}
                 {{/isCommentOwner}}
             </div>
             {{/comments}}
