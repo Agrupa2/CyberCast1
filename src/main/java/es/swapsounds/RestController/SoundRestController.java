@@ -4,7 +4,7 @@ import es.swapsounds.DTO.SoundDTO;
 import es.swapsounds.model.User;
 import es.swapsounds.service.SoundService;
 import es.swapsounds.service.UserService;
-import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -57,10 +57,10 @@ public class SoundRestController {
             @RequestParam String description,
             @RequestParam List<String> categories,
             @RequestParam MultipartFile audioFile,
-            @RequestParam(required = false) MultipartFile imageFile,
-            HttpSession session) throws IOException {
+            @RequestParam MultipartFile imageFile,
+            HttpServletRequest request) throws IOException {
 
-        Long id = usvc.getUserIdFromSession(session);
+        Long id = usvc.getUserIdFromPrincipal(request.getUserPrincipal());
         Optional<User> user = usvc.getUserById(id);
         User userId = user.get();
         svc.createSound(title, description, categories, audioFile, imageFile, userId);
@@ -71,9 +71,9 @@ public class SoundRestController {
     public ResponseEntity<Map<String, String>> updateAudio(
             @PathVariable Long id,
             @RequestParam("audioFile") MultipartFile audioFile,
-            HttpSession session) throws IOException {
+            HttpServletRequest request) throws IOException {
 
-        Long userId = usvc.getUserIdFromSession(session);
+        Long userId = usvc.getUserIdFromPrincipal(request.getUserPrincipal());
         svc.updateAudio(id, audioFile, userId);
         return ResponseEntity.ok(Map.of("success", "Audio actualizado"));
     }
@@ -82,9 +82,9 @@ public class SoundRestController {
     public ResponseEntity<Map<String, String>> updateImage(
             @PathVariable Long id,
             @RequestParam MultipartFile imageFile,
-           HttpSession session) throws IOException, SerialException, SQLException {
+           HttpServletRequest request) throws IOException, SerialException, SQLException {
 
-        Long userId = usvc.getUserIdFromSession(session);
+        Long userId = usvc.getUserIdFromPrincipal(request.getUserPrincipal());
         svc.updateImage(id, imageFile, userId);
         return ResponseEntity.ok(Map.of("success", "Imagen actualizada"));
     }
@@ -92,9 +92,9 @@ public class SoundRestController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, String>> delete(
             @PathVariable Long id,
-            HttpSession session) {
+            HttpServletRequest request) {
         
-        Long userId = usvc.getUserIdFromSession(session);
+        Long userId = usvc.getUserIdFromPrincipal(request.getUserPrincipal());
         svc.deleteSound(id, userId);
         return ResponseEntity.ok(Map.of("success", "Sonido eliminado"));
     }

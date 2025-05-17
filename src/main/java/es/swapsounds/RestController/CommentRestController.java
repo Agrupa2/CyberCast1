@@ -1,6 +1,7 @@
 package es.swapsounds.RestController;
 
 import java.net.URI;
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -15,7 +16,8 @@ import es.swapsounds.DTO.CommentMapper;
 import es.swapsounds.model.Comment;
 import es.swapsounds.service.CommentService;
 import es.swapsounds.service.UserService;
-import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
+
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,11 +43,12 @@ public class CommentRestController {
     @GetMapping
     public ResponseEntity<List<CommentDTO>> listComments(
             @PathVariable long soundId,
-            HttpSession session,
+            HttpServletRequest request,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
+
         Pageable pageable = PageRequest.of(page, size);
-        Page<CommentDTO> dtos = commentService.findBySoundId(soundId, pageable, session)
+        Page<CommentDTO> dtos = commentService.findBySoundId(soundId, pageable)
                 .map(c -> commentMapper.toDto(c));
         return ResponseEntity.ok(dtos.getContent());
     }
@@ -54,8 +57,10 @@ public class CommentRestController {
     public ResponseEntity<CommentDTO> addComment(
             @PathVariable long soundId,
             @RequestParam String content,
-            HttpSession session) {
-        long userId = userService.getUserIdFromSession(session);
+            HttpServletRequest request) {
+
+        Principal principal = request.getUserPrincipal();
+        Long userId = userService.getUserIdFromPrincipal(principal);
         Comment comment = commentService.addComment(userId, soundId, content);
         CommentDTO dto = commentMapper.toDto(comment);
         URI location = URI.create(String.format("/api/sounds/%d/comments/%d", soundId, dto.commentId()));
@@ -67,8 +72,9 @@ public class CommentRestController {
             @PathVariable long soundId,
             @PathVariable long commentId,
             @RequestParam String content,
-            HttpSession session) {
-        Long userId = userService.getUserIdFromSession(session);
+            HttpServletRequest request) {
+        Principal principal = request.getUserPrincipal();
+        Long userId = userService.getUserIdFromPrincipal(principal);
         Comment comment = commentService.commentEdition(userId, soundId, commentId, content);
         CommentDTO dto = commentMapper.toDto(comment);
         return ResponseEntity.ok(dto);
@@ -78,8 +84,9 @@ public class CommentRestController {
     public ResponseEntity<Void> deleteComment(
             @PathVariable long soundId,
             @PathVariable long commentId,
-            HttpSession session) {
-        Long userId = userService.getUserIdFromSession(session);
+            HttpServletRequest request) {
+        Principal principal = request.getUserPrincipal();
+        Long userId = userService.getUserIdFromPrincipal(principal);
         commentService.deleteComment(userId, soundId, commentId);
         return ResponseEntity.noContent().build();
     }
