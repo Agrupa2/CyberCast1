@@ -38,24 +38,26 @@
         <div class="profile-header">
             <div class="profile-avatar">
                 {{#hasProfilePicture}}
-                <img src="{{/users/{id}/avatar}}" alt="Perfil de {{user.username}}" class="profile-avatar-img">
+                <img src="/users/{{user.userId}}/avatar" alt="Perfil de {{user.username}}" class="profile-avatar-img">
                 {{/hasProfilePicture}}
                 {{^hasProfilePicture}}
                 <div class="default-avatar">{{userInitial}}</div>
                 {{/hasProfilePicture}}
             </div>
-            {{#isOwner}}
-            {{#admin}}
+            {{#isAllowedToEdit}}
             <div class="profile-actions">
                 <details class="profile-dropdown">
-                    <summary class="dropdown-toggle"></summary>
+                    <summary class="dropdown-toggle">
+                        <!-- Ícono o texto para abrir el desplegable -->
+                        <i class="fas fa-ellipsis-v"></i>
+                    </summary>
                     <div class="dropdown-content">
                         <form action="/profile/update-username" method="POST">
                             <div class="form-group">
                                 <label for="newUsername">Nuevo nombre:</label>
-                                <input type="text" id="newUsername" name="newUsername" value="{{user.username}}"
-                                    required>
-                                <input type="hidden" name="_csrf" value="{{token}}" />
+                                <input type="hidden" name="targetUserId" value="{{profileUser.userId}}">
+                                <input type="text" name="newUsername" value="{{profileUser.username}}" required>
+                                <input type="hidden" name="_csrf" value="{{token}}">
                             </div>
                             <button type="submit" class="btn-icon">Guardar nombre</button>
                         </form>
@@ -63,16 +65,16 @@
                         <form action="/profile/update-avatar" method="POST" enctype="multipart/form-data">
                             <div class="form-group">
                                 <label for="avatarInput">Nuevo avatar:</label>
-                                <input type="file" id="avatarInput" name="avatar" accept="image/*">
-                                <input type="hidden" name="_csrf" value="{{token}}" />
+                                <input type="hidden" name="targetUserId" value="{{profileUser.userId}}">
+                                <input type="file" name="avatar" accept="image/*">
+                                <input type="hidden" name="_csrf" value="{{token}}">
                             </div>
                             <button type="submit" class="btn-icon">Subir avatar</button>
                         </form>
                     </div>
                 </details>
             </div>
-            {{/admin}}
-            {{/isOwner}}
+            {{/isAllowedToEdit}}
             <div class="profile-info">
                 <h1>{{user.username}}</h1>
                 <div class="stats">
@@ -114,12 +116,10 @@
                 <div class="sound-actions">
                     <a href="/sounds/{{soundId}}" class="btn">Ver</a>
                     {{#isOwner}}
-                    {{#admin}}
                     <form action="/sounds/{{soundId}}/delete" method="POST">
                         <button type="submit" class="btn btn-danger"
                             onclick="return confirm('¿Estás seguro de que quieres eliminar este sonido?')">Eliminar</button>
                     </form>
-                    {{/admin}}
                     {{/isOwner}}
                 </div>
             </div>
@@ -148,14 +148,12 @@
                     <small class="comment-date">{{created}} en <a href="/sounds/{{soundId}}">{{soundTitle}}</a></small>
                 </div>
                 {{#isOwner}}
-                {{#admin}}
                 <div class="comment-actions">
                     <form action="/sounds/{{soundId}}/comments/{{commentId}}/delete" method="POST">
                         <input type="hidden" name="_method" value="DELETE">
                         <button type="submit" class="btn-danger">Eliminar</button>
                     </form>
                 </div>
-                {{/admin}}
                 {{/isOwner}}
             </div>
             {{/comments}}

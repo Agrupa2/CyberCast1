@@ -13,14 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.sql.Blob;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,14 +40,16 @@ public class CommentService {
     /**
      * Agrega un comentario a un sonido.
      */
-     @Transactional
+    @Transactional
     public Comment addComment(Long userId, long soundId, String content) {
         // Validar entrada
         if (content == null || content.trim().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El contenido del comentario no puede estar vacío");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "El contenido del comentario no puede estar vacío");
         }
         if (content.length() > 150) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El comentario es demasiado largo (máximo 150 caracteres)");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "El comentario es demasiado largo (máximo 150 caracteres)");
         }
 
         // Configurar lista segura para sanitización
@@ -89,12 +90,25 @@ public class CommentService {
      */
     @Transactional
     public boolean editComment(Long userId, long soundId, long commentId, String newContent) {
-
         Optional<Comment> optComment = commentRepository.findById(commentId);
         if (optComment.isPresent()) {
             Comment comment = optComment.get();
-            if (comment.getUser().getUserId() == userId && comment.getSoundId() == soundId) {
-                comment.setContent(newContent);
+
+            boolean isAdmin = SecurityContextHolder.getContext().getAuthentication()
+                    .getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
+
+            if ((isAdmin || comment.getUser().getUserId() == userId)
+                    && comment.getSoundId() == soundId) {
+
+                Safelist safelist = Safelist.relaxed()
+                        .addTags("h1", "h2", "code")
+                        .addAttributes("a", "href", "target")
+                        .addAttributes(":all", "class")
+                        .addProtocols("a", "href", "http", "https");
+
+                // Sanitizar el contenido
+                String cleanContent = Jsoup.clean(newContent, safelist);
+                comment.setContent(cleanContent);
                 comment.setModified(LocalDateTime.now());
                 commentRepository.save(comment);
                 return true;
@@ -111,8 +125,17 @@ public class CommentService {
         if (comment.getUser().getUserId() != userId || comment.getSoundId() != soundId) {
             throw new SecurityException("No autorizado para editar este comentario");
         }
+        
+        Safelist safelist = Safelist.relaxed()
+                .addTags("h1", "h2", "code")
+                .addAttributes("a", "href", "target")
+                .addAttributes(":all", "class")
+                .addProtocols("a", "href", "http", "https");
 
-        comment.setContent(newContent);
+        // Sanitizar el contenido
+        String cleanContent = Jsoup.clean(newContent, safelist);
+
+        comment.setContent(cleanContent);
         comment.setModified(LocalDateTime.now());
 
         return commentRepository.save(comment);
@@ -122,18 +145,21 @@ public class CommentService {
      * Elimina un comentario, validando que el usuario sea el autor.
      */
     @Transactional
-    public boolean deleteComment(Long userId, long soundId, long commentId) { // la función del comment repsoitory
-                                                                              // devuelve un boolean por eso cambuiio de
-                                                                              // void a boolean
-
+    public boolean deleteComment(Long userId, long soundId, long commentId) {
         Optional<Comment> optComment = commentRepository.findById(commentId);
         if (optComment.isPresent()) {
             Comment comment = optComment.get();
-            if (comment.getUser().getUserId() == userId) {
+            // Verificar si el usuario es ADMIN
+            boolean isAdmin = SecurityContextHolder.getContext().getAuthentication()
+                    .getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
+
+            if ((isAdmin || comment.getUser().getUserId() == userId)
+                    && comment.getSoundId() == soundId) {
                 commentRepository.delete(comment);
                 return true;
+            } else {
+                throw new SecurityException("No tienes permiso para eliminar este comentario");
             }
-            throw new SecurityException("No tienes permiso para eliminar este comentario");
         }
         return false;
     }
@@ -186,36 +212,21 @@ public class CommentService {
             boolean owner = (currentUserId != null && currentUserId.equals(comment.getUser().getUserId()));
             comment.setCommentOwner(owner);
 
-            // Convertir la imagen de perfil (Blob) a Base64
-            String profileImageBase64 = null; // Cambiado de "" a null
-            boolean hasProfilePicture = false;
-            Blob profilePicture = comment.getUser().getProfilePicture();
-            if (profilePicture != null) {
-                try {
-                    byte[] imageBytes = profilePicture.getBytes(1, (int) profilePicture.length());
-                    profileImageBase64 = "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(imageBytes);
-                    hasProfilePicture = true;
-                } catch (SQLException e) {
-                    System.err.println("Error al convertir el Blob a Base64: " + e.getMessage());
-                }
-            }
+            // Obtener información del usuario del comentario
+            User commentUser = comment.getUser();
 
-            // Calcular la inicial del usuario
-            Map<String, Object> profileInfo = userService.getProfileInfo(comment.getUser());
-            String userInitial = (String) profileInfo.get("userInitial");
-
-            // Crear un mapa con los datos del comentario
+            // Crear un mapa con los datos del comentario (sin Base64)
             Map<String, Object> commentData = new HashMap<>();
             commentData.put("commentId", comment.getCommentId());
-            commentData.put("user", comment.getUser());
+            commentData.put("user", commentUser); // Enviamos el User completo para acceder a su ID
             commentData.put("content", comment.getContent());
             commentData.put("created", comment.getCreated());
             commentData.put("isCommentOwner", comment.isCommentOwner());
-            commentData.put("profileImageBase64", profileImageBase64);
-            commentData.put("userInitial", userInitial);
-            commentData.put("hasProfilePicture", hasProfilePicture); // Nueva bandera
+            commentData.put("hasProfilePicture", commentUser.getProfilePicture() != null); // Usamos el Blob para la
+                                                                                           // bandera
+            commentData.put("userInitial", userService.getProfileInfo(commentUser).get("userInitial"));
             commentData.put("soundId", soundId);
-            commentData.put("username", comment.getUser().getUsername()); // Añadido para {{username}} en HTML
+            commentData.put("username", commentUser.getUsername());
 
             commentsWithImages.add(commentData);
         }

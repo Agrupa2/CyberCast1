@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -56,17 +57,23 @@ public class ProfileController {
         User profileUser = profileUserOpt.get();
 
         boolean isOwner = false;
+        boolean isAdmin = false;
         if (principal != null) {
             String loggedUsername = principal.getName();
             isOwner = loggedUsername.equals(profileUser.getUsername());
-            model.addAttribute("loggedUsername", loggedUsername); // por si quieres usarlo en la vista
+
+            // Verificar si el usuario actual es ADMIN
+            Optional<User> currentUserOpt = userService.findUserByUsername(loggedUsername);
+            if (currentUserOpt.isPresent()) {
+                isAdmin = SecurityContextHolder.getContext().getAuthentication()
+                        .getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
+            }
         }
 
         List<Sound> userSounds = soundService.getSoundByUserId(profileUser.getUserId());
         List<Comment> userComments = commentService.getCommentsByUserId(profileUser.getUserId());
 
         Map<String, Object> profileInfo = userService.getProfileInfo(profileUser);
-        model.addAttribute("profileImageBase64", profileInfo.get("profileImageBase64"));
         model.addAttribute("userInitial", profileInfo.get("userInitial"));
         model.addAttribute("hasProfilePicture", profileInfo.get("hasProfilePicture"));
         model.addAttribute("comments", userComments);
@@ -75,60 +82,100 @@ public class ProfileController {
         model.addAttribute("isOwner", isOwner);
         model.addAttribute("sounds", userSounds);
         model.addAttribute("user", profileUser); // redundante si ya tienes profileUser
+        model.addAttribute("isAllowedToEdit", isOwner || isAdmin); // Añadir esta línea
+        model.addAttribute("isAdmin", isAdmin); // Opcional: si necesitas usar isAdmin en la vista
 
         return "profile";
     }
 
     @PostMapping("/profile/update-username")
-    public String updateUsername(@RequestParam String newUsername,
+    public String updateUsername(
+            @RequestParam String newUsername,
+            @RequestParam Long targetUserId, // ID del usuario a editar
             Principal principal,
             RedirectAttributes redirectAttributes) {
-        if (principal == null) {
-            return "redirect:/login";
-        }
-        if (newUsername == null || newUsername.trim().isEmpty()) {
-            redirectAttributes.addFlashAttribute("error", "El nombre de usuario no puede estar vacío");
-            return "redirect:/profile";
-        }
 
-        Long userId = userService.findUserByUsername(principal.getName())
-                .map(User::getUserId)
+        if (principal == null)
+            return "redirect:/login";
+
+        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication()
+                .getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
+
+        // Obtener usuario actual
+        User currentUser = userService.findUserByUsername(principal.getName())
                 .orElseThrow(() -> new IllegalStateException("Usuario no encontrado"));
 
-        userService.updateUsername(userId, newUsername.trim());
-        // Crear nuevo Authentication con el nuevo nombre
-        UserDetails updatedUserDetails = userDetailsService.loadUserByUsername(newUsername.trim());
-        UsernamePasswordAuthenticationToken newAuth = new UsernamePasswordAuthenticationToken(
-                updatedUserDetails,
-                updatedUserDetails.getPassword(),
-                updatedUserDetails.getAuthorities());
+        // Verificar permisos: admin o dueño del perfil
+        boolean isAllowed = currentUser.getUserId() == targetUserId
+                || isAdmin;
 
-        // Reemplazar el Authentication actual en el SecurityContext
-        SecurityContextHolder.getContext().setAuthentication(newAuth);
-        redirectAttributes.addFlashAttribute("success", "Nombre de usuario actualizado");
-        return "redirect:/profile";
+        if (!isAllowed) {
+            redirectAttributes.addFlashAttribute("error", "No autorizado");
+            return "redirect:/sounds";
+        }
+
+        // Actualizar nombre de usuario
+        try {
+            userService.updateUsername(targetUserId, newUsername.trim());
+            redirectAttributes.addFlashAttribute("success", "Nombre actualizado");
+
+            // Actualizar SecurityContext si el usuario editó su propio nombre
+            if (currentUser.getUserId() == targetUserId) {
+                UserDetails updatedUserDetails = userDetailsService.loadUserByUsername(newUsername.trim());
+                UsernamePasswordAuthenticationToken newAuth = new UsernamePasswordAuthenticationToken(
+                        updatedUserDetails, updatedUserDetails.getPassword(), updatedUserDetails.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(newAuth);
+            }
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error: " + e.getMessage());
+        }
+
+        // Redirigir al perfil actualizado
+        String newProfileUsername = userService.findUserById(targetUserId)
+                .map(User::getUsername)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+        return "redirect:/profile/" + newProfileUsername;
     }
 
     @PostMapping("/profile/update-avatar")
-    public String updateAvatar(@RequestParam("avatar") MultipartFile file,
+    public String updateAvatar(
+            @RequestParam("avatar") MultipartFile file,
+            @RequestParam Long targetUserId, // ID del usuario a editar
             Principal principal,
             RedirectAttributes redirectAttributes) {
-        if (principal == null) {
-            return "redirect:/login";
-        }
 
-        Long userId = userService.findUserByUsername(principal.getName())
-                .map(User::getUserId)
+        if (principal == null)
+            return "redirect:/login";
+
+        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication()
+                .getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
+
+        // Obtener usuario actual
+        User currentUser = userService.findUserByUsername(principal.getName())
                 .orElseThrow(() -> new IllegalStateException("Usuario no encontrado"));
 
-        try {
-            userService.updateProfilePicture(userId, file);
-            redirectAttributes.addFlashAttribute("success", "Avatar actualizado");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error al subir la imagen: " + e.getMessage());
+        // Verificar permisos: admin o dueño del perfil
+        boolean isAllowed = currentUser.getUserId() == targetUserId
+                || isAdmin;
+
+        if (!isAllowed) {
+            redirectAttributes.addFlashAttribute("error", "No autorizado");
+            return "redirect:/sounds";
         }
 
-        return "redirect:/profile";
+        // Actualizar avatar
+        try {
+            userService.updateProfilePicture(targetUserId, file);
+            redirectAttributes.addFlashAttribute("success", "Avatar actualizado");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error: " + e.getMessage());
+        }
+
+        // Redirigir al perfil del usuario editado
+        String targetUsername = userService.findUserById(targetUserId)
+                .map(User::getUsername)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+        return "redirect:/profile/" + targetUsername;
     }
 
     @GetMapping("/profile")
