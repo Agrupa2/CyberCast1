@@ -10,11 +10,9 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import es.swapsounds.security.jwt.JwtRequestFilter;
 import es.swapsounds.security.jwt.UnauthorizedHandlerJwt;
@@ -60,6 +58,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         // 1. Recursos estáticos
+                        // Public pages
                         .requestMatchers("/", "/login", "/error",
                                 "/css/**", "/js/**",
                                 "/sounds", "/sounds/{soundId}")
@@ -70,6 +69,16 @@ public class SecurityConfig {
                         .permitAll()
                         .requestMatchers("/signup").permitAll()
 
+                        //Comment EndPoints
+                        .requestMatchers(HttpMethod.POST, "/sounds/{soundId}/comments").hasRole("USER")
+                        .requestMatchers(HttpMethod.POST, "/sounds/{soundId}/comments/{commentId}/edit").hasRole("USER")
+                        .requestMatchers(HttpMethod.POST, "/sounds/{soundId}/comments/{commentId}/delete").hasRole("USER")
+
+                        // Sound EndPoints
+                        .requestMatchers("/sounds/upload", "/sounds/download").hasRole("USER")
+                        .requestMatchers(HttpMethod.POST, "/sounds/*/edit").hasRole("USER")
+                        .requestMatchers(HttpMethod.POST, "/sounds/*/delete").hasRole("USER")
+
                         // Private pages
                         .requestMatchers("/sounds/**").hasRole("USER")
                         .requestMatchers("/profile/**", "/delete-account").hasRole("USER")
@@ -78,10 +87,12 @@ public class SecurityConfig {
                 .formLogin(form -> form
                         .loginPage("/login")
                         .defaultSuccessUrl("/sounds", true)
+                        .failureUrl("/login?error=true")
                         .permitAll())
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/")
+                        .deleteCookies("JSESSIONID")
                         .permitAll());
 
         return http.build();

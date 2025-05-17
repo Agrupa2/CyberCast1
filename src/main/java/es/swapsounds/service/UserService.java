@@ -21,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.Base64;
@@ -279,6 +280,14 @@ public class UserService {
 
 	public UserDTO getLoggedUserDTO() {
         return mapper.toDto(getLoggedUser());
+    }
+
+    public Optional<User> getUserFromPrincipal(Principal principal) {
+        if (principal == null) {
+            return Optional.empty();
+        }
+        String username = principal.getName();
+        return userRepository.findByUsername(username);
     }
 
 }
