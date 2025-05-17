@@ -79,7 +79,6 @@
             <details>
                 <summary>Editar Sonido</summary>
                 <form id="editForm" action="/sounds/{{soundId}}/edit" method="post" enctype="multipart/form-data">
-                    <input type="hidden" name="_csrf" value="{{token}}" />
                     <div class="form-group">
                         <label>Título:</label>
                         <input type="text" name="title" value="{{sound.title}}" required>
@@ -115,7 +114,6 @@
                 <form action="/sounds/{{soundId}}/delete" method="post"
                     onsubmit="return confirm('¿Seguro que quieres eliminar este sonido?')">
                     <button type="submit" class="danger">Eliminar Sonido</button>
-                    <input type="hidden" name="_csrf" value="{{token}}" />
                 </form>
             </details>
         </div>
@@ -131,7 +129,6 @@
                 <!-- Contenedor para el editor Quill -->
                 <div id="editor" style="min-height: 100px;"></div>
                 <!-- Input oculto para enviar el contenido sanitizado -->
-                <input type="hidden" name="_csrf" value="{{token}}" />
                 <input type="hidden" name="content" id="content">
                 <button type="submit">Publicar</button>
             </form>
@@ -163,12 +160,10 @@
                         <div class="dropdown-content">
                             <form action="/sounds/{{soundId}}/comments/{{commentId}}/edit" method="POST">
                                 <input type="hidden" name="_method" value="PUT">
-                                <input type="hidden" name="_csrf" value="{{token}}" />
                                 <textarea name="content">{{content}}</textarea>
                                 <button type="submit">Guardar</button>
                             </form>
                             <form action="/sounds/{{soundId}}/comments/{{commentId}}/delete" method="POST">
-                                <input type="hidden" name="_csrf" value="{{token}}" />
                                 <input type="hidden" name="_method" value="DELETE">
                                 <button type="submit" class="danger">Eliminar</button>
                             </form>
