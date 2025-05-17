@@ -2,6 +2,7 @@ package es.swapsounds.controller;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.Principal;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.List;
@@ -13,6 +14,7 @@ import es.swapsounds.service.SoundService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,7 +30,6 @@ import es.swapsounds.model.User;
 import es.swapsounds.service.UserService;
 import es.swapsounds.service.CategoryService;
 import es.swapsounds.service.CommentService;
-import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class SoundController {
@@ -49,11 +50,11 @@ public class SoundController {
     public String showSounds(
             @RequestParam(name = "query", required = false) String query,
             @RequestParam(name = "category", defaultValue = "all") String category,
-            HttpSession session,
+            Principal principal,
             Model model) {
 
         // Obtener usuario desde el UserService
-        Optional<User> userOpt = userService.getUserFromSession(session);
+        Optional<User> userOpt = userService.getUserFromPrincipal(principal);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             model.addAttribute("username", user.getUsername());
@@ -79,9 +80,9 @@ public class SoundController {
     }
 
     @GetMapping("/sounds/upload")
-    public String showUploadForm(HttpSession session, Model model) {
+    public String showUploadForm(Principal principal, Model model) {
 
-        String username = (String) session.getAttribute("username");
+        String username = (principal != null) ? principal.getName() : null;
         System.out.println("Accediendo a /sounds/upload con username: " + username);
         if (username == null) {
             model.addAttribute("error", "You must be logged in to upload sounds.");
@@ -115,20 +116,19 @@ public class SoundController {
             @RequestParam List<String> categories,
             @RequestParam MultipartFile audioFile,
             @RequestParam MultipartFile imageFile,
-            HttpSession session,
+            Principal principal,
             Model model) throws IOException {
 
-        Long userId = (Long) session.getAttribute("userId");
-        if (userId == null) {
+        if (principal == null) {
             model.addAttribute("error", "Debes iniciar sesión para subir sonidos.");
             return "redirect:/login";
         }
-
+        Long userId = userService.findUserByUsername(principal.getName()).get().getUserId();
         Optional<User> user = userService.findUserById(userId);
         User uploader = user.get();
         if (!user.isPresent()) {
             model.addAttribute("error", "Usuario no encontrado.");
-            session.invalidate();
+            principal = null;
             return "redirect:/login";
         }
 
@@ -142,11 +142,11 @@ public class SoundController {
     public String downloadSounds(
             @RequestParam(name = "query", required = false) String query,
             @RequestParam(name = "category", defaultValue = "all") String category,
-            HttpSession session,
+            Principal principal,
             Model model) {
 
         // Obtener usuario desde el UserService
-        Optional<User> userOpt = userService.getUserFromSession(session);
+        Optional<User> userOpt = userService.getUserFromPrincipal(principal);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             model.addAttribute("username", user.getUsername());
@@ -172,9 +172,9 @@ public class SoundController {
     }
 
     @GetMapping("/sounds/{soundId}")
-    public String soundDetails(@PathVariable long soundId, HttpSession session, Model model) {
-        Long currentUserId = userService.getUserIdFromSession(session);
-        String username = (String) session.getAttribute("username");
+    public String soundDetails(@PathVariable long soundId, Principal principal, Model model) {
+        Long userId = userService.findUserByUsername(principal.getName()).get().getUserId();
+        String username = (principal != null) ? principal.getName() : null;
 
         Optional<Sound> soundOpt = soundService.findSoundById(soundId);
         if (soundOpt.isEmpty()) {
@@ -196,7 +196,7 @@ public class SoundController {
 
         // Obtener comentarios con imágenes procesadas desde CommentService
         List<Map<String, Object>> commentsWithImages = commentService.getCommentsWithImagesBySoundId(soundId,
-                currentUserId);
+                userId);
         model.addAttribute("comments", commentsWithImages);
 
         List<Category> allCategories = categoryService.getAllCategories();
@@ -204,7 +204,7 @@ public class SoundController {
         Set<String> selectedCategories = soundService.getSelectedCategoryNames(sound);
         model.addAttribute("selectedCategories", selectedCategories);
 
-        model.addAttribute("isOwner", currentUserId != null && currentUserId.equals(sound.getUserId()));
+        model.addAttribute("isOwner", userId != null && userId.equals(sound.getUserId()));
         model.addAttribute("username", username);
 
         return "sound-details";
@@ -218,11 +218,11 @@ public class SoundController {
             @RequestParam Set<String> categories,
             @RequestParam(required = false) MultipartFile audioFile,
             @RequestParam(required = false) MultipartFile imageFile,
-            HttpSession session,
+            Principal principal,
             Model model) throws IOException {
 
-        Long userId = (Long) session.getAttribute("userId");
-        String username = (String) session.getAttribute("username");
+        Long userId = userService.findUserByUsername(principal.getName()).get().getUserId();
+        String username = (principal != null) ? principal.getName() : null;
 
         Optional<Sound> originalSound = soundService.findSoundById(soundId);
 
@@ -245,17 +245,16 @@ public class SoundController {
     @PostMapping("/sounds/{soundId}/delete")
     public String deleteSound(
             @PathVariable long soundId, // ID del sonido a eliminar
-            HttpSession session, // Sesión del usuario
+            Principal principal, // Sesión del usuario
             RedirectAttributes redirectAttributes) { // Para enviar mensajes de retroalimentación
 
-        // Obtener el ID del usuario actual desde la sesión
-        Long userId = userService.getUserIdFromSession(session);
-
         // Verificar si el usuario está autenticado
-        if (userId == null) {
+        if (principal == null) {
             redirectAttributes.addFlashAttribute("error", "Debes iniciar sesión para eliminar un sonido.");
             return "redirect:/login"; // Redirigir al login si no está autenticado
         }
+
+        Long userId = userService.findUserByUsername(principal.getName()).get().getUserId();
 
         // Buscar el sonido por su ID
         Optional<Sound> soundOptional = soundService.findSoundById(soundId);
