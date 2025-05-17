@@ -29,6 +29,27 @@
             <h1>Panel de Administración</h1>
         </div>
 
+        <div class="user-profile">
+            {{#uploader}}
+            <div class="avatar-container">
+                {{#profileImageBase64}}
+                <img src="data:image/png;base64,{{profileImageBase64}}" alt="Perfil de {{username}}"
+                    class="profile-avatar">
+                {{/profileImageBase64}}
+                {{^profileImageBase64}}
+                <img src="/users/{{id}}/avatar" alt="Perfil de {{username}}"
+                    class="profile-avatar">
+                {{/profileImageBase64}}
+            </div>
+            <div class="user-info">
+                <span class="subido-por">Subido por:</span>
+                <div class="username">
+                    <a href="/profile/{{username}}">{{username}}</a>
+                </div>
+            </div>
+            {{/uploader}}
+        </div>
+
         <div class="sounds-list">
             <h2>Usuarios registrados</h2>
 
@@ -73,7 +94,50 @@
                 <p>No hay usuarios registrados</p>
             </div>
             {{/users}}
+        </div>
 
+        <div class="sounds-list" style="margin-top: 3rem;">
+            <h2>Sonidos subidos</h2>
+
+            {{#sounds}}
+            <div class="sound-item" style="grid-template-columns: 60px 2fr 2fr 100px;">
+                <div>
+                    {{#imageUrl}}
+                    <img src="{{imageUrl}}" class="sound-thumbnail" alt="{{title}}">
+                    {{/imageUrl}}
+                    {{^imageUrl}}
+                    <div class="default-avatar" style="width:40px; height:40px; font-size:1rem;">
+                        ♫
+                    </div>
+                    {{/imageUrl}}
+                </div>
+                <div class="sound-info">
+                    <h3>
+                        <a href="/sounds/{{soundId}}" class="user-link">{{title}}</a>
+                    </h3>
+                    <span class="duration">
+                        {{#uploader}}
+                        <a href="/profile/{{username}}">{{username}}</a>
+                        {{/uploader}}
+                </div>
+                <div class="sound-meta">
+                    <span class="duration">{{description}}</span>
+                </div>
+                <div class="sound-actions">
+                    <form action="/admin/sounds/{{soundId}}/delete" method="post"
+                        onsubmit="return confirm('¿Eliminar el sonido {{title}}?')">
+                        <input type="hidden" name="_csrf" value="{{token}}" />
+                        <button type="submit" class="btn-danger">Eliminar</button>
+                    </form>
+                </div>
+            </div>
+            {{/sounds}}
+
+            {{^sounds}}
+            <div class="empty-state">
+                <p>No hay sonidos subidos</p>
+            </div>
+            {{/sounds}}
         </div>
     </div>
 </body>

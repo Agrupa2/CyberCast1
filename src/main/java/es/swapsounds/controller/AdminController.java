@@ -2,6 +2,8 @@ package es.swapsounds.controller;
 
 import es.swapsounds.DTO.AdminUserViewDTO;
 import es.swapsounds.model.User;
+import es.swapsounds.service.CommentService;
+import es.swapsounds.service.SoundService;
 import es.swapsounds.service.UserService;
 
 import org.springframework.http.HttpStatus;
@@ -15,7 +17,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequestMapping("/admin")
@@ -24,8 +25,14 @@ public class AdminController {
 
     private final UserService userService;
 
-    public AdminController(UserService userService) {
+    private final CommentService commentService;
+
+    private final SoundService soundService;
+
+    public AdminController(UserService userService, CommentService commentService, SoundService soundService) {
         this.userService = userService;
+        this.commentService = commentService;
+        this.soundService = soundService;
     }
 
     /** Listado de todos los usuarios **/
@@ -51,6 +58,7 @@ public class AdminController {
                 .toList();
                 
         model.addAttribute("users", views);
+        model.addAttribute("sounds", soundService.getAllSounds());
         return "admin-users";
     }
 
@@ -68,6 +76,18 @@ public class AdminController {
         }
 
         userService.deleteUser(id);
+        return "redirect:/admin/users";
+    }
+
+    //Eliminar Sonidos siendo admin
+    @PostMapping("/sounds/{id}/delete")
+    public String deleteSound(@PathVariable Long id,
+            Principal principal,
+            Model model) {
+
+        commentService.deleteCommentsBySoundId(id);
+        soundService.deleteSound(id);
+        model.addAttribute("success", "El sonido se ha eliminado correctamente.");
         return "redirect:/admin/users";
     }
 }
