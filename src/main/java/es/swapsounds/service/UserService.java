@@ -6,6 +6,7 @@ import es.swapsounds.DTO.UserRegistrationDTO;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
 import es.swapsounds.repository.SoundRepository;
+import es.swapsounds.repository.CommentRepository;
 import es.swapsounds.repository.UserRepository;
 
 import org.springframework.data.domain.Page;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -34,12 +36,14 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final SoundRepository soundRepository;
+    private final CommentRepository commentRepository;
     private final UserMapper mapper;
 
-    public UserService(UserRepository userRepository, SoundRepository soundRepository, UserMapper mapper) {
+    public UserService(UserRepository userRepository, SoundRepository soundRepository, UserMapper mapper, CommentRepository CommentRepository) {
         this.userRepository = userRepository;
         this.soundRepository = soundRepository;
         this.mapper = mapper;
+        this.commentRepository = CommentRepository;
 
     }
 
@@ -161,17 +165,23 @@ public class UserService {
         return userRepository.findById(userId);
     }
 
+    @Transactional
     public void deleteUser(long userId) {
-        Optional<User> userOptional = userRepository.findById(userId);
+        // 1) Eliminar todos los comentarios que el usuario ha escrito
+        commentRepository.deleteByUserUserId(userId);
 
-        if (userOptional.isPresent()) {
-            // 1. Borrar sonidos del usuario
-            List<Sound> userSounds = soundRepository.findByUserId(userId);
-            soundRepository.deleteAll(userSounds);
-
-            // 2. Borrar el usuario
-            userRepository.deleteById(userId);
+        // 2) Para cada sonido que el usuario ha subido:
+        List<Sound> userSounds = soundRepository.findByUserId(userId);
+        for (Sound sound : userSounds) {
+            long sid = sound.getSoundId();
+            // 2a) Borrar comentarios apuntando a ese sonido
+            commentRepository.deleteBySoundId(sid);
+            // 2b) Borrar el sonido
+            soundRepository.deleteById(sid);
         }
+
+        // 3) Borrar al usuario
+        userRepository.deleteById(userId);
     }
 
     public void deleteAccount(Long sessionUserId, String pathUsername, String confirmation) {

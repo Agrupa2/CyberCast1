@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración</title>
+    <link rel="stylesheet" href="/css/profile.css">
+</head>
+
+<body>
+    <!-- Navbar igual que en profile -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="logo"><a href="/sounds">Sound Library</a></div>
+            <ul class="nav-links">
+                {{#username}}
+                <li><a href="/sounds/upload?username={{username}}">Upload Sound</a></li>
+                <li><a href="/sounds/download">Download Sound</a></li>
+                <li><a href="/logout">Logout</a></li>
+                <li><a href="/admin/users">Admin Panel</a></li>
+                {{/username}}
+            </ul>
+        </div>
+    </nav>
+
+    <div class="profile-container">
+        <div class="profile-header">
+            <h1>Panel de Administración</h1>
+        </div>
+
+        <div class="sounds-list">
+            <h2>Usuarios registrados</h2>
+
+            {{#error}}
+            <div class="empty-state">
+                <p class="stat-label">{{error}}</p>
+            </div>
+            {{/error}}
+
+            {{#users}}
+            <div class="sound-item" style="grid-template-columns: 60px 1fr 2fr 100px;">
+                <div>
+                    {{#avatarUrl}}
+                    <img src="{{avatarUrl}}" class="sound-thumbnail" alt="{{username}}">
+                    {{/avatarUrl}}
+                    {{^avatarUrl}}
+                    <div class="default-avatar" style="width:40px; height:40px; font-size:1rem;">
+                        {{userInitial}}
+                    </div>
+                    {{/avatarUrl}}
+                </div>
+                <div class="sound-info">
+                    <h3>
+                        <a href="/profile/{{username}}" class="user-link">{{username}}</a>
+                    </h3>
+                </div>
+                <div class="sound-meta">
+                    <span class="duration">{{email}}</span>
+                </div>
+                <div class="sound-actions">
+                    <form action="/admin/users/{{userId}}/delete" method="post"
+                        onsubmit="return confirm('¿Eliminar al usuario {{username}}?')">
+                        <input type="hidden" name="_csrf" value="{{token}}" />
+                        <button type="submit" class="btn-danger">Eliminar</button>
+                    </form>
+                </div>
+            </div>
+            {{/users}}
+
+            {{^users}}
+            <div class="empty-state">
+                <p>No hay usuarios registrados</p>
+            </div>
+            {{/users}}
+
+        </div>
+    </div>
+</body>
+
+</html>
