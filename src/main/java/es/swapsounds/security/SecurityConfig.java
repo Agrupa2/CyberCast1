@@ -82,6 +82,8 @@ public class SecurityConfig {
                         // Private pages
                         .requestMatchers("/sounds/**").hasRole("USER")
                         .requestMatchers("/profile/**", "/delete-account").hasRole("USER")
+                        .requestMatchers("/users/{id}/delete").hasRole("ADMIN")
+                        .requestMatchers("/admin/users").hasRole("ADMIN")
                         .anyRequest().authenticated())
 
                 .formLogin(form -> form
@@ -93,7 +95,11 @@ public class SecurityConfig {
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/")
                         .deleteCookies("JSESSIONID")
-                        .permitAll());
+                        .permitAll())
+                        .exceptionHandling(ex -> ex
+            .accessDeniedPage("/error")
+        );
+
 
         return http.build();
     }

@@ -172,16 +172,27 @@ public class SoundController {
 
     @GetMapping("/sounds/{soundId}")
     public String soundDetails(@PathVariable long soundId, Principal principal, Model model) {
-        Long userId = userService.findUserByUsername(principal.getName()).get().getUserId();
-        String username = (principal != null) ? principal.getName() : null;
-
-        Optional<Sound> soundOpt = soundService.findSoundById(soundId);
-        if (soundOpt.isEmpty()) {
-            return "redirect:/sounds";
+        // Manejar usuario autenticado o no
+        String username = principal != null ? principal.getName() : null;
+        Long userId = null;
+        if (principal != null) {
+            Optional<User> userOpt = userService.findUserByUsername(principal.getName());
+            if (userOpt.isPresent()) {
+                userId = userOpt.get().getUserId();
+            } else {
+                // Si el usuario no se encuentra (raro, pero posible), lanzar excepción
+                throw new IllegalArgumentException("Usuario no encontrado");
+            }
         }
-        Sound sound = soundOpt.get();
+
+        // Buscar el sonido
+        Sound sound = soundService.findSoundById(soundId)
+                .orElseThrow(() -> new IllegalArgumentException("Recurso no encontrado"));
+
+        // Añadir sonido al modelo
         model.addAttribute("sound", sound);
 
+        // Obtener información del uploader
         Optional<User> uploaderOpt = userService.findUserById(sound.getUserId());
         if (uploaderOpt.isPresent()) {
             User uploader = uploaderOpt.get();
@@ -193,20 +204,22 @@ public class SoundController {
             model.addAttribute("uploader", null);
         }
 
-        // Obtener comentarios con imágenes procesadas desde CommentService
-        List<Map<String, Object>> commentsWithImages = commentService.getCommentsWithImagesBySoundId(soundId,
-                userId);
+        // Obtener comentarios
+        List<Map<String, Object>> commentsWithImages = commentService.getCommentsWithImagesBySoundId(soundId, userId);
         model.addAttribute("comments", commentsWithImages);
 
+        // Obtener categorías
         List<Category> allCategories = categoryService.getAllCategories();
         model.addAttribute("allCategories", allCategories);
         Set<String> selectedCategories = soundService.getSelectedCategoryNames(sound);
         model.addAttribute("selectedCategories", selectedCategories);
 
-        model.addAttribute("isOwner", userId != null && userId.equals(sound.getUserId()));
+        // Determinar si el usuario es el propietario del sonido
+        boolean isOwner = userId != null && userId.equals(sound.getUserId());
+        model.addAttribute("isOwner", isOwner);
         model.addAttribute("username", username);
 
-        return "sound-details";
+        return "sound-details"; // Nombre de la plantilla HTML
     }
 
     @PostMapping("/sounds/{soundId}/edit")
@@ -218,7 +231,13 @@ public class SoundController {
             @RequestParam(required = false) MultipartFile audioFile,
             @RequestParam(required = false) MultipartFile imageFile,
             Principal principal,
-            Model model) throws IOException {
+            Model model,
+            RedirectAttributes redirectAttributes) throws IOException {
+                
+        // Verificar si el usuario está autenticado
+        if (principal == null) {
+            return "redirect:/login"; // Redirigir al login si no está autenticado
+        }
 
         Long userId = userService.findUserByUsername(principal.getName()).get().getUserId();
         String username = (principal != null) ? principal.getName() : null;
@@ -293,7 +312,8 @@ public class SoundController {
                     InputStream inputStream = audioBlob.getBinaryStream();
                     byte[] audioBytes = inputStream.readAllBytes();
                     return ResponseEntity.ok()
-                            .contentType(MediaType.parseMediaType("audio/mpeg")) // Ajusta el tipo de medio si es diferente
+                            .contentType(MediaType.parseMediaType("audio/mpeg")) // Ajusta el tipo de medio si es
+                                                                                 // diferente
                             .body(audioBytes);
                 }
             } catch (SQLException | IOException e) {
@@ -314,7 +334,8 @@ public class SoundController {
                     InputStream inputStream = imageBlob.getBinaryStream();
                     byte[] imageBytes = inputStream.readAllBytes();
                     return ResponseEntity.ok()
-                            .contentType(MediaType.IMAGE_JPEG) // Ajusta el tipo de medio si es diferente (image/png, etc.)
+                            .contentType(MediaType.IMAGE_JPEG) // Ajusta el tipo de medio si es diferente (image/png,
+                                                               // etc.)
                             .body(imageBytes);
                 }
             } catch (SQLException | IOException e) {
