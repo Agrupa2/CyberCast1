@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.MultipartFile;
 
 import es.swapsounds.model.Category;
@@ -358,4 +359,28 @@ public class SoundController {
         }
         return ResponseEntity.notFound().build();
     }
+
+    @GetMapping("/sounds/upload/secret")
+    public String showUploadSecretSoundForm(Principal principal, Model model) {
+        if (principal == null) {
+            model.addAttribute("error", "Debes iniciar sesión para subir sonidos secretos.");
+            return "login";
+        }
+        String username = principal.getName();
+        Optional<User> userOpt = userService.findUserByUsername(username);
+        if (userOpt.isEmpty()) {
+            model.addAttribute("error", "Usuario no encontrado. Por favor inicia sesión nuevamente.");
+            return "login";
+        }
+
+        model.addAttribute("username", username);
+        model.addAttribute("userId", userOpt.get().getUserId());
+        model.addAttribute("allCategories", categoryService.getAllCategories());
+        model.addAttribute("isSecret", true);
+
+        return "upload-secret-sound";  
+    }
 }
+
+
+
