@@ -122,7 +122,8 @@ Bienvenido a *SwapSounds, una plataforma intuitiva y colaborativa donde los usua
 
 My task during the practice was mainly focused on the comments and categories sections. Throughout the semester, I have been modifying the files related to these two entities as we progressed through the final part. Finally, towards the end of the practice, I was responsible for implementing dynamic queries for the Sound entity, allowing filtering by title, exact duration, category, and userId (the user who may have uploaded sounds). I also took care of enabling the editing and deleting of categories through the REST API.
 
-1.Creating the Dynamic queries for the entity sound modifiying this files:SoundControler, SoundRepository y SoundService. **ee74fdfbfc01b508263ed4d140badf7f51f25b19**
+1. Creating the Dynamic queries for the entity sound modifiying this files:SoundControler, SoundRepository y SoundService. 
+ **ee74fdfbfc01b508263ed4d140badf7f51f25b19**
 
 2. Creating the CommentRepository and CommentService files. **29d50a8ec96bbbfff0682329ad85f25206d909ac**
 
