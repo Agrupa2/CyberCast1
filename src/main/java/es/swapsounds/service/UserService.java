@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,12 +40,15 @@ public class UserService {
     private final SoundRepository soundRepository;
     private final CommentRepository commentRepository;
     private final UserMapper mapper;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, SoundRepository soundRepository, UserMapper mapper, CommentRepository CommentRepository) {
+    public UserService(UserRepository userRepository, SoundRepository soundRepository, UserMapper mapper,
+            CommentRepository CommentRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.soundRepository = soundRepository;
         this.mapper = mapper;
         this.commentRepository = CommentRepository;
+        this.passwordEncoder = passwordEncoder;
 
     }
 
@@ -70,76 +74,91 @@ public class UserService {
 
     public void changeUsername(Long sessionUserId, String pathUsername, String newUsername) {
         if (newUsername == null || newUsername.isBlank()) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "El nombre no puede estar vacío");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre no puede estar vacío");
         }
 
-        User u = userRepository.findById(sessionUserId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.UNAUTHORIZED,
-                        "No autenticado"));
+        // Obtener el usuario que realiza la acción (sesión)
+        User sessionUser = userRepository.findById(sessionUserId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No autenticado"));
 
-        if (!u.getUsername().equals(pathUsername)) {
+        // Obtener el usuario objetivo (a modificar)
+        User targetUser = userRepository.findByUsername(pathUsername)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+
+        // Verificar permisos: admin o dueño del perfil
+        boolean isAdmin = sessionUser.getRoles().contains("ADMIN");
+        if (!isAdmin && sessionUser.getUserId() != targetUser.getUserId()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para modificar este usuario");
+        }
+
+        // Actualizar nombre
+        targetUser.setUsername(newUsername.trim());
+        userRepository.save(targetUser);
+    }
+
+    public void updateProfilePicture(long sessionUserId, long targetUserId, MultipartFile profilePhoto)
+            throws IOException {
+        // Obtener el usuario que realiza la acción (sesión)
+        User sessionUser = userRepository.findById(sessionUserId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No autenticado"));
+
+        // Obtener el usuario objetivo (a modificar)
+        User targetUser = userRepository.findById(targetUserId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+
+        // Verificar permisos: admin o dueño del perfil
+        boolean isAdmin = sessionUser.getRoles().contains("ADMIN");
+        if (!isAdmin && sessionUser.getUserId() != targetUser.getUserId()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para modificar este usuario");
+        }
+
+        // Actualizar avatar
+        try {
+            if (profilePhoto != null && !profilePhoto.isEmpty()) {
+                Blob photoBlob = new SerialBlob(profilePhoto.getBytes());
+                targetUser.setProfilePicture(photoBlob);
+            } else {
+                targetUser.setProfilePicture(null);
+            }
+            userRepository.save(targetUser);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al convertir la imagen a Blob: " + e.getMessage());
+        }
+    }
+
+    public void updateAvatar(Long currentUserId, String targetUsername, MultipartFile file) {
+        // 1. Validar usuario actual
+        User currentUser = userRepository.findById(currentUserId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario no autenticado"));
+
+        // 2. Obtener usuario objetivo
+        User targetUser = userRepository.findByUsername(targetUsername)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario objetivo no encontrado"));
+
+        // 3. Verificar permisos (admin o dueño del perfil)
+        boolean isAdmin = currentUser.getRoles().contains("ADMIN");
+        boolean isOwner = currentUser.getUserId() == targetUser.getUserId();
+
+        if (!isAdmin && !isOwner) {
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN,
-                    "No tienes permiso para modificar este usuario");
+                    "No tienes permisos para modificar este avatar");
         }
 
-        u.setUsername(newUsername.trim());
-        userRepository.save(u);
-    }
-
-    public void updateProfilePicture(long userId, MultipartFile profilePhoto) throws IOException {
-        userRepository.findById(userId).ifPresent(user -> {
-            try {
-                if (profilePhoto != null && !profilePhoto.isEmpty()) {
-                    // Convertir el MultipartFile a Blob
-                    Blob photoBlob = new SerialBlob(profilePhoto.getBytes());
-                    user.setProfilePicture(photoBlob); // Asume que el campo en User es 'profilePicture' de tipo Blob
-                } else {
-                    // Si no se proporciona imagen, asignamos null
-                    user.setProfilePicture(null);
-                }
-                userRepository.save(user);
-            } catch (SQLException e) {
-                throw new RuntimeException("Error al convertir la imagen a Blob: " + e.getMessage());
-            } catch (IOException e) {
-                // Manejar el error, por ejemplo, lanzando una excepción personalizada
-                throw new RuntimeException("Error al leer los bytes del archivo: " + e.getMessage());
-            }
-        });
-    }
-
-    public void updateAvatar(Long userId, String pathUsername, MultipartFile file) {
-        if (userId == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No autenticado");
-        }
-
-        User u = userRepository.findById(userId)
-            .orElseThrow(() -> 
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado")
-            );
-
-        if (!u.getUsername().equals(pathUsername)) {
-            throw new ResponseStatusException(
-                HttpStatus.FORBIDDEN, 
-                "No tienes permiso para modificar este avatar"
-            );
-        }
-
+        // 4. Actualizar avatar
         try {
-            Blob blob = (file != null && !file.isEmpty())
-                ? new SerialBlob(file.getBytes())
-                : null;
-            u.setProfilePicture(blob);
-            userRepository.save(u);
+            Blob blob = null;
+            if (file != null && !file.isEmpty()) {
+                blob = new SerialBlob(file.getBytes());
+            }
+            targetUser.setProfilePicture(blob);
+            userRepository.save(targetUser);
+
         } catch (SQLException | IOException e) {
             throw new ResponseStatusException(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "Error al subir avatar",
-                e
-            );
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Error al actualizar el avatar: " + e.getMessage(),
+                    e);
         }
     }
 
@@ -185,42 +204,42 @@ public class UserService {
         userRepository.deleteById(userId);
     }
 
-    public void deleteAccount(Long sessionUserId, String pathUsername, String confirmation) {
-    // 1. Autenticación
-    if (sessionUserId == null) {
-        throw new ResponseStatusException(
-            HttpStatus.UNAUTHORIZED,
-            "No autenticado"
-        );
+    public void deleteAccount(Long currentUserId, String targetUsername, String confirmation) {
+        // 1. Validar confirmación
+        if (!"ELIMINAR CUENTA".equals(confirmation != null ? confirmation.trim() : "")) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Debes confirmar escribiendo 'ELIMINAR CUENTA'");
+        }
+
+        // 2. Obtener usuario actual (quien realiza la acción)
+        User currentUser = userRepository.findById(currentUserId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED,
+                        "Usuario autenticado no encontrado"));
+
+        // 3. Obtener usuario objetivo (a eliminar)
+        User targetUser = userRepository.findByUsername(targetUsername)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Usuario objetivo no encontrado"));
+
+        // 4. Verificar permisos (admin o dueño de la cuenta)
+        boolean isAdmin = currentUser.getRoles().contains("ADMIN");
+        boolean isOwner = currentUser.getUserId() ==targetUser.getUserId();
+
+        if (!isAdmin && !isOwner) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "No tienes permisos para eliminar esta cuenta");
+        }
+
+        // 5. Eliminar recursos relacionados
+        soundRepository.deleteAll(soundRepository.findByUserId(targetUser.getUserId()));
+
+        // 6. Eliminar usuario objetivo (no el usuario actual)
+        userRepository.deleteById(targetUser.getUserId());
     }
-
-    // 2. Confirmación textual
-    if (confirmation == null || !"ELIMINAR CUENTA".equals(confirmation.trim())) {
-        throw new ResponseStatusException(
-            HttpStatus.BAD_REQUEST,
-            "Debes confirmar escribiendo 'ELIMINAR CUENTA'"
-        );
-    }
-
-    // 3. Obtener usuario y verificar autorización
-    User u = userRepository.findById(sessionUserId)
-        .orElseThrow(() -> new ResponseStatusException(
-            HttpStatus.NOT_FOUND,
-            "Usuario no encontrado"
-        ));
-
-    if (!u.getUsername().equals(pathUsername)) {
-        throw new ResponseStatusException(
-            HttpStatus.FORBIDDEN,
-            "No tienes permiso para eliminar esta cuenta"
-        );
-    }
-
-    // 4. Borrado de sonidos y usuario
-    soundRepository.deleteAll(soundRepository.findByUserId(sessionUserId));
-    userRepository.deleteById(sessionUserId);
-}
-
 
     public Map<String, Object> getProfileInfo(User user) {
         Map<String, Object> info = new HashMap<>();
@@ -262,23 +281,22 @@ public class UserService {
         User user = new User();
         user.setUsername(dto.username());
         user.setEmail(dto.email());
-        user.setEncodedPassword(dto.password());
+        user.setEncodedPassword(passwordEncoder.encode(dto.password()));
         user.setRoles(List.of("ROLE_USER"));
 
         return mapper.toDto(userRepository.save(user));
     }
 
+    public UserDTO getUser(String username) {
+        return mapper.toDto(userRepository.findByUsername(username).orElseThrow());
+    }
 
-	public UserDTO getUser(String username) {
-		return mapper.toDto(userRepository.findByUsername(username).orElseThrow());
-	}
-
-	public User getLoggedUser() {
+    public User getLoggedUser() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         return userRepository.findByUsername(username).get();
     }
 
-	public UserDTO getLoggedUserDTO() {
+    public UserDTO getLoggedUserDTO() {
         return mapper.toDto(getLoggedUser());
     }
 
@@ -288,6 +306,11 @@ public class UserService {
         }
         String username = principal.getName();
         return userRepository.findByUsername(username);
+    }
+
+    public Long getUserIdFromPrincipal(Principal principal) {
+        String username = principal.getName();
+        return userRepository.findByUsername(username).map(User::getUserId).orElse(null);
     }
 
 }

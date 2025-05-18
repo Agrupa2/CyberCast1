@@ -44,7 +44,7 @@
                 {{#uploader}}
                 <div class="avatar-container">
                     {{#profileImageBase64}}
-                    <img src="{{/users/{id}/avatar}}" alt="Perfil de {{username}}" class="profile-avatar">
+                    <img src="/users/{{uploader.userId}}/avatar" alt="Perfil de {{username}}" class="profile-avatar">
                     {{/profileImageBase64}}
                     {{^profileImageBase64}}
                     <div class="default-avatar">{{userInitial}}</div>

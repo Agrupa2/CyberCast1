@@ -4,7 +4,6 @@ import es.swapsounds.model.Comment;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
 import es.swapsounds.repository.CommentRepository;
-import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 
 import org.jsoup.Jsoup;
@@ -122,21 +121,25 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("Comentario no encontrado"));
 
-        if (comment.getUser().getUserId() != userId || comment.getSoundId() != soundId) {
+        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication()
+                .getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
+
+        if (comment.getUser().getUserId() == userId || isAdmin) {
+            Safelist safelist = Safelist.relaxed()
+                    .addTags("h1", "h2", "code")
+                    .addAttributes("a", "href", "target")
+                    .addAttributes(":all", "class")
+                    .addProtocols("a", "href", "http", "https");
+
+            // Sanitizar el contenido
+            String cleanContent = Jsoup.clean(newContent, safelist);
+
+            comment.setContent(cleanContent);
+            comment.setModified(LocalDateTime.now());
+
+        } else {
             throw new SecurityException("No autorizado para editar este comentario");
         }
-        
-        Safelist safelist = Safelist.relaxed()
-                .addTags("h1", "h2", "code")
-                .addAttributes("a", "href", "target")
-                .addAttributes(":all", "class")
-                .addProtocols("a", "href", "http", "https");
-
-        // Sanitizar el contenido
-        String cleanContent = Jsoup.clean(newContent, safelist);
-
-        comment.setContent(cleanContent);
-        comment.setModified(LocalDateTime.now());
 
         return commentRepository.save(comment);
     }
@@ -234,7 +237,7 @@ public class CommentService {
         return commentsWithImages;
     }
 
-    public Page<Comment> findBySoundId(long soundId, Pageable pageable, HttpSession session) {
+    public Page<Comment> findBySoundId(long soundId, Pageable pageable) {
         return commentRepository.findBySound_SoundIdOrderByCreatedDesc(soundId, pageable);
     }
 }

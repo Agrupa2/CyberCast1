@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import es.swapsounds.dto.UserDTO;
 import es.swapsounds.dto.UserRegistrationDTO;
 import es.swapsounds.service.UserService;
-import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,10 +59,11 @@ public class UserRestController {
     public ResponseEntity<Map<String, String>> updateUsername(
             @PathVariable String username,
             @RequestParam String newUsername,
-            HttpSession session) {
-        Long id = svc.getUserIdFromSession(session);
+            HttpServletRequest request) {
+
+        Long id = svc.getUserIdFromPrincipal(request.getUserPrincipal());
         svc.changeUsername(id, username, newUsername);
-        session.setAttribute("username", newUsername.trim());
+        request.setAttribute("username", newUsername.trim());
         return ResponseEntity.ok(Map.of("success", "Nombre actualizado"));
     }
 
@@ -70,8 +71,8 @@ public class UserRestController {
     public ResponseEntity<Map<String, String>> updateAvatar(
             @PathVariable String username,
             @RequestParam MultipartFile avatar,
-            HttpSession session) throws IOException {
-        Long id = svc.getUserIdFromSession(session);
+            HttpServletRequest request) throws IOException {
+        Long id = svc.getUserIdFromPrincipal(request.getUserPrincipal());
         svc.updateAvatar(id, username, avatar);
         return ResponseEntity.ok(Map.of("success", "Avatar actualizado"));
     }
@@ -80,10 +81,10 @@ public class UserRestController {
     public ResponseEntity<Map<String, String>> delete(
             @PathVariable String username,
             @RequestParam String confirmation,
-            HttpSession session) {
-        Long id = svc.getUserIdFromSession(session);
+            HttpServletRequest request) {
+        Long id = svc.getUserIdFromPrincipal(request.getUserPrincipal());
         svc.deleteAccount(id, username, confirmation);
-        session.invalidate();
+        request.getSession().invalidate();
         return ResponseEntity.ok(Map.of("success", "Cuenta eliminada"));
     }
 }
