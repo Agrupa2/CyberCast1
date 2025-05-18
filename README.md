@@ -38,15 +38,9 @@ Bienvenido a *SwapSounds, una plataforma intuitiva y colaborativa donde los usua
 | User                             | Ver y reproducir el contenido de la página web, acceder al panel de login. Subir sonidos, descargar sonidos, realizar comentarios y editarlos junto con sus sonidos, además de poder editar su perfil (nombre y foto). También pueden borrar su propia cuenta. Los usuarios pueden ver el número de sonidos y comentarios que tienen .                                       |
 | Admin                            | Ver y reproducir el contenido de la página web, acceder al panel de login. Subir sonidos, descargar sonidos, realizar comentarios y editarlos junto con sus sonidos, además de poder editar su perfil (nombre y foto). Puede ver el número de sonidos y comentarios que tienen los usuarios. Dispone de un panel "Admin Panel" que puede borrar tanto usuarios como sonidos. |
 
-## 🖼️ Imágenes
-
-
-
-
-
 ## 📊 Diagrama
 
-![[swapsoundsEnBlanco.png]]
+![Logo GitHub](https://github.com/DWS-2025/project-grupo-10/blob/main/src/main/resources/static/images/swapsoundsEnBlanco.png)
 
 ## 🌟 Características principales
 
@@ -125,15 +119,18 @@ Bienvenido a *SwapSounds, una plataforma intuitiva y colaborativa donde los usua
 --------------------
 @myyykyy
 --------------------
-1. 
 
-2.
+My task during the practice was mainly focused on the comments and categories sections. Throughout the semester, I have been modifying the files related to these two entities as we progressed through the final part. Finally, towards the end of the practice, I was responsible for implementing dynamic queries for the Sound entity, allowing filtering by title, exact duration, category, and userId (the user who may have uploaded sounds). I also took care of enabling the editing and deleting of categories through the REST API.
 
-3.
+1.Creating the Dynamic queries for the entity sound modifiying this files:SoundControler, SoundRepository y SoundService. **ee74fdfbfc01b508263ed4d140badf7f51f25b19**
 
-4.
+2. Creating the CommentRepository and CommentService files. **29d50a8ec96bbbfff0682329ad85f25206d909ac**
 
-5.
+3. Crating and configuring CategoryService.  **7d299a112403a039d5df870301dcb2c28a62eaf0**
+
+4. Creating the editing, creation and deletion functions of the comment entity. **2a073ed23c4b5594ae94ee3c9406807115ba6e36**
+
+5. Making the transition from the CommentRepository to the CommentService. **e8dda06104b851f71f38e12e07e63bf7fdf70530**
 
 --------------------
 @carlagmezc
