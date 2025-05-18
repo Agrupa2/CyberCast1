@@ -4,23 +4,23 @@ import es.swapsounds.model.Comment;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
 import es.swapsounds.repository.CommentRepository;
-import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Safelist;
+import org.owasp.html.PolicyFactory;
+import org.owasp.html.Sanitizers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.sql.Blob;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,39 +39,41 @@ public class CommentService {
     private CommentRepository commentRepository;
 
     /**
-     * Agrega un comentario a un sonido.
+     * Adds a comment to a sound, validating the user and sanitizing the content.
      */
-     @Transactional
+    @Transactional
     public Comment addComment(Long userId, long soundId, String content) {
-        // Validar entrada
+        // Validate input
         if (content == null || content.trim().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El contenido del comentario no puede estar vacío");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Comment content cannot be empty");
         }
         if (content.length() > 150) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El comentario es demasiado largo (máximo 150 caracteres)");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Comment is too long (maximum 150 characters)");
         }
 
-        // Configurar lista segura para sanitización
+        // Configurate the list of allowed tags and attributes
         Safelist safelist = Safelist.relaxed()
                 .addTags("h1", "h2", "code")
                 .addAttributes("a", "href", "target")
                 .addAttributes(":all", "class")
                 .addProtocols("a", "href", "http", "https");
 
-        // Sanitizar el contenido
+        // Sanitized content
         String cleanContent = Jsoup.clean(content, safelist);
 
-        // Obtener el usuario
+        // Get the user
         User currentUser = userService.findUserById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        // Obtener el sonido
+        // Get the sound
         Sound sound = soundService.findSoundById(soundId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sonido no encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sound not found"));
 
         String soundTitle = sound.getTitle();
 
-        // Crear el comentario
+        // Create the comment
         Comment comment = new Comment();
         comment.setContent(cleanContent);
         comment.setUser(currentUser);
@@ -80,21 +82,29 @@ public class CommentService {
         comment.setSoundTitle(soundTitle);
         comment.setCreated(LocalDateTime.now());
 
-        // Guardar y devolver
+        // Store the comment
         return commentRepository.save(comment);
     }
 
     /**
-     * Edita un comentario, verificando que el usuario sea el autor.
+     * Edit a comment, validating the user and sanitizing the content.
      */
     @Transactional
     public boolean editComment(Long userId, long soundId, long commentId, String newContent) {
-
         Optional<Comment> optComment = commentRepository.findById(commentId);
         if (optComment.isPresent()) {
             Comment comment = optComment.get();
-            if (comment.getUser().getUserId() == userId && comment.getSoundId() == soundId) {
-                comment.setContent(newContent);
+
+            boolean isAdmin = SecurityContextHolder.getContext().getAuthentication()
+                    .getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
+
+            if ((isAdmin || comment.getUser().getUserId() == userId)
+                    && comment.getSoundId() == soundId) {
+
+                PolicyFactory policy = Sanitizers.FORMATTING.and(Sanitizers.LINKS);
+                String cleanContent = policy.sanitize(newContent);
+
+                comment.setContent(cleanContent);
                 comment.setModified(LocalDateTime.now());
                 commentRepository.save(comment);
                 return true;
@@ -106,116 +116,112 @@ public class CommentService {
     @Transactional
     public Comment commentEdition(Long userId, long soundId, long commentId, String newContent) {
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new RuntimeException("Comentario no encontrado"));
+                .orElseThrow(() -> new RuntimeException("Comment not found"));
 
-        if (comment.getUser().getUserId() != userId || comment.getSoundId() != soundId) {
-            throw new SecurityException("No autorizado para editar este comentario");
+        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication()
+                .getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
+
+        if (comment.getUser().getUserId() == userId || isAdmin) {
+            Safelist safelist = Safelist.relaxed()
+                    .addTags("h1", "h2", "code")
+                    .addAttributes("a", "href", "target")
+                    .addAttributes(":all", "class")
+                    .addProtocols("a", "href", "http", "https");
+
+            // Sanitized content
+            String cleanContent = Jsoup.clean(newContent, safelist);
+
+            comment.setContent(cleanContent);
+            comment.setModified(LocalDateTime.now());
+
+        } else {
+            throw new SecurityException("Not authorized to edit this comment");
         }
-
-        comment.setContent(newContent);
-        comment.setModified(LocalDateTime.now());
 
         return commentRepository.save(comment);
     }
 
     /**
-     * Elimina un comentario, validando que el usuario sea el autor.
+     * Deletes a comment, validating that the user is the author.
      */
     @Transactional
-    public boolean deleteComment(Long userId, long soundId, long commentId) { // la función del comment repsoitory
-                                                                              // devuelve un boolean por eso cambuiio de
-                                                                              // void a boolean
-
+    public boolean deleteComment(Long userId, long soundId, long commentId) {
         Optional<Comment> optComment = commentRepository.findById(commentId);
         if (optComment.isPresent()) {
             Comment comment = optComment.get();
-            if (comment.getUser().getUserId() == userId) {
+            // Verify if the user is the owner of the comment or an admin
+            boolean isAdmin = SecurityContextHolder.getContext().getAuthentication()
+                    .getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
+
+            if ((isAdmin || comment.getUser().getUserId() == userId)
+                    && comment.getSoundId() == soundId) {
                 commentRepository.delete(comment);
                 return true;
+            } else {
+                throw new SecurityException("You do not have permission to delete this comment");
             }
-            throw new SecurityException("No tienes permiso para eliminar este comentario");
         }
         return false;
     }
 
     /**
-     * Busca y devuelve un comentario por su ID.
+     * Look for a comment by its ID.
      */
-
     public Optional<Comment> findCommentById(long commentId) {
         return commentRepository.findById(commentId);
     }
 
     /**
-     * Obtiene la lista de comentarios asociados a un sonido.
+     * Get the list of comments associated to a sound.
      */
     public List<Comment> getCommentsBySoundId(long soundId) {
         return commentRepository.findBySoundId(soundId);
     }
 
-    /* Obtiene la lista de comentarios realizados por un usuario. */
-
+    /* Get the list of comments by a user */
     public List<Comment> getCommentsByUserId(long userId) {
         return commentRepository.findByUserUserId(userId);
     }
 
-    // */Borra los comentarios dependiendo del tipo de usuario que seas */
-
+    // Delete comments by userId
     @Transactional
     public void deleteCommentsByUserId(long userId) {
         commentRepository.deleteByUserUserId(userId);
     }
 
-    // Borra los comentarios de un sonido específico
-
+    // Delete comments by soundId
     @Transactional
     public void deleteCommentsBySoundId(long soundId) {
         commentRepository.deleteBySoundId(soundId);
     }
 
     /**
-     * Obtiene los comentarios de un sonido con imágenes de perfil en Base64 y datos
-     * adicionales.
+     * Get the list of comments associated to a sound with user information and
+     * image
      */
     public List<Map<String, Object>> getCommentsWithImagesBySoundId(long soundId, Long currentUserId) {
         List<Comment> comments = commentRepository.findBySoundId(soundId);
         List<Map<String, Object>> commentsWithImages = new ArrayList<>();
 
         for (Comment comment : comments) {
-            // Determinar si el usuario actual es el propietario del comentario
+            // Determine if the current user is the owner of the comment
             boolean owner = (currentUserId != null && currentUserId.equals(comment.getUser().getUserId()));
             comment.setCommentOwner(owner);
 
-            // Convertir la imagen de perfil (Blob) a Base64
-            String profileImageBase64 = null; // Cambiado de "" a null
-            boolean hasProfilePicture = false;
-            Blob profilePicture = comment.getUser().getProfilePicture();
-            if (profilePicture != null) {
-                try {
-                    byte[] imageBytes = profilePicture.getBytes(1, (int) profilePicture.length());
-                    profileImageBase64 = "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(imageBytes);
-                    hasProfilePicture = true;
-                } catch (SQLException e) {
-                    System.err.println("Error al convertir el Blob a Base64: " + e.getMessage());
-                }
-            }
+            // Get the user who made the comment
+            User commentUser = comment.getUser();
 
-            // Calcular la inicial del usuario
-            Map<String, Object> profileInfo = userService.getProfileInfo(comment.getUser());
-            String userInitial = (String) profileInfo.get("userInitial");
-
-            // Crear un mapa con los datos del comentario
+            // Create a map to store the comment data
             Map<String, Object> commentData = new HashMap<>();
             commentData.put("commentId", comment.getCommentId());
-            commentData.put("user", comment.getUser());
+            commentData.put("user", commentUser); // Send the complete User to access its ID
             commentData.put("content", comment.getContent());
             commentData.put("created", comment.getCreated());
             commentData.put("isCommentOwner", comment.isCommentOwner());
-            commentData.put("profileImageBase64", profileImageBase64);
-            commentData.put("userInitial", userInitial);
-            commentData.put("hasProfilePicture", hasProfilePicture); // Nueva bandera
+            commentData.put("hasProfilePicture", commentUser.getProfilePicture() != null); // Use the Blob for the flag
+            commentData.put("userInitial", userService.getProfileInfo(commentUser).get("userInitial"));
             commentData.put("soundId", soundId);
-            commentData.put("username", comment.getUser().getUsername()); // Añadido para {{username}} en HTML
+            commentData.put("username", commentUser.getUsername());
 
             commentsWithImages.add(commentData);
         }
@@ -223,7 +229,21 @@ public class CommentService {
         return commentsWithImages;
     }
 
-    public Page<Comment> findBySoundId(long soundId, Pageable pageable, HttpSession session) {
+    public Page<Comment> findBySoundId(long soundId, Pageable pageable) {
         return commentRepository.findBySound_SoundIdOrderByCreatedDesc(soundId, pageable);
+    }
+
+    public boolean canEditComment(Comment comment, Long userId, boolean isAdmin) {
+        return isAdmin || (userId != null && userId.equals(comment.getUser().getUserId()));
+    }
+
+    public List<Map<String, Object>> getCommentsWithImagesAndPermissions(long soundId, Long userId, boolean isAdmin) {
+        List<Map<String, Object>> commentsWithImages = getCommentsWithImagesBySoundId(soundId, userId);
+        for (Map<String, Object> comment : commentsWithImages) {
+            Long commentUserId = (Long) comment.get("userId");
+            boolean canEditComment = (userId != null && userId.equals(commentUserId)) || isAdmin;
+            comment.put("canEditComment", canEditComment);
+        }
+        return commentsWithImages;
     }
 }

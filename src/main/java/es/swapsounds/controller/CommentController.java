@@ -26,13 +26,14 @@ public class CommentController {
             Principal principal,
             RedirectAttributes redirectAttributes) {
 
+        // If user is not logged in, redirect to login
         if (principal == null)
             return "redirect:/login";
 
         try {
             Long userId = userService.findUserByUsername(principal.getName()).get().getUserId();
             commentService.addComment(userId, soundId, content);
-            redirectAttributes.addFlashAttribute("success", "Comentario publicado");
+            redirectAttributes.addFlashAttribute("success", "Comment published");
         } catch (RuntimeException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
@@ -47,6 +48,7 @@ public class CommentController {
             Principal principal,
             RedirectAttributes redirectAttributes) {
 
+        // If user is not logged in, redirect to login
         if (principal == null)
             return "redirect:/login";
 
@@ -54,7 +56,7 @@ public class CommentController {
             Long userId = userService.findUserByUsername(principal.getName()).get().getUserId();
             boolean success = commentService.editComment(userId, soundId, commentId, content);
             if (!success) {
-                redirectAttributes.addFlashAttribute("error", "No se pudo editar el comentario");
+                redirectAttributes.addFlashAttribute("error", "Could not edit the comment");
             }
         } catch (RuntimeException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
@@ -70,14 +72,14 @@ public class CommentController {
             Principal principal,
             RedirectAttributes redirectAttributes) {
 
-        
+        // If user is not logged in, redirect to login
         if (principal == null)
             return "redirect:/login";
-                
+
         try {
             Long userId = userService.findUserByUsername(principal.getName()).get().getUserId();
             commentService.deleteComment(userId, soundId, commentId);
-            redirectAttributes.addFlashAttribute("success", "Comentario eliminado");
+            redirectAttributes.addFlashAttribute("success", "Comment deleted");
         } catch (SecurityException se) {
             redirectAttributes.addFlashAttribute("error", se.getMessage());
         } catch (RuntimeException e) {

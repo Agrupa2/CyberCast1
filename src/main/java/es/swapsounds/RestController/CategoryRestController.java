@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,13 +32,13 @@ public class CategoryRestController {
     private final CategoryService categoryService;
     private final SoundMapper soundMapper;
 
-    public CategoryRestController(CategoryService categoryService, SoundMapper soundMapper) {
+    public CategoryRestController(CategoryService categoryService, @Qualifier("soundMapperImpl") SoundMapper mapper) {
         this.categoryService = categoryService;
-        this.soundMapper = soundMapper;
+        this.soundMapper = mapper;
     }
 
-     /**
-     * Obtiene todas las categorías (sin sonidos).
+    /**
+     * Gets all categories (without sounds).
      */
     @GetMapping
     public ResponseEntity<List<CategoryDTO>> getAll() {
@@ -48,7 +49,7 @@ public class CategoryRestController {
     }
 
     /**
-     * Crea o devuelve una categoría.
+     * Creates or returns a category.
      */
     @PostMapping
     public ResponseEntity<CategoryDTO> create(@RequestParam String name) {
@@ -59,14 +60,14 @@ public class CategoryRestController {
     }
 
     /**
-     * Busca (o crea) una categoría y devuelve sus datos con sonidos.
+     * Finds (or creates) a category and returns its data with sounds.
      */
     @GetMapping("/{id}")
     public ResponseEntity<CategoryDTO> getById(@PathVariable Long id) {
         Category cat = categoryService.getCategoryById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
-                        "Categoría no encontrada"));
+                        "Category not found"));
         List<SoundDTO> sounds = cat.getSounds().stream()
                 .map(soundMapper::toDTO)
                 .collect(Collectors.toList());
@@ -75,7 +76,7 @@ public class CategoryRestController {
     }
 
     /**
-     * Busca o crea por nombre.
+     * Finds or creates by name.
      */
     @GetMapping("/search")
     public ResponseEntity<CategoryDTO> search(@RequestParam String name) {

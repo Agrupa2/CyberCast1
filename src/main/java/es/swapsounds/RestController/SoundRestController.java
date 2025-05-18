@@ -4,10 +4,9 @@ import es.swapsounds.DTO.SoundDTO;
 import es.swapsounds.model.User;
 import es.swapsounds.service.SoundService;
 import es.swapsounds.service.UserService;
-import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,85 +32,104 @@ public class SoundRestController {
         this.usvc = usvc;
     }
 
+
+    /**
+     * Returns a paginated list of all sounds.
+     */
     @GetMapping
-    public ResponseEntity<Page<SoundDTO>> list(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String query,
-            @RequestParam(defaultValue = "all") String category) {
-        
-        Pageable p = PageRequest.of(page, size);
-        Page<SoundDTO> dtos = svc.findAllSoundsDTO(p);
+    public ResponseEntity<Page<SoundDTO>> list(Pageable pageable) {
+        Page<SoundDTO> dtos = svc.findAllSoundsDTO(pageable);
         return ResponseEntity.ok(dtos);
     }
 
+    /**
+     * Returns a sound by its ID.
+     */
     @GetMapping("/{id}")
     public ResponseEntity<SoundDTO> get(@PathVariable Long id) {
         SoundDTO dto = svc.findSoundByIdDTO(id);
         return ResponseEntity.ok(dto);
     }
 
+    /**
+     * Creates a new sound.
+     */
     @PostMapping("/")
     public ResponseEntity<Map<String, String>> create(
             @RequestParam String title,
             @RequestParam String description,
             @RequestParam List<String> categories,
             @RequestParam MultipartFile audioFile,
-            @RequestParam(required = false) MultipartFile imageFile,
-            HttpSession session) throws IOException {
+            @RequestParam MultipartFile imageFile,
+            HttpServletRequest request) throws IOException {
 
-        Long id = usvc.getUserIdFromSession(session);
+        Long id = usvc.getUserIdFromPrincipal(request.getUserPrincipal());
         Optional<User> user = usvc.getUserById(id);
         User userId = user.get();
         svc.createSound(title, description, categories, audioFile, imageFile, userId);
-        return ResponseEntity.ok(Map.of("success", "Sonido creado exitosamente"));
+        return ResponseEntity.ok(Map.of("success", "Sound created successfully"));
     }
 
+    /**
+     * Updates the audio file of a sound.
+     */
     @PostMapping("/{id}/audio")
     public ResponseEntity<Map<String, String>> updateAudio(
             @PathVariable Long id,
             @RequestParam("audioFile") MultipartFile audioFile,
-            HttpSession session) throws IOException {
+            HttpServletRequest request) throws IOException {
 
-        Long userId = usvc.getUserIdFromSession(session);
+        Long userId = usvc.getUserIdFromPrincipal(request.getUserPrincipal());
         svc.updateAudio(id, audioFile, userId);
-        return ResponseEntity.ok(Map.of("success", "Audio actualizado"));
+        return ResponseEntity.ok(Map.of("success", "Audio updated"));
     }
 
+    /**
+     * Updates the image of a sound.
+     */
     @PostMapping("/{id}/image")
     public ResponseEntity<Map<String, String>> updateImage(
             @PathVariable Long id,
             @RequestParam MultipartFile imageFile,
-           HttpSession session) throws IOException, SerialException, SQLException {
+            HttpServletRequest request) throws IOException, SerialException, SQLException {
 
-        Long userId = usvc.getUserIdFromSession(session);
+        Long userId = usvc.getUserIdFromPrincipal(request.getUserPrincipal());
         svc.updateImage(id, imageFile, userId);
-        return ResponseEntity.ok(Map.of("success", "Imagen actualizada"));
+        return ResponseEntity.ok(Map.of("success", "Image updated"));
     }
 
+    /**
+     * Deletes a sound.
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, String>> delete(
             @PathVariable Long id,
-            HttpSession session) {
-        
-        Long userId = usvc.getUserIdFromSession(session);
+            HttpServletRequest request) {
+
+        Long userId = usvc.getUserIdFromPrincipal(request.getUserPrincipal());
         svc.deleteSound(id, userId);
-        return ResponseEntity.ok(Map.of("success", "Sonido eliminado"));
+        return ResponseEntity.ok(Map.of("success", "Sound deleted"));
     }
 
+    /**
+     * Returns the audio content of a sound.
+     */
     @GetMapping("/{id}/audio")
     public ResponseEntity<byte[]> getAudio(@PathVariable Long id) {
         byte[] audio = svc.getAudioContent(id)
-                          .orElseThrow(() -> new IllegalArgumentException("Audio not found for ID: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Audio not found for ID: " + id));
         return ResponseEntity.ok()
                 .header("Content-Type", "audio/mpeg")
                 .body(audio);
     }
 
+    /**
+     * Returns the image content of a sound.
+     */
     @GetMapping("/{id}/image")
     public ResponseEntity<byte[]> getImage(@PathVariable Long id) {
         byte[] image = svc.getImageContent(id)
-                          .orElseThrow(() -> new IllegalArgumentException("Image not found for ID: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Image not found for ID: " + id));
         return ResponseEntity.ok()
                 .header("Content-Type", "image/jpeg")
                 .body(image);

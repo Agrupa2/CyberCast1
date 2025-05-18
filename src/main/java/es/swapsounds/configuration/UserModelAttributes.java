@@ -10,19 +10,19 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @ControllerAdvice(basePackages = "es.swapsounds.controller")
 public class UserModelAttributes {
-    
+
 	@ModelAttribute
 	public void addAttributes(Model model, HttpServletRequest request) {
 
 		Principal principal = request.getUserPrincipal();
 
 		if (principal != null) {
-
+			// User is logged in
 			model.addAttribute("logged", true);
 			model.addAttribute("userName", principal.getName());
 			model.addAttribute("admin", request.isUserInRole("ADMIN"));
-
 		} else {
+			// User is not logged in
 			model.addAttribute("logged", false);
 		}
 	}

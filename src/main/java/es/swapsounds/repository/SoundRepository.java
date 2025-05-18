@@ -3,6 +3,8 @@ package es.swapsounds.repository;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -37,4 +39,6 @@ public interface SoundRepository extends JpaRepository<Sound, Long>, JpaSpecific
     );
 
 
+    Page <Sound> findByTitleContainingIgnoreCase(String title, Pageable pageable);
+    Page<Sound> findByTitleContainingIgnoreCaseAndCategories_NameIgnoreCase(String title, String category, Pageable pageable);
 }

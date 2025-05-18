@@ -5,20 +5,22 @@ import es.swapsounds.DTO.UserMapper;
 import es.swapsounds.DTO.UserRegistrationDTO;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
-import es.swapsounds.repository.SoundRepository;
 import es.swapsounds.repository.CommentRepository;
+import es.swapsounds.repository.SoundRepository;
 import es.swapsounds.repository.UserRepository;
 
+import org.owasp.html.PolicyFactory;
+import org.owasp.html.Sanitizers;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-
-import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.security.Principal;
@@ -39,22 +41,26 @@ public class UserService {
     private final SoundRepository soundRepository;
     private final CommentRepository commentRepository;
     private final UserMapper mapper;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, SoundRepository soundRepository, UserMapper mapper, CommentRepository CommentRepository) {
+    public UserService(UserRepository userRepository, SoundRepository soundRepository, @Qualifier("userMapperImpl") UserMapper mapper,
+            CommentRepository CommentRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.soundRepository = soundRepository;
         this.mapper = mapper;
         this.commentRepository = CommentRepository;
+        this.passwordEncoder = passwordEncoder;
 
     }
 
-    public Long getUserIdFromSession(HttpSession session) {
-        return (Long) session.getAttribute("userId");
+    public Optional<Long> getUserIdByUsername(String username) {
+        return userRepository.findByUsername(username).map(User::getUserId);
     }
 
-    public Optional<User> getUserFromSession(HttpSession session) {
-        Long userId = getUserIdFromSession(session);
-        return (userId != null) ? userRepository.findById(userId) : Optional.empty();
+    public boolean isAdmin(String username) {
+        return userRepository.findByUsername(username)
+                .map(user -> user.getRoles().contains("ADMIN"))
+                .orElse(false);
     }
 
     public Optional<User> getUserById(Long userId) {
@@ -62,84 +68,103 @@ public class UserService {
     }
 
     public void updateUsername(long userId, String newUsername) {
+
+        PolicyFactory policy = Sanitizers.FORMATTING.and(Sanitizers.LINKS);
+        String cleanUsername = policy.sanitize(newUsername);
+
         userRepository.findById(userId).ifPresent(user -> {
-            user.setUsername(newUsername);
+            user.setUsername(cleanUsername);
             userRepository.save(user);
         });
     }
 
     public void changeUsername(Long sessionUserId, String pathUsername, String newUsername) {
         if (newUsername == null || newUsername.isBlank()) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "El nombre no puede estar vacío");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Name cannot be empty");
         }
 
-        User u = userRepository.findById(sessionUserId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.UNAUTHORIZED,
-                        "No autenticado"));
+        // Get the user performing the action (session)
+        User sessionUser = userRepository.findById(sessionUserId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated"));
 
-        if (!u.getUsername().equals(pathUsername)) {
+        // Get the target user (to modify)
+        User targetUser = userRepository.findByUsername(pathUsername)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        // Check permissions: admin or profile owner
+        boolean isAdmin = sessionUser.getRoles().contains("ADMIN");
+        if (!isAdmin && sessionUser.getUserId() != targetUser.getUserId()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to modify this user");
+        }
+
+        // Actualizar nombre
+        targetUser.setUsername(newUsername.trim());
+        userRepository.save(targetUser);
+    }
+
+    public void updateProfilePicture(long sessionUserId, long targetUserId, MultipartFile profilePhoto)
+            throws IOException {
+        // Get the user performing the action (session)
+        User sessionUser = userRepository.findById(sessionUserId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated"));
+
+        // Get the target user (to modify)
+        User targetUser = userRepository.findById(targetUserId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        // Check permissions: admin or profile owner
+        boolean isAdmin = sessionUser.getRoles().contains("ADMIN");
+        if (!isAdmin && sessionUser.getUserId() != targetUser.getUserId()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to modify this user");
+        }
+
+        // Actualizar avatar
+        try {
+            if (profilePhoto != null && !profilePhoto.isEmpty()) {
+                Blob photoBlob = new SerialBlob(profilePhoto.getBytes());
+                targetUser.setProfilePicture(photoBlob);
+            } else {
+                targetUser.setProfilePicture(null);
+            }
+            userRepository.save(targetUser);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al convertir la imagen a Blob: " + e.getMessage());
+        }
+    }
+
+    public void updateAvatar(Long currentUserId, String targetUsername, MultipartFile file) {
+        // 1. Validate current user
+        User currentUser = userRepository.findById(currentUserId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authenticated"));
+
+        // 2. Get target user
+        User targetUser = userRepository.findByUsername(targetUsername)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Target user not found"));
+
+        // 3. Check permissions (admin or profile owner)
+        boolean isAdmin = currentUser.getRoles().contains("ADMIN");
+        boolean isOwner = currentUser.getUserId() == targetUser.getUserId();
+
+        if (!isAdmin && !isOwner) {
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN,
-                    "No tienes permiso para modificar este usuario");
+                    "You do not have permission to modify this avatar");
         }
 
-        u.setUsername(newUsername.trim());
-        userRepository.save(u);
-    }
-
-    public void updateProfilePicture(long userId, MultipartFile profilePhoto) throws IOException {
-        userRepository.findById(userId).ifPresent(user -> {
-            try {
-                if (profilePhoto != null && !profilePhoto.isEmpty()) {
-                    // Convertir el MultipartFile a Blob
-                    Blob photoBlob = new SerialBlob(profilePhoto.getBytes());
-                    user.setProfilePicture(photoBlob); // Asume que el campo en User es 'profilePicture' de tipo Blob
-                } else {
-                    // Si no se proporciona imagen, asignamos null
-                    user.setProfilePicture(null);
-                }
-                userRepository.save(user);
-            } catch (SQLException e) {
-                throw new RuntimeException("Error al convertir la imagen a Blob: " + e.getMessage());
-            } catch (IOException e) {
-                // Manejar el error, por ejemplo, lanzando una excepción personalizada
-                throw new RuntimeException("Error al leer los bytes del archivo: " + e.getMessage());
-            }
-        });
-    }
-
-    public void updateAvatar(Long userId, String pathUsername, MultipartFile file) {
-        if (userId == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No autenticado");
-        }
-
-        User u = userRepository.findById(userId)
-            .orElseThrow(() -> 
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado")
-            );
-
-        if (!u.getUsername().equals(pathUsername)) {
-            throw new ResponseStatusException(
-                HttpStatus.FORBIDDEN, 
-                "No tienes permiso para modificar este avatar"
-            );
-        }
-
+        // 4. Actualizar avatar
         try {
-            Blob blob = (file != null && !file.isEmpty())
-                ? new SerialBlob(file.getBytes())
-                : null;
-            u.setProfilePicture(blob);
-            userRepository.save(u);
+            Blob blob = null;
+            if (file != null && !file.isEmpty()) {
+                blob = new SerialBlob(file.getBytes());
+            }
+            targetUser.setProfilePicture(blob);
+            userRepository.save(targetUser);
+
         } catch (SQLException | IOException e) {
             throw new ResponseStatusException(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "Error al subir avatar",
-                e
-            );
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Error al actualizar el avatar: " + e.getMessage(),
+                    e);
         }
     }
 
@@ -185,46 +210,52 @@ public class UserService {
         userRepository.deleteById(userId);
     }
 
-    public void deleteAccount(Long sessionUserId, String pathUsername, String confirmation) {
-    // 1. Autenticación
-    if (sessionUserId == null) {
-        throw new ResponseStatusException(
-            HttpStatus.UNAUTHORIZED,
-            "No autenticado"
-        );
+    public void deleteAccount(Long currentUserId, String targetUsername, String confirmation) {
+        // 1. Validar confirmación
+        if (!"ELIMINAR CUENTA".equals(confirmation != null ? confirmation.trim() : "")) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "You must confirm by typing 'ELIMINAR CUENTA'");
+        }
+
+        // 2. Get current user (who performs the action)
+        User currentUser = userRepository.findById(currentUserId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED,
+                        "Authenticated user not found"));
+
+        // 3. Get target user (to delete)
+        User targetUser = userRepository.findByUsername(targetUsername)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Target user not found"));
+
+        // 4. Check permissions (admin or account owner)
+        boolean isAdmin = currentUser.getRoles().contains("ADMIN");
+        boolean isOwner = currentUser.getUserId() == targetUser.getUserId();
+
+        if (!isAdmin && !isOwner) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "You do not have permission to delete this account");
+        }
+
+        if(targetUser.getRoles().contains("ADMIN")) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "No puedes eliminar a un admin");
+        }
+
+        // 5. Delete related resources
+        soundRepository.deleteAll(soundRepository.findByUserId(targetUser.getUserId()));
+
+        // 6. Delete target user (not the current user)
+        userRepository.deleteById(targetUser.getUserId());
     }
-
-    // 2. Confirmación textual
-    if (confirmation == null || !"ELIMINAR CUENTA".equals(confirmation.trim())) {
-        throw new ResponseStatusException(
-            HttpStatus.BAD_REQUEST,
-            "Debes confirmar escribiendo 'ELIMINAR CUENTA'"
-        );
-    }
-
-    // 3. Obtener usuario y verificar autorización
-    User u = userRepository.findById(sessionUserId)
-        .orElseThrow(() -> new ResponseStatusException(
-            HttpStatus.NOT_FOUND,
-            "Usuario no encontrado"
-        ));
-
-    if (!u.getUsername().equals(pathUsername)) {
-        throw new ResponseStatusException(
-            HttpStatus.FORBIDDEN,
-            "No tienes permiso para eliminar esta cuenta"
-        );
-    }
-
-    // 4. Borrado de sonidos y usuario
-    soundRepository.deleteAll(soundRepository.findByUserId(sessionUserId));
-    userRepository.deleteById(sessionUserId);
-}
-
 
     public Map<String, Object> getProfileInfo(User user) {
         Map<String, Object> info = new HashMap<>();
-        String profileImageBase64 = null; // Cambia a null en lugar de ""
+        String profileImageBase64 = null; // Change to null instead of ""
         String userInitial = null;
         boolean hasProfilePicture = false;
 
@@ -235,7 +266,7 @@ public class UserService {
                 profileImageBase64 = "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(imageBytes);
                 hasProfilePicture = true;
             } catch (SQLException e) {
-                System.err.println("Error al convertir el Blob a Base64: " + e.getMessage());
+                System.err.println("Error converting Blob to Base64: " + e.getMessage());
             }
         }
 
@@ -252,33 +283,37 @@ public class UserService {
     }
 
     public UserDTO saveDTO(UserRegistrationDTO dto) {
-        if (userRepository.existsByUsername(dto.username())) {
+        if (userRepository.existsByUsername(dto.getUsername())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "El nombre de usuario ya está en uso");
         }
-        if (userRepository.existsByEmail(dto.email())) {
+        if (userRepository.existsByEmail(dto.getEmail())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "El email ya está registrado");
         }
 
+        PolicyFactory policy = Sanitizers.FORMATTING.and(Sanitizers.LINKS);
+        String cleanUsername = policy.sanitize(dto.getUsername());
+        String cleanEmail = policy.sanitize(dto.getEmail());
+        String cleanPassword = policy.sanitize(dto.getPassword());
+
         User user = new User();
-        user.setUsername(dto.username());
-        user.setEmail(dto.email());
-        user.setEncodedPassword(dto.password());
+        user.setUsername(cleanUsername);
+        user.setEmail(cleanEmail);
+        user.setEncodedPassword(passwordEncoder.encode(cleanPassword));
         user.setRoles(List.of("ROLE_USER"));
 
         return mapper.toDto(userRepository.save(user));
     }
 
+    public UserDTO getUser(String username) {
+        return mapper.toDto(userRepository.findByUsername(username).orElseThrow());
+    }
 
-	public UserDTO getUser(String username) {
-		return mapper.toDto(userRepository.findByUsername(username).orElseThrow());
-	}
-
-	public User getLoggedUser() {
+    public User getLoggedUser() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         return userRepository.findByUsername(username).get();
     }
 
-	public UserDTO getLoggedUserDTO() {
+    public UserDTO getLoggedUserDTO() {
         return mapper.toDto(getLoggedUser());
     }
 
@@ -288,6 +323,31 @@ public class UserService {
         }
         String username = principal.getName();
         return userRepository.findByUsername(username);
+    }
+
+    public Long getUserIdFromPrincipal(Principal principal) {
+        String username = principal.getName();
+        return userRepository.findByUsername(username).map(User::getUserId).orElse(null);
+    }
+
+    public boolean validateProfilePic(MultipartFile imageFile) {
+        // Si no hay ficheros, aceptamos
+        if (imageFile == null || imageFile.isEmpty()) {
+            return true;
+        }
+
+        // Si hay imagen, validarla
+        if (imageFile != null && !imageFile.isEmpty()) {
+            String imageType = imageFile.getContentType();
+            if (imageType == null || !imageType.startsWith("image/")) {
+                throw new IllegalArgumentException("El archivo debe ser una imagen válida.");
+            }
+            if (imageFile.getSize() > 5 * 1024 * 1024) {
+                throw new IllegalArgumentException("La imagen excede el tamaño máximo (5 MB).");
+            }
+        }
+
+        return true;
     }
 
 }

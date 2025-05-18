@@ -11,7 +11,7 @@ public final class ErrorMessages {
     private static final Map<Integer, String> ERROR_MESSAGES = new HashMap<>();
 
     static {
-        // Nombres de errores (basados en HttpStatus.getReasonPhrase())
+        // Error names (based on HttpStatus.getReasonPhrase())
         ERROR_NAMES.put(HttpStatus.BAD_REQUEST.value(), "Bad Request");
         ERROR_NAMES.put(HttpStatus.UNAUTHORIZED.value(), "Unauthorized");
         ERROR_NAMES.put(HttpStatus.FORBIDDEN.value(), "Forbidden");
@@ -19,13 +19,13 @@ public final class ErrorMessages {
         ERROR_NAMES.put(HttpStatus.TOO_MANY_REQUESTS.value(), "Too Many Requests");
         ERROR_NAMES.put(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Internal Server Error");
 
-        // Mensajes genéricos y amigables
-        ERROR_MESSAGES.put(HttpStatus.BAD_REQUEST.value(), "Solicitud inválida");
-        ERROR_MESSAGES.put(HttpStatus.UNAUTHORIZED.value(), "Autenticación requerida");
-        ERROR_MESSAGES.put(HttpStatus.FORBIDDEN.value(), "Acceso denegado");
-        ERROR_MESSAGES.put(HttpStatus.NOT_FOUND.value(), "Recurso no encontrado");
-        ERROR_MESSAGES.put(HttpStatus.TOO_MANY_REQUESTS.value(), "Demasiadas solicitudes");
-        ERROR_MESSAGES.put(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Error interno del servidor");
+        // Generic and friendly messages
+        ERROR_MESSAGES.put(HttpStatus.BAD_REQUEST.value(), "Invalid request");
+        ERROR_MESSAGES.put(HttpStatus.UNAUTHORIZED.value(), "Authentication required");
+        ERROR_MESSAGES.put(HttpStatus.FORBIDDEN.value(), "Access denied");
+        ERROR_MESSAGES.put(HttpStatus.NOT_FOUND.value(), "Resource not found");
+        ERROR_MESSAGES.put(HttpStatus.TOO_MANY_REQUESTS.value(), "Too many requests");
+        ERROR_MESSAGES.put(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Internal server error");
     }
 
     public static String getErrorName(int statusCode) {
@@ -33,8 +33,6 @@ public final class ErrorMessages {
     }
 
     public static String getErrorMessage(int statusCode) {
-        return ERROR_MESSAGES.getOrDefault(statusCode, "Ocurrió un error inesperado");
+        return ERROR_MESSAGES.getOrDefault(statusCode, "An unexpected error occurred");
     }
-} 
-    
-
+}

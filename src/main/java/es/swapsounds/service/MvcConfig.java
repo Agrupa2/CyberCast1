@@ -31,39 +31,40 @@ public class MvcConfig implements WebMvcConfigurer {
                                      HttpServletResponse response,
                                      Object handler) throws Exception {
 
-                // Cabecera CSP ampliada
+                // Headers para prevenir ataques XSS y clickjacking
                 response.setHeader("Content-Security-Policy",
-                    // recursos por defecto solo de este origen
+                    // default resources only from this origin
                     "default-src 'self'; " +
 
-                    // scripts que se pueden ejecutar:
-                    // - desde este origen
-                    // - inline y eval (imprescindible para Quill)
-                    // - desde cdn.quilljs.com y cdn.jsdelivr.net
+                    // scripts thart are allowed:
+                    // - since this origin
+                    // - inline and eval (imprescindible for Quill)
+                    // - since cdn.quilljs.com and cdn.jsdelivr.net
                     "script-src 'self' 'unsafe-inline' 'unsafe-eval' " +
                                 "https://cdn.quilljs.com https://cdn.jsdelivr.net; " +
 
-                    // para <script src="..."> específicamente
+                    // for <script src="..."> specifically
                     "script-src-elem 'self' https://cdn.quilljs.com https://cdn.jsdelivr.net; " +
 
-                    // estilos permitidos:
-                    // - de este origen
-                    // - inline (Quill usa estilos inline)
-                    // - de Quill CDN, jsDelivr y Google Fonts
+                    // permited resources:
+                    // - this origin
+                    // - inline (Quill uses inline resources)
+                    // - Quill CDN, jsDelivr and Google Fonts
                     "style-src 'self' 'unsafe-inline' " +
                                "https://cdn.quilljs.com https://cdn.jsdelivr.net https://fonts.googleapis.com; " +
 
-                    // para <link href="..."> específicamente
+                    // for <link href="..."> specifically
                     "style-src-elem 'self' https://cdn.quilljs.com https://cdn.jsdelivr.net https://fonts.googleapis.com; " +
 
-                    // imágenes: este origen y data URIs (avatares, imágenes embebidas)
+                    // images from:
                     "img-src 'self' data:; " +
 
-                    // ningún plugin de objeto
+                    // Neither frame nor iframe
                     "object-src 'none';"
                 );
 
                 return true;
+
             }
         });
     }

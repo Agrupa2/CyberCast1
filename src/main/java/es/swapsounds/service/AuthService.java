@@ -8,6 +8,8 @@ import es.swapsounds.security.jwt.LoginRequest;
 import es.swapsounds.security.jwt.UserLoginService;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.owasp.html.HtmlPolicyBuilder;
+import org.owasp.html.PolicyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,30 +46,40 @@ public class AuthService {
 
     /**
      * Registers a new user.
-     * Verifies if the username or email is already in use and if the password is
+     * Checks if the username or email is already in use and if the password is
      * valid.
      */
     public User registerUser(String username, String email, String password, MultipartFile profilePhoto)
             throws IOException {
-        // Verificar si el nombre de usuario o correo ya está registrado
+        // Check if the username or email is already in use
         List<User> existingUsers = userRepository.findByUsernameOrEmail(username, email);
         if (!existingUsers.isEmpty()) {
-            throw new IllegalArgumentException("El nombre de usuario o correo ya está registrado");
+            throw new IllegalArgumentException("Username or email is already registered");
         }
 
-        // Verificar que la contraseña tenga al menos 8 caracteres
+        // Check if the password is valid
         if (password.length() < 8) {
-            throw new IllegalArgumentException("La contraseña debe tener al menos 8 caracteres");
+            throw new IllegalArgumentException("Password must be at least 8 characters long");
         }
 
-        String encoded = passwordEncoder.encode(password);
+        // Crear una política que solo permita texto plano (sin etiquetas HTML)
+        PolicyFactory policy = new HtmlPolicyBuilder().toFactory();
+
+        // Sanitizar title y description
+        String safeUsername = policy.sanitize(username);
+        String safeEmail = policy.sanitize(email);
+        String safePassword = policy.sanitize(password);
+
+        boolean isPicValid = validateProfilePic(profilePhoto);
+
+        String encoded = passwordEncoder.encode(safePassword);
 
         String roles = "USER";
 
-        // Crear el usuario
-        User user = new User(username, email, encoded, null, roles);
+        // Create a new user
+        User user = new User(safeUsername, safeEmail, encoded, null, roles);
 
-        // Si se proporciona una foto de perfil, convertirla a Blob
+        // If a profile photo is provided, convert it to a Blob and set it
         if (profilePhoto != null && !profilePhoto.isEmpty()) {
             try {
                 Blob photoBlob = new SerialBlob(profilePhoto.getBytes());
@@ -76,17 +88,17 @@ public class AuthService {
                 throw new IOException("Error al convertir la imagen a Blob: " + e.getMessage());
             }
         } else {
-            // Opcional: asignar una imagen por defecto como Blob si no se proporciona
-            // ninguna
-            // Por ahora, dejaremos profilePicture como null
+            // Optional: Set a default profile picture or leave it as null
+            // nothing to do here
+            // Right now, we are not setting a default profile picture
         }
 
-        // Guardar y devolver el usuario
+        // Store and return the user
         return userRepository.save(user);
     }
 
     /**
-     * * Authenticates a user using their username or email and password.
+     * Authenticates a user using their username or email and password.
      */
     public Optional<User> authenticate(String emailOrUsername, String password) {
         Optional<User> userOptional = userRepository.findByEmailOrUsername(emailOrUsername, emailOrUsername);
@@ -111,28 +123,48 @@ public class AuthService {
     public ResponseEntity<AuthResponse> signup(String username, String email, String password,
             MultipartFile profilePhoto, HttpServletResponse response) {
         try {
-            // 1. Registrar al usuario
+            // 1. Register the user
             User user = registerUser(username, email, password, profilePhoto);
 
-            // 2. Autenticar automáticamente al usuario
+            // 2. Authenticate the user
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username,
                     password);
             Authentication auth = authManager.authenticate(authToken);
             SecurityContextHolder.getContext().setAuthentication(auth);
 
-            // 3. Generar respuesta con token
+            // 3. Generate JWT tokens
             LoginRequest loginRequest = new LoginRequest(username, password);
-            return userService.login(response, loginRequest); // Reutilizamos la lógica de login
+            return userService.login(response, loginRequest); // Reuse login logic
 
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest()
-                    .body(new AuthResponse(Status.FAILURE, "Error en el registro: " + e.getMessage()));
+                    .body(new AuthResponse(Status.FAILURE, "Registration error: " + e.getMessage()));
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new AuthResponse(Status.FAILURE, "Error al subir la imagen de perfil"));
+                    .body(new AuthResponse(Status.FAILURE, "Error uploading profile image"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new AuthResponse(Status.FAILURE, "Error inesperado: " + e.getMessage()));
+                    .body(new AuthResponse(Status.FAILURE, "Unexpected error: " + e.getMessage()));
         }
+    }
+
+    public boolean validateProfilePic(MultipartFile imageFile) {
+        // Si no hay ficheros, aceptamos
+        if (imageFile == null || imageFile.isEmpty()) {
+            return true;
+        }
+
+        // Si hay imagen, validarla
+        if (imageFile != null && !imageFile.isEmpty()) {
+            String imageType = imageFile.getContentType();
+            if (imageType == null || !imageType.startsWith("image/")) {
+                throw new IllegalArgumentException("El archivo debe ser una imagen válida.");
+            }
+            if (imageFile.getSize() > 5 * 1024 * 1024) {
+                throw new IllegalArgumentException("La imagen excede el tamaño máximo (5 MB).");
+            }
+        }
+
+        return true;
     }
 }

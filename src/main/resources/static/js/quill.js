@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 ["clean"],
             ],
         },
-        placeholder: "Escribe tu comentario...",
+        placeholder: "Write your comment...",
     });
 
     const purifyConfig = {
@@ -25,19 +25,19 @@ document.addEventListener("DOMContentLoaded", function () {
         try {
             const html = quill.root.innerHTML;
             if (html.length > 150) {
-                alert("El comentario es demasiado largo. Máximo 150 caracteres.");
+                alert("The comment is too long. Maximum 150 characters.");
                 return;
             }
             const clean = DOMPurify.sanitize(html, purifyConfig);
             if (!clean) {
-                alert("Error al sanitizar el contenido. Por favor, intenta de nuevo.");
+                alert("Error sanitizing content. Please try again.");
                 return;
             }
             document.getElementById("content").value = clean;
             this.submit();
         } catch (error) {
-            console.error("Error al procesar el comentario:", error);
-            alert("Ocurrió un error al enviar el comentario.");
+            console.error("Error processing the comment:", error);
+            alert("An error occurred while submitting the comment.");
         }
     });
 });

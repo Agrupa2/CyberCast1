@@ -19,7 +19,7 @@ public class GlobalExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    // Método auxiliar para crear ModelAndView
+    // Helper method to create ModelAndView for errors
     private ModelAndView createErrorView(int statusCode, String message, Exception ex) {
         logger.error("Handling exception: type={}, message={}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
         ModelAndView mav = new ModelAndView("error");
@@ -31,31 +31,31 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ModelAndView handleIllegalArgumentException(IllegalArgumentException ex, Model model) {
-        return createErrorView(HttpStatus.NOT_FOUND.value(), "Recurso no encontrado", ex);
+        return createErrorView(HttpStatus.NOT_FOUND.value(), "Resource not found", ex);
     }
 
     @ExceptionHandler(NullPointerException.class)
     public ModelAndView handleNullPointerException(NullPointerException ex, Model model) {
-        return createErrorView(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Error interno del servidor", ex);
+        return createErrorView(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Internal server error", ex);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ModelAndView handleAccessDeniedException(AccessDeniedException ex, Model model) {
-        return createErrorView(HttpStatus.FORBIDDEN.value(), "Acceso denegado", ex);
+        return createErrorView(HttpStatus.FORBIDDEN.value(), "Access denied", ex);
     }
 
-    @ExceptionHandler({MethodArgumentNotValidException.class, BindException.class})
+    @ExceptionHandler({ MethodArgumentNotValidException.class, BindException.class })
     public ModelAndView handleValidationException(Exception ex, Model model) {
-        return createErrorView(HttpStatus.BAD_REQUEST.value(), "Solicitud inválida", ex);
+        return createErrorView(HttpStatus.BAD_REQUEST.value(), "Invalid request", ex);
     }
 
     @ExceptionHandler(DataAccessException.class)
     public ModelAndView handleDataAccessException(DataAccessException ex, Model model) {
-        return createErrorView(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Error al acceder a la base de datos", ex);
+        return createErrorView(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Database access error", ex);
     }
 
     @ExceptionHandler(Exception.class)
     public ModelAndView handleGenericException(Exception ex, Model model) {
-        return createErrorView(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Error inesperado", ex);
+        return createErrorView(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Unexpected error", ex);
     }
 }

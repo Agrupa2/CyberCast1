@@ -20,7 +20,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/admin")
-@PreAuthorize("hasRole('ADMIN')") // Toda ruta en /admin solo para ROLE_ADMIN
+@PreAuthorize("hasRole('ADMIN')") // All routes in /admin only for ROLE_ADMIN
 public class AdminController {
 
     private final UserService userService;
@@ -35,43 +35,43 @@ public class AdminController {
         this.soundService = soundService;
     }
 
-    /** Listado de todos los usuarios **/
+    /** List all users **/
     @GetMapping("/users")
     public String listUsers(Principal principal, Model model) {
         if (principal == null) {
-            // 401 si no está autenticado
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Debes iniciar sesión");
+            // 401 if not authenticated
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You must be logged in");
         }
-        // Si no es ADMIN, 403 Forbidden
+        // If not ADMIN, 403 Forbidden
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         boolean isAdmin = auth.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
         if (!isAdmin) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para acceder");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to access");
         }
 
-        // Si es admin, renderizamos la lista
+        // If admin, render the list
         model.addAttribute("username", principal.getName());
         List<User> users = userService.getAllUsers();
         List<AdminUserViewDTO> views = users.stream()
                 .map(AdminUserViewDTO::new)
                 .toList();
-                
+
         model.addAttribute("users", views);
         model.addAttribute("sounds", soundService.getAllSounds());
         return "admin-users";
     }
 
-    /** Eliminar un usuario por ID **/
+    /** Delete a user by ID **/
     @PostMapping("/users/{id}/delete")
     public String deleteUser(@PathVariable Long id,
             Principal principal,
             Model model) {
-        // El admin no podrá borrarse a sí mismo
+        // Admin cannot delete their own account
         if (userService.findUserByUsername(principal.getName())
                 .map(u -> u.getUserId() == id)
                 .orElse(false)) {
-            model.addAttribute("error", "No puedes eliminar tu propia cuenta");
+            model.addAttribute("error", "You cannot delete your own account");
             return "redirect:/admin/users";
         }
 
@@ -79,7 +79,7 @@ public class AdminController {
         return "redirect:/admin/users";
     }
 
-    //Eliminar Sonidos siendo admin
+    // Delete sounds as admin
     @PostMapping("/sounds/{id}/delete")
     public String deleteSound(@PathVariable Long id,
             Principal principal,
@@ -87,7 +87,7 @@ public class AdminController {
 
         commentService.deleteCommentsBySoundId(id);
         soundService.deleteSound(id);
-        model.addAttribute("success", "El sonido se ha eliminado correctamente.");
+        model.addAttribute("success", "The sound has been deleted successfully.");
         return "redirect:/admin/users";
     }
 }

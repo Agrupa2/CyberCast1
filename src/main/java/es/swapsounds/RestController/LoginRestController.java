@@ -48,14 +48,14 @@ public class LoginRestController {
 	}
 
 	@PostMapping("/signup")
-    public ResponseEntity<AuthResponse> signup(
-            @RequestParam String username,
-            @RequestParam String email,
-            @RequestParam String password,
-            @RequestParam(required = false) MultipartFile profilePhoto,
-            HttpServletResponse response) {
+	public ResponseEntity<AuthResponse> signup(
+			@RequestParam String username,
+			@RequestParam String email,
+			@RequestParam String password,
+			@RequestParam(required = false) MultipartFile profilePhoto,
+			HttpServletResponse response) {
 
-        return authService.signup(username, email, password, profilePhoto, response);
-    }
+		return authService.signup(username, email, password, profilePhoto, response);
+	}
 
 }
