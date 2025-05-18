@@ -1,8 +1,8 @@
-package es.swapsounds.dto;
+package es.swapsounds.DTO;
 
 public record CommentSimpleDTO(
-        long commentId,
-        UserDTO user,
-        String content,
-        String created) {
+                long commentId,
+                UserDTO user,
+                String content,
+                String created) {
 }

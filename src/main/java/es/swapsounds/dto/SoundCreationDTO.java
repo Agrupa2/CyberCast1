@@ -1,7 +1,7 @@
-package es.swapsounds.dto;
+package es.swapsounds.DTO;
 
-public record SoundCreationDTO (  
- String title,
- String description,
- String duration)
-{}
+public record SoundCreationDTO(
+        String title,
+        String description,
+        String duration) {
+}

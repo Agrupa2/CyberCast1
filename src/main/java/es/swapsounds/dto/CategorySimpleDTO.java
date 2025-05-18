@@ -1,6 +1,6 @@
-package es.swapsounds.dto;
+package es.swapsounds.DTO;
 
 public record CategorySimpleDTO(
-        Long id,
-        String name) {
+                Long id,
+                String name) {
 }
