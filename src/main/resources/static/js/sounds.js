@@ -1,32 +1,32 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const overlay   = document.getElementById('overlaySpinner');
-    const loadMoreBtn = document.getElementById('loadMoreBtn');
-    const container = document.getElementById('soundsContainer');
-    const MIN_VISIBLE = 500; // ms
+  const overlay = document.getElementById('overlaySpinner');
+  const loadMoreBtn = document.getElementById('loadMoreBtn');
+  const container = document.getElementById('soundsContainer');
+  const MIN_VISIBLE = 500; // ms
 
-    loadMoreBtn.addEventListener('click', () => {
-        const start = Date.now();
-        // Show overlay spinner
-        overlay.classList.remove('hidden');
-        loadMoreBtn.disabled = true;
+  loadMoreBtn.addEventListener('click', () => {
+    const start = Date.now();
+    // Show overlay spinner
+    overlay.classList.remove('hidden');
+    loadMoreBtn.disabled = true;
 
-        const currentPage = parseInt(loadMoreBtn.dataset.page, 10);
-        const nextPage    = currentPage + 1;
-        const size        = loadMoreBtn.dataset.size || 8;
-        const query       = loadMoreBtn.dataset.query || '';
-        const category    = loadMoreBtn.dataset.category || 'all';
+    const currentPage = parseInt(loadMoreBtn.dataset.page, 10);
+    const nextPage = currentPage + 1;
+    const size = loadMoreBtn.dataset.size || 8;
+    const query = loadMoreBtn.dataset.query || '';
+    const category = loadMoreBtn.dataset.category || 'all';
 
-        fetch(`/api/sounds?query=${encodeURIComponent(query)}&category=${category}&page=${nextPage}&size=${size}`)
-            .then(res => {
-                if (!res.ok) throw new Error(`Fetch error ${res.status}`);
-                return res.json();
-        })
-            .then(data => {
-                // Insert new sounds
-                data.sounds.forEach(s => {
-                    const card = document.createElement('div');
-                    card.className = 'sound-card';
-                    card.innerHTML = `
+    fetch(`/api/sounds?query=${encodeURIComponent(query)}&category=${category}&page=${nextPage}&size=${size}`)
+      .then(res => {
+        if (!res.ok) throw new Error(`Fetch error ${res.status}`);
+        return res.json();
+      })
+      .then(data => {
+        // Insert new sounds
+        data.sounds.forEach(s => {
+          const card = document.createElement('div');
+          card.className = 'sound-card';
+          card.innerHTML = `
               <div class="card-head">
                 <img src="/sounds/image/${s.soundId}" alt="${s.title}" class="card-img">
                 <div class="card-overlay">
@@ -56,24 +56,24 @@ document.addEventListener('DOMContentLoaded', () => {
                   </div>
                 </div>
               </div>`;
-                    container.appendChild(card);
-                });
+          container.appendChild(card);
+        });
 
-                // Upload new audio elements
-                loadMoreBtn.dataset.page = data.currentPage;
-                const hasMore = data.currentPage + 1 < data.totalPages;
-                loadMoreBtn.style.display = hasMore ? 'inline-block' : 'none';
-            })
-            .catch(err => {
-                console.error('Error al cargar más sonidos:', err);
-            })
-            .finally(() => {
-                const elapsed = Date.now() - start;
-                const wait = Math.max(0, MIN_VISIBLE - elapsed);
-                setTimeout(() => {
-                    overlay.classList.add('hidden');
-                    loadMoreBtn.disabled = false;
-                }, wait);
-            });
-    });
+        // Upload new audio elements
+        loadMoreBtn.dataset.page = data.currentPage;
+        const hasMore = data.currentPage + 1 < data.totalPages;
+        loadMoreBtn.style.display = hasMore ? 'inline-block' : 'none';
+      })
+      .catch(err => {
+        console.error('Error al cargar más sonidos:', err);
+      })
+      .finally(() => {
+        const elapsed = Date.now() - start;
+        const wait = Math.max(0, MIN_VISIBLE - elapsed);
+        setTimeout(() => {
+          overlay.classList.add('hidden');
+          loadMoreBtn.disabled = false;
+        }, wait);
+      });
+  });
 });

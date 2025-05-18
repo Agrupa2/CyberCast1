@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,6 +42,7 @@ public class UserRestController {
         Page<UserDTO> dtos = svc.findAllUsersDTO(pageable);
         return ResponseEntity.ok(dtos);
     }
+
 
     /**
      * Creates a new user.

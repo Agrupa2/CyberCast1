@@ -8,6 +8,8 @@ import jakarta.transaction.Transactional;
 
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Safelist;
+import org.owasp.html.PolicyFactory;
+import org.owasp.html.Sanitizers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -51,7 +53,7 @@ public class CommentService {
                     "Comment is too long (maximum 150 characters)");
         }
 
-        // Configure the list of allowed tags and attributes
+        // Configurate the list of allowed tags and attributes
         Safelist safelist = Safelist.relaxed()
                 .addTags("h1", "h2", "code")
                 .addAttributes("a", "href", "target")
@@ -99,14 +101,9 @@ public class CommentService {
             if ((isAdmin || comment.getUser().getUserId() == userId)
                     && comment.getSoundId() == soundId) {
 
-                Safelist safelist = Safelist.relaxed()
-                        .addTags("h1", "h2", "code")
-                        .addAttributes("a", "href", "target")
-                        .addAttributes(":all", "class")
-                        .addProtocols("a", "href", "http", "https");
+                PolicyFactory policy = Sanitizers.FORMATTING.and(Sanitizers.LINKS);
+                String cleanContent = policy.sanitize(newContent);
 
-                // Sanitized content
-                String cleanContent = Jsoup.clean(newContent, safelist);
                 comment.setContent(cleanContent);
                 comment.setModified(LocalDateTime.now());
                 commentRepository.save(comment);
@@ -234,5 +231,19 @@ public class CommentService {
 
     public Page<Comment> findBySoundId(long soundId, Pageable pageable) {
         return commentRepository.findBySound_SoundIdOrderByCreatedDesc(soundId, pageable);
+    }
+
+    public boolean canEditComment(Comment comment, Long userId, boolean isAdmin) {
+        return isAdmin || (userId != null && userId.equals(comment.getUser().getUserId()));
+    }
+
+    public List<Map<String, Object>> getCommentsWithImagesAndPermissions(long soundId, Long userId, boolean isAdmin) {
+        List<Map<String, Object>> commentsWithImages = getCommentsWithImagesBySoundId(soundId, userId);
+        for (Map<String, Object> comment : commentsWithImages) {
+            Long commentUserId = (Long) comment.get("userId");
+            boolean canEditComment = (userId != null && userId.equals(commentUserId)) || isAdmin;
+            comment.put("canEditComment", canEditComment);
+        }
+        return commentsWithImages;
     }
 }

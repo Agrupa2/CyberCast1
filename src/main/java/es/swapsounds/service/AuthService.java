@@ -8,6 +8,8 @@ import es.swapsounds.security.jwt.LoginRequest;
 import es.swapsounds.security.jwt.UserLoginService;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.owasp.html.HtmlPolicyBuilder;
+import org.owasp.html.PolicyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -60,12 +62,22 @@ public class AuthService {
             throw new IllegalArgumentException("Password must be at least 8 characters long");
         }
 
-        String encoded = passwordEncoder.encode(password);
+        // Crear una política que solo permita texto plano (sin etiquetas HTML)
+        PolicyFactory policy = new HtmlPolicyBuilder().toFactory();
+
+        // Sanitizar title y description
+        String safeUsername = policy.sanitize(username);
+        String safeEmail = policy.sanitize(email);
+        String safePassword = policy.sanitize(password);
+
+        boolean isPicValid = validateProfilePic(profilePhoto);
+
+        String encoded = passwordEncoder.encode(safePassword);
 
         String roles = "USER";
 
         // Create a new user
-        User user = new User(username, email, encoded, null, roles);
+        User user = new User(safeUsername, safeEmail, encoded, null, roles);
 
         // If a profile photo is provided, convert it to a Blob and set it
         if (profilePhoto != null && !profilePhoto.isEmpty()) {
@@ -73,7 +85,7 @@ public class AuthService {
                 Blob photoBlob = new SerialBlob(profilePhoto.getBytes());
                 user.setProfilePicture(photoBlob);
             } catch (SQLException e) {
-                throw new IOException("Error converting image to Blob: " + e.getMessage());
+                throw new IOException("Error al convertir la imagen a Blob: " + e.getMessage());
             }
         } else {
             // Optional: Set a default profile picture or leave it as null
@@ -93,17 +105,17 @@ public class AuthService {
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             System.out.println(
-                    "User found: " + user.getUsername() + ", Password in DB: " + user.getEncodedPassword()
-                            + ", Entered password: " + password);
+                    "Usuario encontrado: " + user.getUsername() + ", Contraseña en DB: " + user.getEncodedPassword()
+                            + ", Contraseña introducida: " + password);
             if (user.getEncodedPassword().equals(password)) {
-                System.out.println("Password matches!");
+                System.out.println("¡Contraseña coincide!");
                 return userOptional;
             } else {
-                System.out.println("Incorrect password for user: " + user.getUsername());
+                System.out.println("Contraseña incorrecta para el usuario: " + user.getUsername());
                 return Optional.empty();
             }
         } else {
-            System.out.println("No user found with email or username: " + emailOrUsername);
+            System.out.println("No se encontró ningún usuario con el email o username: " + emailOrUsername);
             return Optional.empty();
         }
     }
@@ -134,5 +146,25 @@ public class AuthService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new AuthResponse(Status.FAILURE, "Unexpected error: " + e.getMessage()));
         }
+    }
+
+    public boolean validateProfilePic(MultipartFile imageFile) {
+        // Si no hay ficheros, aceptamos
+        if (imageFile == null || imageFile.isEmpty()) {
+            return true;
+        }
+
+        // Si hay imagen, validarla
+        if (imageFile != null && !imageFile.isEmpty()) {
+            String imageType = imageFile.getContentType();
+            if (imageType == null || !imageType.startsWith("image/")) {
+                throw new IllegalArgumentException("El archivo debe ser una imagen válida.");
+            }
+            if (imageFile.getSize() > 5 * 1024 * 1024) {
+                throw new IllegalArgumentException("La imagen excede el tamaño máximo (5 MB).");
+            }
+        }
+
+        return true;
     }
 }

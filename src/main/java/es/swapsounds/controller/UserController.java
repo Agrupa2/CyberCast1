@@ -27,12 +27,12 @@ public class UserController {
    private UserService userService;
 
    @GetMapping("/delete-account")
-   public String showDeletePage(HttpSession session, Model model) {
-      Long userId = (Long) session.getAttribute("userId");
+   public String showDeletePage(Principal principal, HttpSession session, Model model) {
+      Long userId = userService.getUserIdFromPrincipal(principal);
       if (userId == null)
          return "redirect:/login";
 
-      model.addAttribute("username", session.getAttribute("username"));
+      model.addAttribute("username", principal.getName());
       return "delete-account";
    }
 

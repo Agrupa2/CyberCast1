@@ -28,42 +28,43 @@ public class MvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(new HandlerInterceptor() {
             @Override
             public boolean preHandle(HttpServletRequest request,
-                    HttpServletResponse response,
-                    Object handler) throws Exception {
+                                     HttpServletResponse response,
+                                     Object handler) throws Exception {
 
-                // Headers to prevent XSS and clickjacking attacks
+                // Headers para prevenir ataques XSS y clickjacking
                 response.setHeader("Content-Security-Policy",
-                        // default resources only from this origin
-                        "default-src 'self'; " +
+                    // default resources only from this origin
+                    "default-src 'self'; " +
 
-                // scripts that are allowed:
-                // - from this origin
-                // - inline and eval (required for Quill)
-                // - from cdn.quilljs.com and cdn.jsdelivr.net
-                                "script-src 'self' 'unsafe-inline' 'unsafe-eval' " +
+                    // scripts thart are allowed:
+                    // - since this origin
+                    // - inline and eval (imprescindible for Quill)
+                    // - since cdn.quilljs.com and cdn.jsdelivr.net
+                    "script-src 'self' 'unsafe-inline' 'unsafe-eval' " +
                                 "https://cdn.quilljs.com https://cdn.jsdelivr.net; " +
 
-                // for <script src="..."> specifically
-                                "script-src-elem 'self' https://cdn.quilljs.com https://cdn.jsdelivr.net; " +
+                    // for <script src="..."> specifically
+                    "script-src-elem 'self' https://cdn.quilljs.com https://cdn.jsdelivr.net; " +
 
-                // permitted resources:
-                // - this origin
-                // - inline (Quill uses inline resources)
-                // - Quill CDN, jsDelivr and Google Fonts
-                                "style-src 'self' 'unsafe-inline' " +
-                                "https://cdn.quilljs.com https://cdn.jsdelivr.net https://fonts.googleapis.com; " +
+                    // permited resources:
+                    // - this origin
+                    // - inline (Quill uses inline resources)
+                    // - Quill CDN, jsDelivr and Google Fonts
+                    "style-src 'self' 'unsafe-inline' " +
+                               "https://cdn.quilljs.com https://cdn.jsdelivr.net https://fonts.googleapis.com; " +
 
-                // for <link href="..."> specifically
-                                "style-src-elem 'self' https://cdn.quilljs.com https://cdn.jsdelivr.net https://fonts.googleapis.com; "
-                                +
+                    // for <link href="..."> specifically
+                    "style-src-elem 'self' https://cdn.quilljs.com https://cdn.jsdelivr.net https://fonts.googleapis.com; " +
 
-                // images from:
-                                "img-src 'self' data:; " +
+                    // images from:
+                    "img-src 'self' data:; " +
 
-                // Neither frame nor iframe
-                                "object-src 'none';");
+                    // Neither frame nor iframe
+                    "object-src 'none';"
+                );
 
                 return true;
+
             }
         });
     }

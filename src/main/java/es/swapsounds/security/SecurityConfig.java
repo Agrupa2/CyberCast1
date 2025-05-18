@@ -53,46 +53,45 @@ public class SecurityConfig {
     }
 
     @Bean
-	@Order(1)
-	public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
-		
-		http.authenticationProvider(authenticationProvider());
-		
-		http
-			.securityMatcher("/api/**")
-			.exceptionHandling(handling -> handling.authenticationEntryPoint(unauthorizedHandlerJwt));
-		
-		http
-			.authorizeHttpRequests(authorize -> authorize
-                    // PRIVATE ENDPOINTS
-					.requestMatchers(HttpMethod.GET, "/api/categories").permitAll() 
-                    .requestMatchers(HttpMethod.POST,"/api/categories").hasRole("ADMIN")
-                    .requestMatchers(HttpMethod.GET,"/api/categories/*").permitAll()
-                    .requestMatchers("/api/sounds/{soundId}/comments").hasRole("USER")
-                    .requestMatchers("/api/sounds/{soundId}/comments/{commentId}").hasRole("USER") 
-                    .requestMatchers(HttpMethod.POST,"/api/auth/login").permitAll() 
-                    .requestMatchers(HttpMethod.POST,"/api/auth/refresh").hasRole("USER") 
-                    .requestMatchers(HttpMethod.POST,"/api/auth/logout").hasRole("USER") 
-                    .requestMatchers(HttpMethod.POST,"/api/auth/signup").permitAll() 
-                    .requestMatchers(HttpMethod.GET,"/api/users").hasAnyRole("ADMIN")
-                    .requestMatchers(HttpMethod.POST,"/api/users/").hasRole("ADMIN")
-                    .requestMatchers(HttpMethod.GET,"/api/users/{username}").hasRole("ADMIN")
-                    .requestMatchers(HttpMethod.POST,"/api/users/{username}/username").hasRole("USER")
-                    .requestMatchers(HttpMethod.POST,"/api/users/{username}/avatar").hasRole("USER") 
-                    .requestMatchers(HttpMethod.DELETE,"/api/users/{username}").hasRole("USER") 
-                    .requestMatchers(HttpMethod.GET,"/api/sounds").permitAll() 
-                    .requestMatchers(HttpMethod.GET,"/api/sounds/{id}").permitAll() 
-                    .requestMatchers(HttpMethod.POST,"/api/sounds/{id}/audio").hasRole("USER")  
-                    .requestMatchers(HttpMethod.POST,"/api/sounds/{id}/image").hasRole("USER") 
-                    .requestMatchers(HttpMethod.DELETE,"/api/sounds/{id}").hasRole("USER") 
-                    .requestMatchers(HttpMethod.GET,"/api/sounds/{id}/image").permitAll()
-                    .requestMatchers(HttpMethod.GET,"/api/sounds/{id}/audio").permitAll()
-                    .requestMatchers(HttpMethod.POST,"/api/sounds/").hasRole("USER") 
+    @Order(1)
+    public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
 
-					// PUBLIC ENDPOINTS
-					.anyRequest().permitAll()
-			);
-		
+        http.authenticationProvider(authenticationProvider());
+
+        http
+                .securityMatcher("/api/**")
+                .exceptionHandling(handling -> handling.authenticationEntryPoint(unauthorizedHandlerJwt));
+
+        http
+                .authorizeHttpRequests(authorize -> authorize
+                        // PRIVATE ENDPOINTS
+                        .requestMatchers(HttpMethod.GET, "/api/categories").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/categories").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/categories/*").permitAll()
+                        .requestMatchers("/api/sounds/{soundId}/comments").hasRole("USER")
+                        .requestMatchers("/api/sounds/{soundId}/comments/{commentId}").hasRole("USER")
+                        .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/refresh").hasRole("USER")
+                        .requestMatchers(HttpMethod.POST, "/api/auth/logout").hasRole("USER")
+                        .requestMatchers(HttpMethod.POST, "/api/auth/signup").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/users").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/users/").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/users/{username}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/users/{username}/username").hasRole("USER")
+                        .requestMatchers(HttpMethod.POST, "/api/users/{username}/avatar").hasRole("USER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/users/{username}").hasRole("USER")
+                        .requestMatchers(HttpMethod.GET, "/api/sounds").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/sounds/{id}").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/sounds/{id}/audio").hasRole("USER")
+                        .requestMatchers(HttpMethod.POST, "/api/sounds/{id}/image").hasRole("USER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/sounds/{id}").hasRole("USER")
+                        .requestMatchers(HttpMethod.GET, "/api/sounds/{id}/image").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/sounds/{id}/audio").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/sounds/").hasRole("USER")
+
+                        // PUBLIC ENDPOINTS
+                        .anyRequest().permitAll());
+
         // Disable Form login Authentication
         http.formLogin(formLogin -> formLogin.disable());
 
@@ -105,11 +104,11 @@ public class SecurityConfig {
         // Stateless session
         http.sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-		// Add JWT Token filter
-		http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+        // Add JWT Token filter
+        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
-		return http.build();
-	}
+        return http.build();
+    }
 
     @Bean
     @Order(2)
@@ -118,16 +117,18 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests(auth -> auth
-                        // 1. Recursos estáticos
+                        // 1. Static resources
                         // Public pages
-                        .requestMatchers("/", "/login", "/error","/css/**", "/js/**","/sounds", "/sounds/{soundId}").permitAll()
-                        .requestMatchers(HttpMethod.GET,"/sounds/image/**","/sounds/audio/**").permitAll()
+                        .requestMatchers("/", "/login", "/error", "/css/**", "/js/**", "/sounds", "/sounds/{soundId}")
+                        .permitAll()
+                        .requestMatchers(HttpMethod.GET, "/sounds/image/**", "/sounds/audio/**").permitAll()
                         .requestMatchers("/signup").permitAll()
 
-                        //Comment EndPoints
+                        // Comment EndPoints
                         .requestMatchers(HttpMethod.POST, "/sounds/{soundId}/comments").hasRole("USER")
                         .requestMatchers(HttpMethod.POST, "/sounds/{soundId}/comments/{commentId}/edit").hasRole("USER")
-                        .requestMatchers(HttpMethod.POST, "/sounds/{soundId}/comments/{commentId}/delete").hasRole("USER")
+                        .requestMatchers(HttpMethod.POST, "/sounds/{soundId}/comments/{commentId}/delete")
+                        .hasRole("USER")
 
                         // Sound EndPoints
                         .requestMatchers("/sounds/upload", "/sounds/download").hasRole("USER")
@@ -151,10 +152,8 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/")
                         .deleteCookies("JSESSIONID")
                         .permitAll())
-                        .exceptionHandling(ex -> ex
-            .accessDeniedPage("/error")
-        );
-
+                .exceptionHandling(ex -> ex
+                        .accessDeniedPage("/error"));
 
         return http.build();
     }
