@@ -120,6 +120,7 @@
                         <input type="hidden" name="_csrf" value="{{token}}">
                         <button type="submit" class="btn btn-danger"
                             onclick="return confirm('¿Estás seguro de que quieres eliminar este sonido?')">Eliminar</button>
+                        <input type="hidden" name="_csrf" value="{{token}}">
                     </form>
                     {{/isOwner}}
                 </div>
@@ -154,6 +155,8 @@
                         <input type="hidden" name="_method" value="DELETE">
                         <input type="hidden" name="_csrf" value="{{token}}">
                         <button type="submit" class="btn-danger">Eliminar</button>
+                        <input type="hidden" name="_csrf" value="{{token}}">
+
                     </form>
                 </div>
                 {{/isOwner}}

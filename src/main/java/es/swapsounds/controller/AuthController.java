@@ -9,10 +9,6 @@ import java.io.IOException;
 import java.security.Principal;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,9 +28,6 @@ public class AuthController {
         return "signup";
     }
 
-    @Autowired
-    private AuthenticationManager authManager;
-
     @PostMapping("/signup")
     public String registerUser(
             @RequestParam String username,
@@ -47,18 +40,9 @@ public class AuthController {
             // 1) registrar
             User user = authService.registerUser(username, email, user_password, profile_photo);
 
-            // 2) autenticar automáticamente
-            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username,
-                    user_password);
-            Authentication auth = authManager.authenticate(authToken);
-            SecurityContextHolder.getContext().setAuthentication(auth);
-
-            // 3) crear sesión (para que session.getAttribute("userId") siga funcionando si
-            // lo necesitas)
-            request.getSession().setAttribute("userId", user.getUserId());
-
-            redirectAttributes.addFlashAttribute("success", "¡Registro exitoso!");
+            redirectAttributes.addFlashAttribute("success", "¡Registro exitoso! Por favor inicia sesión");
             return "redirect:/login";
+
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/signup";
