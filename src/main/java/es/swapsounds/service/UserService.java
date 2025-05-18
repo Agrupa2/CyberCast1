@@ -263,6 +263,12 @@ public class UserService {
                     "No tienes permisos para eliminar esta cuenta");
         }
 
+        if(targetUser.getRoles().contains("ADMIN")) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "No puedes eliminar a un admin");
+        }
+
         // 5. Eliminar recursos relacionados
         soundRepository.deleteAll(soundRepository.findByUserId(targetUser.getUserId()));
 

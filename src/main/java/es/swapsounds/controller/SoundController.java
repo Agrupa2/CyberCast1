@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import es.swapsounds.service.SoundService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,6 @@ import es.swapsounds.model.Category;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
 import es.swapsounds.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
 import es.swapsounds.service.CategoryService;
 import es.swapsounds.service.CommentService;
 
@@ -133,7 +133,11 @@ public class SoundController {
             return "redirect:/login";
         }
 
-        soundService.createSound(title, description, categories, audioFile, imageFile, uploader);
+        boolean validFiles = soundService.validateFiles(audioFile, imageFile);
+
+        if (validFiles) {
+            soundService.createSound(title, description, categories, audioFile, imageFile, uploader);
+        }
 
         model.addAttribute("success", "¡Sonido subido con éxito!");
         return "redirect:/sounds/" + soundService.getLastInsertedSoundId();
@@ -173,28 +177,16 @@ public class SoundController {
     }
 
     @GetMapping("/sounds/{soundId}")
-    public String soundDetails(@PathVariable long soundId, Principal principal, Model model, HttpServletRequest request) {
-        // Manejar usuario autenticado o no
+    public String soundDetails(@PathVariable long soundId, Principal principal, Model model) {
+        // Obtener información del usuario autenticado
         String username = principal != null ? principal.getName() : null;
-        Long userId = null;
-        boolean isAdmin = false;
+        Long userId = username != null ? userService.getUserIdByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado")) : null;
+        boolean isAdmin = username != null && userService.isAdmin(username);
 
-        if (principal != null) {
-            Optional<User> userOpt = userService.findUserByUsername(principal.getName());
-            if (userOpt.isPresent()) {
-                userId = userOpt.get().getUserId();
-                // Check if the user has the ADMIN role
-                isAdmin = request.isUserInRole("ADMIN");
-            } else {
-                throw new IllegalArgumentException("Usuario no encontrado");
-            }
-        }
-
-        // Buscar el sonido
+        // Obtener el sonido
         Sound sound = soundService.findSoundById(soundId)
                 .orElseThrow(() -> new IllegalArgumentException("Recurso no encontrado"));
-
-        // Añadir sonido al modelo
         model.addAttribute("sound", sound);
 
         // Obtener información del uploader
@@ -209,14 +201,9 @@ public class SoundController {
             model.addAttribute("uploader", null);
         }
 
-        // Obtener comentarios con información de permisos para edición/eliminación
-        List<Map<String, Object>> commentsWithImages = commentService.getCommentsWithImagesBySoundId(soundId, userId);
-        // Add isOwner or isAdmin flag to each comment
-        for (Map<String, Object> comment : commentsWithImages) {
-            Long commentUserId = (Long) comment.get("userId");
-            boolean canEditComment = (userId != null && userId.equals(commentUserId)) || isAdmin;
-            comment.put("canEditComment", canEditComment);
-        }
+        // Obtener comentarios con permisos
+        List<Map<String, Object>> commentsWithImages = commentService.getCommentsWithImagesAndPermissions(soundId,
+                userId, isAdmin);
         model.addAttribute("comments", commentsWithImages);
 
         // Obtener categorías
@@ -225,9 +212,8 @@ public class SoundController {
         Set<String> selectedCategories = soundService.getSelectedCategoryNames(sound);
         model.addAttribute("selectedCategories", selectedCategories);
 
-        // Determinar si el usuario puede editar/eliminar el sonido (propietario o
-        // admin)
-        boolean canEditSound = (userId != null && userId.equals(sound.getUserId())) || isAdmin;
+        // Determinar permisos para editar el sonido
+        boolean canEditSound = soundService.canEditSound(sound, userId, isAdmin);
         model.addAttribute("canEditSound", canEditSound);
         model.addAttribute("username", username);
 
@@ -266,9 +252,17 @@ public class SoundController {
             throw new IllegalArgumentException("No tienes permisos para editar este sonido");
         }
 
+        // Crear una política que solo permita texto plano (sin etiquetas HTML)
+        boolean validFiles = soundService.validateFiles(audioFile, imageFile);
+
         try {
-            soundService.editSound(soundId, title, description, categories, audioFile, imageFile, username);
-            return "redirect:/sounds/" + soundId;
+            if (validFiles) {
+                soundService.editSound(soundId, title, description, categories, audioFile, imageFile, username);
+                return "redirect:/sounds/" + soundId;
+            }else{
+                throw new IllegalArgumentException("Archivos inválidos");
+            }
+
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Datos inválidos para actualizar el sonido");
         } catch (IOException e) {
