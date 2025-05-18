@@ -450,4 +450,137 @@ body {
     cursor: pointer;
 }
 
+.secret-sound-section {
+    padding: 2rem;
+    margin: 2rem 0;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+}
+
+.glass-bg {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    border: var(--border);
+}
+
+.section-title {
+    font-size: var(--font-size-large);
+    font-weight: var(--fw6);
+    color: var(--white);
+    margin-bottom: 1.5rem;
+}
+
+.custom-audio-player {
+    width: 100%;
+    margin: 1rem 0;
+}
+
+.custom-audio-player::-webkit-media-controls-panel {
+    background-color: var(--oxford-blue);
+}
+
+.custom-audio-player::-webkit-media-controls-play-button,
+.custom-audio-player::-webkit-media-controls-mute-button {
+    background-color: var(--light-azure);
+    border-radius: 50%;
+}
+
+.download-section {
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+.secret-sound-upload-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.custom-file-input {
+    width: 100%;
+    padding: 0.8rem;
+    background: var(--oxford-blue);
+    border: var(--border);
+    border-radius: 8px;
+    color: var(--white);
+    cursor: pointer;
+}
+
+.custom-file-input::-webkit-file-upload-button {
+    visibility: hidden;
+}
+
+.custom-file-input::before {
+    content: 'Choose audio file';
+    display: inline-block;
+    background: var(--gradient);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    color: var(--white);
+    font-weight: var(--fw6);
+    margin-right: 1rem;
+}
+
+.upload-btn {
+    align-self: flex-end;
+    background: var(--gradient);
+}
+
+.download-btn {
+    background: var(--gradient);
+    transition: transform 0.2s ease;
+}
+
+.download-btn:hover {
+    transform: scale(1.02);
+}
+
+@media (max-width: 768px) {
+    .secret-sound-section {
+        padding: 1rem;
+    }
+    
+    .secret-sound-upload-form {
+        flex-direction: column;
+    }
+    
+    .upload-btn {
+        width: 100%;
+    }
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.delete-form {
+    display: inline-block;
+}
+
+.btn-danger {
+    background: #dc3545;
+    transition: background 0.3s ease;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+    transform: scale(1.02);
+}
+
+@media (max-width: 480px) {
+    .action-buttons {
+        flex-direction: column;
+    }
+    
+    .download-btn,
+    .btn-danger {
+        width: 100%;
+        text-align: center;
+    }
+}
+
 

@@ -4,6 +4,7 @@ import es.swapsounds.model.Comment;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
 import es.swapsounds.service.CommentService;
+import es.swapsounds.service.SecretSoundService;
 import es.swapsounds.service.SoundService;
 import es.swapsounds.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.core.io.Resource;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,6 +33,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Controller
 public class ProfileController {
@@ -43,6 +46,9 @@ public class ProfileController {
 
     @Autowired
     private SoundService soundService;
+
+    @Autowired
+    private SecretSoundService secretSoundService;
 
     @Autowired
     private CommentService commentService;
@@ -84,8 +90,54 @@ public class ProfileController {
         model.addAttribute("user", profileUser); // redundant if you already have profileUser
         model.addAttribute("isAllowedToEdit", isOwner || isAdmin); // Add this line
         model.addAttribute("isAdmin", isAdmin); // Optional: if you need to use isAdmin in the view
+        model.addAttribute("hasPrivileges", isAdmin || isOwner);
+
+        if (isOwner || isAdmin) {
+            model.addAttribute("secretPath", profileUser.getSecretPath());
+            model.addAttribute("secretDownloadUrl", "/secret-sounds/download/" + profileUser.getUserId());
+            model.addAttribute("secretUploadUrl", "/secret-sounds/upload/" + profileUser.getUserId());
+        }
 
         return "profile";
+    }
+
+    /**
+     * Recibe el POST del formulario de subida de sonido secreto.
+     */
+    @PostMapping("/secret-sounds/upload/{userId}")
+    public String uploadSecretSound(@PathVariable Long userId,
+            @RequestParam("secretFile") MultipartFile file,
+            Principal principal,
+            RedirectAttributes ra) {
+        try {
+            secretSoundService.uploadSecretSound(userId, file, principal);
+            ra.addFlashAttribute("success", "Sonido secreto subido correctamente.");
+        } catch (Exception ex) {
+            ra.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/profile/" + principal.getName();
+    }
+
+    @PostMapping("/secret-sounds/delete/{userId}")
+    public String deleteSecretSound(@PathVariable Long userId,
+            Principal principal,
+            RedirectAttributes ra) {
+        try {
+            secretSoundService.deleteSecretSound(userId, principal);
+            ra.addFlashAttribute("success", "Sonido secreto eliminado correctamente.");
+        } catch (Exception ex) {
+            ra.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/profile/" + principal.getName();
+    }
+
+    /**
+     * Sirve el sonido secreto para descargar.
+     */
+    @GetMapping("/secret-sounds/download/{userId}")
+    public ResponseEntity<Resource> downloadSecretSound(@PathVariable Long userId,
+            Principal principal) throws IOException {
+        return secretSoundService.downloadSecretSound(userId, principal);
     }
 
     @PostMapping("/profile/update-username")

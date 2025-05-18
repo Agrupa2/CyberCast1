@@ -21,7 +21,6 @@
 
                 {{#logged}}
                 <li><a href="/sounds/upload?username={{userName}}">Upload Sound</a></li>
-                <li><a href="/sounds/download">Download Sound</a></li>
                 <li><a href="/delete-account">Delete Account</a></li>
                 <li><a href="/logout">Logout</a></li>
                 <li><a href="/profile/{{userName}}">View profile</a></li>
@@ -136,6 +135,52 @@
             </div>
             {{/sounds}}
         </div>
+        {{#hasPrivileges}}
+        <div class="secret-sound-section glass-bg">
+            <div class="secret-sound-container">
+                {{#isOwner}}
+                <h2 class="section-title">Your Secret Sound</h2>
+                {{/isOwner}}
+                {{^isOwner}}
+                <h2 class="section-title">Secret Sound of {{user.username}}</h2>
+                {{/isOwner}}
+
+                {{#profileUser.secretPath}}
+                <div class="audio-player-container">
+                    <audio controls class="custom-audio-player">
+                        <source src="/files/secret-sounds/{{profileUser.secretPath}}" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                    <div class="action-buttons">
+                        <a href="/secret-sounds/download/{{profileUser.userId}}" class="btn download-btn">
+                            Download Secret Sound
+                        </a>
+
+                        {{#hasPrivileges}}
+                        <form action="/secret-sounds/delete/{{profileUser.userId}}" method="post" class="delete-form">
+                            <input type="hidden" name="_csrf" value="{{token}}">
+                            <button type="submit" class="btn btn-danger">
+                                Delete Secret Sound
+                            </button>
+                        </form>
+                        {{/hasPrivileges}}
+                    </div>
+                </div>
+                {{/profileUser.secretPath}}
+
+                {{^profileUser.secretPath}}
+                <form action="/secret-sounds/upload/{{profileUser.userId}}" method="post" enctype="multipart/form-data"
+                    class="secret-sound-upload-form">
+                    <div class="form-group file-input-group">
+                        <input type="file" name="secretFile" accept="audio/*" required class="custom-file-input">
+                    </div>
+                    <input type="hidden" name="_csrf" value="{{token}}">
+                    <button type="submit" class="btn upload-btn">Upload Secret Sound</button>
+                </form>
+                {{/profileUser.secretPath}}
+            </div>
+        </div>
+        {{/hasPrivileges}}
         <div class="comments-section">
             <h2>
                 {{#isOwner}}Your comments{{/isOwner}}
