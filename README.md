@@ -138,15 +138,15 @@ Bienvenido a *SwapSounds, una plataforma intuitiva y colaborativa donde los usua
 --------------------
 @carlagmezc
 --------------------
-1. 
+1. Adding different policies, sanitizers and security, as well as fixing some bugs we had previously. **45c39ceccf621e998b68f15bf2f9b2d483e59f71** 
 
-2.
+2. Improve security in "SecurityConfig" because the previously created code caused problems with sounds when compiling; and improve functionality. **e01894cbafd01c94efd1316bbeb9e8420ab8c031** 
 
-3.
+3. Add pagination functionality, with reload button and other settings **e586b33f84b3e5986cdd50a4df14f951f0e97ab2** 
 
-4.
+4. Include web pagination, with javascript, html and the Services **6bf7c3e41acbf233979e3994081ec80341d0c344** (165 commits)
 
-5.
+5. Add functionality to the UserService and AuthService **9952324bd2e105e1baebce3c015a006e413bd6fc**
 
 --------------------
 ## 🚀 Cómo ejecutar el proyecto localmente
