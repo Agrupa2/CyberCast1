@@ -21,11 +21,11 @@
 
                     {{#logged}}
                     <li><a href="/sounds/upload?username={{userName}}">Upload Sound</a></li>
-                    <li><a href="/sounds/upload/secret">Upload Secrect Sound</a></li>
+                    <li><a href="/sounds/upload/secret">Upload Secret Sound</a></li>
                     <li><a href="/sounds/download">Download Sound</a></li>
                     <li><a href="/delete-account">Delete Account</a></li>
                     <li><a href="/logout">Logout</a></li>
-                    <li><a href="/profile/{{userName}}">Ver perfil</a></li>
+                    <li><a href="/profile/{{userName}}">View profile</a></li>
 
                     {{#admin}}
                     <li><a href="/admin/users">Admin Panel</a></li>
@@ -93,15 +93,13 @@
 
         <!-- Pagination -->
         {{#hasNext}}
-        <button id="loadMoreBtn"
-                data-page="{{currentPage}}"
-                data-query="{{#query}}{{query}}{{/query}}{{^query}}{{/query}}"
-                data-category="{{category}}">
-            <span class="label">Más resultados</span>
+        <button id="loadMoreBtn" data-page="{{currentPage}}"
+            data-query="{{#query}}{{query}}{{/query}}{{^query}}{{/query}}" data-category="{{category}}">
+            <span class="label">More results</span>
             <span class="loader"></span>
         </button>
         {{/hasNext}}
-        
+
         <script src="/js/sounds.js"></script>
 
         <!-- Footer -->
@@ -117,29 +115,6 @@
                         <a href="#"><ion-icon name="logo-tiktok"></ion-icon></a>
                         <a href="#"><ion-icon name="logo-youtube"></ion-icon></a>
                     </div>
-                </div>
-                <div class="footer-links">
-                    <ul>
-                        <h4 class="link-heading">SwapSounds</h4>
-                        <li class="link-item"><a href="#">About us</a></li>
-                        <li class="link-item"><a href="#">My profile</a></li>
-                        <li class="link-item"><a href="#">Pricing plans</a></li>
-                        <li class="link-item"><a href="#">Contacts</a></li>
-                    </ul>
-                    <ul>
-                        <h4 class="link-heading">Browse</h4>
-                        <li class="link-item"><a href="#">Categories</a></li>
-                        <li class="link-item"><a href="#">Production Sounds</a></li>
-                        <li class="link-item"><a href="#">Free-to-use</a></li>
-                        <li class="link-item"><a href="#">Favourites</a></li>
-                    </ul>
-                    <ul>
-                        <h4 class="link-heading">Help</h4>
-                        <li class="link-item"><a href="#">Account & Billing</a></li>
-                        <li class="link-item"><a href="#">Plans & Pricing</a></li>
-                        <li class="link-item"><a href="#">Supported Devices</a></li>
-                        <li class="link-item"><a href="#">Accessibility</a></li>
-                    </ul>
                 </div>
             </div>
             <div class="footer-copyright">
