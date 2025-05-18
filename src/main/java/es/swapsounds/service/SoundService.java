@@ -390,12 +390,6 @@ public class SoundService {
 
     }
 
-    public Page<Sound> getFilteredSoundsPage(
-            String query, String category, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("title"));
-        return soundRepository.findFiltered(query, category, pageable);
-    }
-
     public boolean canEditSound(Sound sound, Long userId, boolean isAdmin) {
         return isAdmin || (userId != null && userId.equals(sound.getUserId()));
     }

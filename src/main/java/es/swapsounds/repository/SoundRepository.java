@@ -14,6 +14,4 @@ public interface SoundRepository extends JpaRepository<Sound, Long> {
     List<Sound> findByUserId(long userId);
     Page <Sound> findByTitleContainingIgnoreCase(String title, Pageable pageable);
     Page<Sound> findByTitleContainingIgnoreCaseAndCategories_NameIgnoreCase(String title, String category, Pageable pageable);
-    Page<Sound> findFiltered(String query, String category, Pageable pageable);
-
 }
