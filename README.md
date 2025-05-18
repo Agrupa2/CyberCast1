@@ -112,15 +112,15 @@ Bienvenido a *SwapSounds, una plataforma intuitiva y colaborativa donde los usua
 --------------------
 @4lexxxx
 --------------------
-1. 
+1. Adding all the functions for deleting sounds from the admin panel **4ce9d39a67099e22caba5c934cd7610f665f017b** && **eb82becc499957ba9c62a89ed1ffd8b78c477efd**
 
-2.
+2. Adding the download funcionality for the Sounds **a43fe4d21fed99d0e4b6911aefec1824851ff366**
 
-3.
+3. First steps for the DB **20e0b5507370f4519754e42ded29aade0490a7a0**
 
-4.
+4. Changing all the stuff to Blob, (the new audioBlob and imageBlob are the old FilePath and imagePath) **6b5240d5d91247d0d6e852cc1687628739d8c849**
 
-5.
+5. Changing the Data Loader for the second fase type **bb66468fadec6f09e0d3648f054ec20b20f66b36**
 
 --------------------
 @myyykyy
