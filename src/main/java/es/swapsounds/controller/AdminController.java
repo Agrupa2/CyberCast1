@@ -1,6 +1,6 @@
 package es.swapsounds.controller;
 
-import es.swapsounds.DTO.AdminUserViewDTO;
+import es.swapsounds.dto.AdminUserViewDTO;
 import es.swapsounds.model.User;
 import es.swapsounds.service.CommentService;
 import es.swapsounds.service.SoundService;

@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import es.swapsounds.DTO.UserDTO;
-import es.swapsounds.DTO.UserRegistrationDTO;
+import es.swapsounds.dto.UserDTO;
+import es.swapsounds.dto.UserRegistrationDTO;
 import es.swapsounds.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -35,12 +35,10 @@ public class UserRestController {
         this.svc = svc;
     }
 
+
     @GetMapping
-    public ResponseEntity<Page<UserDTO>> list(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size) {
-        Pageable p = PageRequest.of(page, size);
-        Page<UserDTO> dtos = svc.findAllUsersDTO(p);
+    public ResponseEntity<Page<UserDTO>> list(Pageable pageable) {
+        Page<UserDTO> dtos = svc.findAllUsersDTO(pageable);
         return ResponseEntity.ok(dtos);
     }
 
