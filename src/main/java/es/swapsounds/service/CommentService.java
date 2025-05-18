@@ -37,7 +37,7 @@ public class CommentService {
     private CommentRepository commentRepository;
 
     /**
-     * Agrega un comentario a un sonido.
+     * Adds a comment to a sound, validating the user and sanitizing the content.
      */
     @Transactional
     public Comment addComment(Long userId, long soundId, String content) {
@@ -51,27 +51,27 @@ public class CommentService {
                     "El comentario es demasiado largo (máximo 150 caracteres)");
         }
 
-        // Configurar lista segura para sanitización
+        // Configurate the list of allowed tags and attributes
         Safelist safelist = Safelist.relaxed()
                 .addTags("h1", "h2", "code")
                 .addAttributes("a", "href", "target")
                 .addAttributes(":all", "class")
                 .addProtocols("a", "href", "http", "https");
 
-        // Sanitizar el contenido
+        // Sanitized content
         String cleanContent = Jsoup.clean(content, safelist);
 
-        // Obtener el usuario
+        // Get the user
         User currentUser = userService.findUserById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
 
-        // Obtener el sonido
+        // Get the sound
         Sound sound = soundService.findSoundById(soundId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sonido no encontrado"));
 
         String soundTitle = sound.getTitle();
 
-        // Crear el comentario
+        // Create the comment
         Comment comment = new Comment();
         comment.setContent(cleanContent);
         comment.setUser(currentUser);
@@ -80,12 +80,12 @@ public class CommentService {
         comment.setSoundTitle(soundTitle);
         comment.setCreated(LocalDateTime.now());
 
-        // Guardar y devolver
+        // Store the comment
         return commentRepository.save(comment);
     }
 
     /**
-     * Edita un comentario, verificando que el usuario sea el autor.
+     * Edit a comment, validating the user and sanitizing the content.
      */
     @Transactional
     public boolean editComment(Long userId, long soundId, long commentId, String newContent) {
@@ -105,7 +105,7 @@ public class CommentService {
                         .addAttributes(":all", "class")
                         .addProtocols("a", "href", "http", "https");
 
-                // Sanitizar el contenido
+                // Sanitized content
                 String cleanContent = Jsoup.clean(newContent, safelist);
                 comment.setContent(cleanContent);
                 comment.setModified(LocalDateTime.now());
@@ -131,7 +131,7 @@ public class CommentService {
                     .addAttributes(":all", "class")
                     .addProtocols("a", "href", "http", "https");
 
-            // Sanitizar el contenido
+            // Sanitized content
             String cleanContent = Jsoup.clean(newContent, safelist);
 
             comment.setContent(cleanContent);
@@ -152,7 +152,7 @@ public class CommentService {
         Optional<Comment> optComment = commentRepository.findById(commentId);
         if (optComment.isPresent()) {
             Comment comment = optComment.get();
-            // Verificar si el usuario es ADMIN
+            // Verify if the user is the owner of the comment or an admin
             boolean isAdmin = SecurityContextHolder.getContext().getAuthentication()
                     .getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
 
@@ -168,7 +168,7 @@ public class CommentService {
     }
 
     /**
-     * Busca y devuelve un comentario por su ID.
+     * Look for a comment by its ID.
      */
 
     public Optional<Comment> findCommentById(long commentId) {
@@ -176,26 +176,26 @@ public class CommentService {
     }
 
     /**
-     * Obtiene la lista de comentarios asociados a un sonido.
+     * Get the comment's list associated to a sound.
      */
     public List<Comment> getCommentsBySoundId(long soundId) {
         return commentRepository.findBySoundId(soundId);
     }
 
-    /* Obtiene la lista de comentarios realizados por un usuario. */
+    /* Get the comment's list by a user */
 
     public List<Comment> getCommentsByUserId(long userId) {
         return commentRepository.findByUserUserId(userId);
     }
 
-    // */Borra los comentarios dependiendo del tipo de usuario que seas */
+    // */Delete comments */
 
     @Transactional
     public void deleteCommentsByUserId(long userId) {
         commentRepository.deleteByUserUserId(userId);
     }
 
-    // Borra los comentarios de un sonido específico
+    // Delete comments by soundId
 
     @Transactional
     public void deleteCommentsBySoundId(long soundId) {
@@ -203,22 +203,21 @@ public class CommentService {
     }
 
     /**
-     * Obtiene los comentarios de un sonido con imágenes de perfil en Base64 y datos
-     * adicionales.
+     * Get the comment's list associated to a sound with user information and image
      */
     public List<Map<String, Object>> getCommentsWithImagesBySoundId(long soundId, Long currentUserId) {
         List<Comment> comments = commentRepository.findBySoundId(soundId);
         List<Map<String, Object>> commentsWithImages = new ArrayList<>();
 
         for (Comment comment : comments) {
-            // Determinar si el usuario actual es el propietario del comentario
+            // Determinate if the current user is the owner of the comment
             boolean owner = (currentUserId != null && currentUserId.equals(comment.getUser().getUserId()));
             comment.setCommentOwner(owner);
 
-            // Obtener información del usuario del comentario
+            // Get the user who made the comment
             User commentUser = comment.getUser();
 
-            // Crear un mapa con los datos del comentario (sin Base64)
+            // Create a map to store the comment data
             Map<String, Object> commentData = new HashMap<>();
             commentData.put("commentId", comment.getCommentId());
             commentData.put("user", commentUser); // Enviamos el User completo para acceder a su ID
