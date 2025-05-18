@@ -41,6 +41,7 @@ public class UserRestController {
         return ResponseEntity.ok(dtos);
     }
 
+
     @PostMapping("/")
     public ResponseEntity<UserDTO> createUser(@RequestBody UserRegistrationDTO dto) {
         UserDTO created = svc.saveDTO(dto);

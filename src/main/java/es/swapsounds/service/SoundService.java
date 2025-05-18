@@ -20,6 +20,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+
 import com.mpatric.mp3agic.InvalidDataException;
 import com.mpatric.mp3agic.Mp3File;
 import com.mpatric.mp3agic.UnsupportedTagException;
@@ -56,6 +57,16 @@ public class SoundService {
 
     public SoundService(@Qualifier("soundMapperImpl") SoundMapper mapper) {
         this.mapper = mapper;
+    }
+
+    public Page<Sound> getFilteredSoundsPage(String query, String category, Pageable pageable) {
+        if (category != null && !"all".equalsIgnoreCase(category)) {
+            return soundRepository.findByTitleContainingIgnoreCaseAndCategories_NameIgnoreCase(
+                    query == null ? "" : query, category, pageable);
+        } else {
+            return soundRepository.findByTitleContainingIgnoreCase(
+                    query == null ? "" : query, pageable);
+        }
     }
 
     private Long lastInsertedSoundId;

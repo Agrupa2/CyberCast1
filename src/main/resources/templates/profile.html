@@ -117,6 +117,7 @@
                     <a href="/sounds/{{soundId}}" class="btn">Ver</a>
                     {{#isOwner}}
                     <form action="/sounds/{{soundId}}/delete" method="POST">
+                        <input type="hidden" name="_csrf" value="{{token}}">
                         <button type="submit" class="btn btn-danger"
                             onclick="return confirm('¿Estás seguro de que quieres eliminar este sonido?')">Eliminar</button>
                         <input type="hidden" name="_csrf" value="{{token}}">
@@ -152,6 +153,7 @@
                 <div class="comment-actions">
                     <form action="/sounds/{{soundId}}/comments/{{commentId}}/delete" method="POST">
                         <input type="hidden" name="_method" value="DELETE">
+                        <input type="hidden" name="_csrf" value="{{token}}">
                         <button type="submit" class="btn-danger">Eliminar</button>
                         <input type="hidden" name="_csrf" value="{{token}}">
 

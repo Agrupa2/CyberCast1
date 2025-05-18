@@ -28,8 +28,8 @@ public class MvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(new HandlerInterceptor() {
             @Override
             public boolean preHandle(HttpServletRequest request,
-                    HttpServletResponse response,
-                    Object handler) throws Exception {
+                                     HttpServletResponse response,
+                                     Object handler) throws Exception {
                 // Añadir en el interceptor
                 response.setHeader("X-Content-Type-Options", "nosniff");
                 response.setHeader("X-Frame-Options", "DENY");
@@ -38,32 +38,33 @@ public class MvcConfig implements WebMvcConfigurer {
                         // Base
                         "default-src 'self'; " +
 
-                // Scripts
+                                // Scripts
                                 "script-src 'self' 'unsafe-inline' 'unsafe-eval' " +
                                 "https://cdn.quilljs.com https://cdn.jsdelivr.net; " +
 
-                // Scripts externos (archivos .js)
+                                // Scripts externos (archivos .js)
                                 "script-src-elem 'self' 'unsafe-inline' " + // <- Añade 'unsafe-inline' aquí
                                 "https://cdn.quilljs.com https://cdn.jsdelivr.net; " +
 
-                // Styles
+                                // Styles
                                 "style-src 'self' 'unsafe-inline' " +
                                 "https://cdn.quilljs.com https://cdn.jsdelivr.net https://fonts.googleapis.com; " +
 
-                // Hojas de estilo externas
+                                // Hojas de estilo externas
                                 "style-src-elem 'self' " +
                                 "https://cdn.quilljs.com https://cdn.jsdelivr.net https://fonts.googleapis.com; " +
 
-                // Imágenes
+                                // Imágenes
                                 "img-src 'self' data:; " + // Permite data: URIs para imágenes en línea
 
-                // Fuentes
+                                // Fuentes
                                 "font-src 'self' data: https://fonts.gstatic.com; " + // <- Añade esto
 
-                // Otros
+                                // Otros
                                 "object-src 'none';");
 
                 return true;
+
             }
         });
     }
