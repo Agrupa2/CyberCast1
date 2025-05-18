@@ -18,7 +18,6 @@ import es.swapsounds.service.CommentService;
 import es.swapsounds.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 
-
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,6 +39,9 @@ public class CommentRestController {
         this.userService = userService;
     }
 
+    /**
+     * Returns a paginated list of comments for a sound.
+     */
     @GetMapping
     public ResponseEntity<List<CommentDTO>> listComments(
             @PathVariable long soundId,
@@ -53,6 +55,9 @@ public class CommentRestController {
         return ResponseEntity.ok(dtos.getContent());
     }
 
+    /**
+     * Adds a new comment to a sound.
+     */
     @PostMapping
     public ResponseEntity<CommentDTO> addComment(
             @PathVariable long soundId,
@@ -67,6 +72,9 @@ public class CommentRestController {
         return ResponseEntity.created(location).body(dto);
     }
 
+    /**
+     * Edits an existing comment.
+     */
     @PutMapping("/{commentId}")
     public ResponseEntity<CommentDTO> editComment(
             @PathVariable long soundId,
@@ -80,6 +88,9 @@ public class CommentRestController {
         return ResponseEntity.ok(dto);
     }
 
+    /**
+     * Deletes a comment.
+     */
     @DeleteMapping("/{commentId}")
     public ResponseEntity<Void> deleteComment(
             @PathVariable long soundId,

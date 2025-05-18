@@ -93,6 +93,10 @@ public class SoundService {
         return soundRepository.findById(id);
     }
 
+    public List<Sound> getSoundsByTitle() {
+        return soundRepository.findSoundByTitle();
+    }
+
     public Sound addSound(Sound sound) {
         Sound savedSound = soundRepository.save(sound);
         this.lastInsertedSoundId = savedSound.getSoundId();
@@ -365,7 +369,7 @@ public class SoundService {
 
         boolean isAdmin = user.getRoles().contains("ADMIN");
         if (!isAdmin && sound.getUserId() != userId) {
-            throw new UnauthorizedAccessException("Usuario no autorizado para eliminar este sonido");
+            throw new UnauthorizedAccessException("User not authorized to delete this sound");
         }
 
         soundRepository.delete(sound);
@@ -373,7 +377,7 @@ public class SoundService {
 
     public class SoundNotFoundException extends RuntimeException {
         public SoundNotFoundException(Long soundId) {
-            super("Spundido no encontrado con ID: " + soundId);
+            super("Sound not found with ID: " + soundId);
         }
     }
 
@@ -390,11 +394,17 @@ public class SoundService {
 
     }
 
-    public Page<Sound> getFilteredSoundsPage(
-            String query, String category, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("title"));
-        return soundRepository.findFiltered(query, category, pageable);
+    //This method is going to be used for the dynamic queries.
+
+    public List<Sound> searchSounds(String title, String category, String duration, Long userId) {
+        return soundRepository.searchByFilters(
+            title != null ? title.toLowerCase() : null,
+            category != null ? category.toLowerCase() : null,
+            duration,
+            userId
+        );
     }
+
 
     public boolean canEditSound(Sound sound, Long userId, boolean isAdmin) {
         return isAdmin || (userId != null && userId.equals(sound.getUserId()));
@@ -431,6 +441,12 @@ public class SoundService {
 
     return true;
 }
+
+public Page<Sound> getFilteredSoundsPage(
+            String query, String category, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("title"));
+        return soundRepository.findFiltered(query, category, pageable);
+    }
 
 
 }

@@ -9,6 +9,10 @@ import java.io.IOException;
 import java.security.Principal;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +32,9 @@ public class AuthController {
         return "signup";
     }
 
+    @Autowired
+    private AuthenticationManager authManager;
+
     @PostMapping("/signup")
     public String registerUser(
             @RequestParam String username,
@@ -37,17 +44,25 @@ public class AuthController {
             HttpServletRequest request,
             RedirectAttributes redirectAttributes) {
         try {
-            // 1) registrar
+            // 1) register user
             User user = authService.registerUser(username, email, user_password, profile_photo);
 
-            redirectAttributes.addFlashAttribute("success", "¡Registro exitoso! Por favor inicia sesión");
-            return "redirect:/login";
+            // 2) automatically authenticate
+            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username,
+                    user_password);
+            Authentication auth = authManager.authenticate(authToken);
+            SecurityContextHolder.getContext().setAuthentication(auth);
 
+            // 3) create session (so session.getAttribute("userId") keeps working if needed)
+            request.getSession().setAttribute("userId", user.getUserId());
+
+            redirectAttributes.addFlashAttribute("success", "Registration successful!");
+            return "redirect:/login";
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/signup";
         } catch (IOException e) {
-            redirectAttributes.addFlashAttribute("error", "Error al subir la imagen de perfil");
+            redirectAttributes.addFlashAttribute("error", "Error uploading profile image");
             return "redirect:/signup";
         }
     }

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Administración</title>
+    <title>Admin Panel</title>
     <link rel="stylesheet" href="/css/profile.css">
 </head>
 
@@ -26,23 +26,22 @@
 
     <div class="profile-container">
         <div class="profile-header">
-            <h1>Panel de Administración</h1>
+            <h1>Admin Panel</h1>
         </div>
 
         <div class="user-profile">
             {{#uploader}}
             <div class="avatar-container">
                 {{#profileImageBase64}}
-                <img src="data:image/png;base64,{{profileImageBase64}}" alt="Perfil de {{username}}"
+                <img src="data:image/png;base64,{{profileImageBase64}}" alt="Profile of {{username}}"
                     class="profile-avatar">
                 {{/profileImageBase64}}
                 {{^profileImageBase64}}
-                <img src="/users/{{id}}/avatar" alt="Perfil de {{username}}"
-                    class="profile-avatar">
+                <img src="/users/{{id}}/avatar" alt="Profile of {{username}}" class="profile-avatar">
                 {{/profileImageBase64}}
             </div>
             <div class="user-info">
-                <span class="subido-por">Subido por:</span>
+                <span class="subido-por">Uploaded by:</span>
                 <div class="username">
                     <a href="/profile/{{username}}">{{username}}</a>
                 </div>
@@ -51,7 +50,7 @@
         </div>
 
         <div class="sounds-list">
-            <h2>Usuarios registrados</h2>
+            <h2>Registered users</h2>
 
             {{#error}}
             <div class="empty-state">
@@ -81,9 +80,9 @@
                 </div>
                 <div class="sound-actions">
                     <form action="/admin/users/{{userId}}/delete" method="post"
-                        onsubmit="return confirm('¿Eliminar al usuario {{username}}?')">
+                        onsubmit="return confirm('Delete user {{username}}?')">
                         <input type="hidden" name="_csrf" value="{{token}}" />
-                        <button type="submit" class="btn-danger">Eliminar</button>
+                        <button type="submit" class="btn-danger">Delete</button>
                     </form>
                 </div>
             </div>
@@ -91,13 +90,13 @@
 
             {{^users}}
             <div class="empty-state">
-                <p>No hay usuarios registrados</p>
+                <p>No registered users</p>
             </div>
             {{/users}}
         </div>
 
         <div class="sounds-list" style="margin-top: 3rem;">
-            <h2>Sonidos subidos</h2>
+            <h2>Uploaded sounds</h2>
 
             {{#sounds}}
             <div class="sound-item" style="grid-template-columns: 60px 2fr 2fr 100px;">
@@ -125,9 +124,9 @@
                 </div>
                 <div class="sound-actions">
                     <form action="/admin/sounds/{{soundId}}/delete" method="post"
-                        onsubmit="return confirm('¿Eliminar el sonido {{title}}?')">
+                        onsubmit="return confirm('Delete sound {{title}}?')">
                         <input type="hidden" name="_csrf" value="{{token}}" />
-                        <button type="submit" class="btn-danger">Eliminar</button>
+                        <button type="submit" class="btn-danger">Delete</button>
                     </form>
                 </div>
             </div>
@@ -135,7 +134,7 @@
 
             {{^sounds}}
             <div class="empty-state">
-                <p>No hay sonidos subidos</p>
+                <p>No uploaded sounds</p>
             </div>
             {{/sounds}}
         </div>

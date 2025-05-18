@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Eliminar Cuenta - SwapSounds</title>
+    <title>Delete Account - SwapSounds</title>
     <link rel="stylesheet" href="/css/delete-account.css">
 </head>
 
@@ -15,7 +15,7 @@
                 {{^username}} <!-- Shows this if there is no user logged in -->
                 <li><a href="/login">Login</a></li>
                 {{/username}}
-                {{#username}} <!-- If a user is logged in it shows this new options -->
+                {{#username}} <!-- If a user is logged in, show these options -->
                 <li><a href="/sounds/upload?username={{username}}">Upload Sound</a></li>
                 <li><a href="/sounds/download">Download Sound</a></li>
                 <li><a href="/logout">Logout</a></li>
@@ -25,32 +25,32 @@
     </nav>
 
     <div class="delete-container"> <!-- This is the new content for the delete-account page -->
-        <h1 class="warning-header">⚠️ Eliminación de Cuenta Permanente</h1>
+        <h1 class="warning-header">⚠️ Permanent Account Deletion</h1>
 
         <div class="warning-content">
-            <p>Hola <strong>{{username}}</strong>, esta acción:</p>
+            <p>Hello <strong>{{username}}</strong>, this action will:</p>
             <ul>
-                <li>❌ Eliminará todos tus sonidos subidos</li>
-                <li>❌ Borrará tu imagen de perfil</li>
-                <li>❌ Eliminará permanentemente tu cuenta</li>
+                <li>❌ Delete all your uploaded sounds</li>
+                <li>❌ Remove your profile image</li>
+                <li>❌ Permanently delete your account</li>
             </ul>
 
-            <p class="final-warning">Esta acción no se puede deshacer.</p>
+            <p class="final-warning">This action cannot be undone.</p>
         </div>
 
         <form class="confirmation-form" action="/delete-account" method="post">
-            <!--if you write 'ELIMINAR CUENTA' you will delete the account-->
-            <input type="text" class="confirmation-input" name="confirmation" placeholder="Escribe 'ELIMINAR CUENTA'"
+            <!-- If you write 'ELIMINAR CUENTA' you will delete the account -->
+            <input type="text" class="confirmation-input" name="confirmation" placeholder="Type 'ELIMINAR CUENTA'"
                 required pattern="ELIMINAR CUENTA">
 
             <button type="submit" class="btn-destruct">
-                Confirmar Eliminación Total
+                Confirm Total Deletion
             </button>
             <input type="hidden" name="_csrf" value="{{token}}" />
 
         </form>
 
-        <a href="/sounds" class="back-link">↩ Volver al inicio</a>
+        <a href="/sounds" class="back-link">↩ Back to home</a>
         <!-- This link will take you back to the start page after deleting the account -->
     </div>
 </body>

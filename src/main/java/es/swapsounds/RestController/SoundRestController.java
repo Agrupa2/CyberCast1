@@ -8,7 +8,6 @@ import es.swapsounds.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,6 +36,9 @@ public class SoundRestController {
     }
 
 
+    /**
+     * Returns a paginated list of all sounds.
+     */
     @GetMapping
     public ResponseEntity<Map<String, Object>> page(
             @RequestParam(required = false) String query,
@@ -59,13 +61,18 @@ public class SoundRestController {
         return ResponseEntity.ok(resp);
     }
 
-
+    /**
+     * Returns a sound by its ID.
+     */
     @GetMapping("/{id}")
     public ResponseEntity<SoundDTO> get(@PathVariable Long id) {
         SoundDTO dto = svc.findSoundByIdDTO(id);
         return ResponseEntity.ok(dto);
     }
 
+    /**
+     * Creates a new sound.
+     */
     @PostMapping("/")
     public ResponseEntity<Map<String, String>> create(
             @RequestParam String title,
@@ -79,9 +86,12 @@ public class SoundRestController {
         Optional<User> user = usvc.getUserById(id);
         User userId = user.get();
         svc.createSound(title, description, categories, audioFile, imageFile, userId);
-        return ResponseEntity.ok(Map.of("success", "Sonido creado exitosamente"));
+        return ResponseEntity.ok(Map.of("success", "Sound created successfully"));
     }
 
+    /**
+     * Updates the audio file of a sound.
+     */
     @PostMapping("/{id}/audio")
     public ResponseEntity<Map<String, String>> updateAudio(
             @PathVariable Long id,
@@ -90,43 +100,55 @@ public class SoundRestController {
 
         Long userId = usvc.getUserIdFromPrincipal(request.getUserPrincipal());
         svc.updateAudio(id, audioFile, userId);
-        return ResponseEntity.ok(Map.of("success", "Audio actualizado"));
+        return ResponseEntity.ok(Map.of("success", "Audio updated"));
     }
 
+    /**
+     * Updates the image of a sound.
+     */
     @PostMapping("/{id}/image")
     public ResponseEntity<Map<String, String>> updateImage(
             @PathVariable Long id,
             @RequestParam MultipartFile imageFile,
-           HttpServletRequest request) throws IOException, SerialException, SQLException {
+            HttpServletRequest request) throws IOException, SerialException, SQLException {
 
         Long userId = usvc.getUserIdFromPrincipal(request.getUserPrincipal());
         svc.updateImage(id, imageFile, userId);
-        return ResponseEntity.ok(Map.of("success", "Imagen actualizada"));
+        return ResponseEntity.ok(Map.of("success", "Image updated"));
     }
 
+    /**
+     * Deletes a sound.
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, String>> delete(
             @PathVariable Long id,
             HttpServletRequest request) {
-        
+
         Long userId = usvc.getUserIdFromPrincipal(request.getUserPrincipal());
         svc.deleteSound(id, userId);
-        return ResponseEntity.ok(Map.of("success", "Sonido eliminado"));
+        return ResponseEntity.ok(Map.of("success", "Sound deleted"));
     }
 
+    /**
+     * Returns the audio content of a sound.
+     */
     @GetMapping("/{id}/audio")
     public ResponseEntity<byte[]> getAudio(@PathVariable Long id) {
         byte[] audio = svc.getAudioContent(id)
-                          .orElseThrow(() -> new IllegalArgumentException("Audio not found for ID: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Audio not found for ID: " + id));
         return ResponseEntity.ok()
                 .header("Content-Type", "audio/mpeg")
                 .body(audio);
     }
 
+    /**
+     * Returns the image content of a sound.
+     */
     @GetMapping("/{id}/image")
     public ResponseEntity<byte[]> getImage(@PathVariable Long id) {
         byte[] image = svc.getImageContent(id)
-                          .orElseThrow(() -> new IllegalArgumentException("Image not found for ID: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Image not found for ID: " + id));
         return ResponseEntity.ok()
                 .header("Content-Type", "image/jpeg")
                 .body(image);

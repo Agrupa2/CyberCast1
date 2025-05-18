@@ -30,38 +30,38 @@ public class MvcConfig implements WebMvcConfigurer {
             public boolean preHandle(HttpServletRequest request,
                                      HttpServletResponse response,
                                      Object handler) throws Exception {
-                // Añadir en el interceptor
-                response.setHeader("X-Content-Type-Options", "nosniff");
-                response.setHeader("X-Frame-Options", "DENY");
-                response.setHeader("X-XSS-Protection", "1; mode=block");
+
+                // Headers para prevenir ataques XSS y clickjacking
                 response.setHeader("Content-Security-Policy",
-                        // Base
-                        "default-src 'self'; " +
+                    // default resources only from this origin
+                    "default-src 'self'; " +
 
-                                // Scripts
-                                "script-src 'self' 'unsafe-inline' 'unsafe-eval' " +
+                    // scripts thart are allowed:
+                    // - since this origin
+                    // - inline and eval (imprescindible for Quill)
+                    // - since cdn.quilljs.com and cdn.jsdelivr.net
+                    "script-src 'self' 'unsafe-inline' 'unsafe-eval' " +
                                 "https://cdn.quilljs.com https://cdn.jsdelivr.net; " +
 
-                                // Scripts externos (archivos .js)
-                                "script-src-elem 'self' 'unsafe-inline' " + // <- Añade 'unsafe-inline' aquí
-                                "https://cdn.quilljs.com https://cdn.jsdelivr.net; " +
+                    // for <script src="..."> specifically
+                    "script-src-elem 'self' https://cdn.quilljs.com https://cdn.jsdelivr.net; " +
 
-                                // Styles
-                                "style-src 'self' 'unsafe-inline' " +
-                                "https://cdn.quilljs.com https://cdn.jsdelivr.net https://fonts.googleapis.com; " +
+                    // permited resources:
+                    // - this origin
+                    // - inline (Quill uses inline resources)
+                    // - Quill CDN, jsDelivr and Google Fonts
+                    "style-src 'self' 'unsafe-inline' " +
+                               "https://cdn.quilljs.com https://cdn.jsdelivr.net https://fonts.googleapis.com; " +
 
-                                // Hojas de estilo externas
-                                "style-src-elem 'self' " +
-                                "https://cdn.quilljs.com https://cdn.jsdelivr.net https://fonts.googleapis.com; " +
+                    // for <link href="..."> specifically
+                    "style-src-elem 'self' https://cdn.quilljs.com https://cdn.jsdelivr.net https://fonts.googleapis.com; " +
 
-                                // Imágenes
-                                "img-src 'self' data:; " + // Permite data: URIs para imágenes en línea
+                    // images from:
+                    "img-src 'self' data:; " +
 
-                                // Fuentes
-                                "font-src 'self' data: https://fonts.gstatic.com; " + // <- Añade esto
-
-                                // Otros
-                                "object-src 'none';");
+                    // Neither frame nor iframe
+                    "object-src 'none';"
+                );
 
                 return true;
 

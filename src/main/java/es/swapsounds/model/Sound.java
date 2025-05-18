@@ -18,21 +18,22 @@ public class Sound {
     private long userId;
 
     @Lob
-    private Blob imageBlob; // Para almacenar la imagen como BLOB
+    private Blob imageBlob; // To store the image as a BLOB
     @Lob
-    private Blob audioBlob; // Para almacenar el archivo de audio como BLOB
+    private Blob audioBlob; // To store the audio file as a BLOB
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL) 
     private List<Comment> comments;
 
-    private String duration; // Duración del audio (en formato "min:seg")
-    private LocalDateTime uploadDate; // Fecha de subida
+    private String duration; // Audio duration (format "min:sec")
+    private LocalDateTime uploadDate; // Upload date
 
     @ManyToMany
-    private List<Category> categories = new ArrayList<>(); // Categorías asociadas al sonido
+    private List<Category> categories = new ArrayList<>(); // Categories associated with the sound
 
-    // Constructor con todos los parámetros necesarios (para inicializar todos los campos)
-    public Sound(String title, String description, Blob audioBlob, Blob imageBlob, long userId, List<Category> categories, String duration) {
+    // Constructor with all necessary parameters (to initialize all fields)
+    public Sound(String title, String description, Blob audioBlob, Blob imageBlob, long userId,
+            List<Category> categories, String duration) {
         this.title = title;
         this.description = description;
         this.audioBlob = audioBlob;
@@ -41,13 +42,14 @@ public class Sound {
         this.comments = new ArrayList<>();
         this.categories = categories != null ? categories : new ArrayList<>();
         this.duration = duration;
-        this.uploadDate = LocalDateTime.now(); // Fecha de carga en el momento de creación
+        this.uploadDate = LocalDateTime.now(); // Upload date at creation time
     }
 
-    // Constructor vacío
-    public Sound() {}
+    // Empty constructor
+    public Sound() {
+    }
 
-    // Getters y Setters
+    // Getters and Setters
 
     public String getTitle() {
         return title;

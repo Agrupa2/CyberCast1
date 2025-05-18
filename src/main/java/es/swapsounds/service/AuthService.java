@@ -46,20 +46,20 @@ public class AuthService {
 
     /**
      * Registers a new user.
-     * Verifies if the username or email is already in use and if the password is
+     * Checks if the username or email is already in use and if the password is
      * valid.
      */
     public User registerUser(String username, String email, String password, MultipartFile profilePhoto)
             throws IOException {
-        // Verify if the username or email is already in use
+        // Check if the username or email is already in use
         List<User> existingUsers = userRepository.findByUsernameOrEmail(username, email);
         if (!existingUsers.isEmpty()) {
-            throw new IllegalArgumentException("El nombre de usuario o correo ya está registrado");
+            throw new IllegalArgumentException("Username or email is already registered");
         }
 
-        // Verify if the username is valid
+        // Check if the password is valid
         if (password.length() < 8) {
-            throw new IllegalArgumentException("La contraseña debe tener al menos 8 caracteres");
+            throw new IllegalArgumentException("Password must be at least 8 characters long");
         }
 
         // Crear una política que solo permita texto plano (sin etiquetas HTML)
@@ -79,17 +79,18 @@ public class AuthService {
         // Create a new user
         User user = new User(safeUsername, safeEmail, encoded, null, roles);
 
-        if (isPicValid) {
-            if (profilePhoto != null && !profilePhoto.isEmpty()) {
-                try {
-                    Blob photoBlob = new SerialBlob(profilePhoto.getBytes());
-                    user.setProfilePicture(photoBlob);
-                } catch (SQLException e) {
-                    throw new IOException("Error al convertir la imagen a Blob: " + e.getMessage());
-                }
-            } else {
-                user.setProfilePicture(null);
+        // If a profile photo is provided, convert it to a Blob and set it
+        if (profilePhoto != null && !profilePhoto.isEmpty()) {
+            try {
+                Blob photoBlob = new SerialBlob(profilePhoto.getBytes());
+                user.setProfilePicture(photoBlob);
+            } catch (SQLException e) {
+                throw new IOException("Error al convertir la imagen a Blob: " + e.getMessage());
             }
+        } else {
+            // Optional: Set a default profile picture or leave it as null
+            // nothing to do here
+            // Right now, we are not setting a default profile picture
         }
 
         // Store and return the user
@@ -97,18 +98,24 @@ public class AuthService {
     }
 
     /**
-     * * Authenticates a user using their username or email and password.
+     * Authenticates a user using their username or email and password.
      */
     public Optional<User> authenticate(String emailOrUsername, String password) {
         Optional<User> userOptional = userRepository.findByEmailOrUsername(emailOrUsername, emailOrUsername);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
+            System.out.println(
+                    "Usuario encontrado: " + user.getUsername() + ", Contraseña en DB: " + user.getEncodedPassword()
+                            + ", Contraseña introducida: " + password);
             if (user.getEncodedPassword().equals(password)) {
+                System.out.println("¡Contraseña coincide!");
                 return userOptional;
             } else {
+                System.out.println("Contraseña incorrecta para el usuario: " + user.getUsername());
                 return Optional.empty();
             }
         } else {
+            System.out.println("No se encontró ningún usuario con el email o username: " + emailOrUsername);
             return Optional.empty();
         }
     }
@@ -127,17 +134,17 @@ public class AuthService {
 
             // 3. Generate JWT tokens
             LoginRequest loginRequest = new LoginRequest(username, password);
-            return userService.login(response, loginRequest); // Reutilizamos la lógica de login
+            return userService.login(response, loginRequest); // Reuse login logic
 
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest()
-                    .body(new AuthResponse(Status.FAILURE, "Error en el registro: " + e.getMessage()));
+                    .body(new AuthResponse(Status.FAILURE, "Registration error: " + e.getMessage()));
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new AuthResponse(Status.FAILURE, "Error al subir la imagen de perfil"));
+                    .body(new AuthResponse(Status.FAILURE, "Error uploading profile image"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new AuthResponse(Status.FAILURE, "Error inesperado: " + e.getMessage()));
+                    .body(new AuthResponse(Status.FAILURE, "Unexpected error: " + e.getMessage()));
         }
     }
 

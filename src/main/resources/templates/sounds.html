@@ -24,10 +24,11 @@
 
                     {{#logged}}
                     <li><a href="/sounds/upload?username={{userName}}">Upload Sound</a></li>
+                    <li><a href="/sounds/upload/secret">Upload Secret Sound</a></li>
                     <li><a href="/sounds/download">Download Sound</a></li>
                     <li><a href="/delete-account">Delete Account</a></li>
                     <li><a href="/logout">Logout</a></li>
-                    <li><a href="/profile/{{userName}}">Ver perfil</a></li>
+                    <li><a href="/profile/{{userName}}">View profile</a></li>
 
                     {{#admin}}
                     <li><a href="/admin/users">Admin Panel</a></li>
@@ -98,6 +99,9 @@
             <span class="label">Más resultados</span>
             <span class="loader"></span>
         </button>
+        {{/hasNext}}
+        
+        <script src="/js/sounds.js"></script>
 
 
     </div>

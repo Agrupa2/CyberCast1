@@ -117,7 +117,7 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests(auth -> auth
-                        // 1. Recursos estáticos
+                        // 1. Static resources
                         // Public pages
                         .requestMatchers("/", "/login", "/error", "/css/**", "/js/**", "/sounds", "/sounds/{soundId}")
                         .permitAll()

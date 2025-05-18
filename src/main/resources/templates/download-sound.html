@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Descargar Sonidos</title>
+    <title>Download Sounds</title>
     <link rel="stylesheet" href="/css/sounds.css">
 </head>
 
@@ -24,13 +24,13 @@
                     <li><a href="/sounds/download">Download Sound</a></li>
                     <li><a href="/delete-account">Delete Account</a></li>
                     <li><a href="/logout">Logout</a></li>
-                    <li><a href="/profile/{{userName}}">Ver perfil</a></li>
+                    <li><a href="/profile/{{userName}}">View profile</a></li>
 
                     {{#admin}}
                     <li><a href="/admin/users">Admin Panel</a></li>
                     {{/admin}}
                     {{/logged}}
-                    
+
                 </ul>
             </div>
         </nav>
@@ -38,7 +38,7 @@
         <!-- Search Bar -->
         <form action="/sounds" method="GET" class="search-container">
             <input type="text" name="query" class="search-bar" placeholder="Searching for sounds..."
-                value="{{#query}}{{query}}{{/query}}"> <!-- Maintain the value after searching -->
+                value="{{#query}}{{query}}{{/query}}"> <!-- Keep the value after searching -->
 
             <select name="category" class="fold-out" onchange="this.form.submit()">
                 <option value="all" {{#selectedAll}}selected{{/selectedAll}}>All Categories</option>
@@ -47,7 +47,7 @@
                 {{/allCategories}}
             </select>
 
-            <!-- Hiden Button to submit with Enter  -->
+            <!-- Hidden Button to submit with Enter  -->
             <button type="submit" hidden></button>
             <input type="hidden" name="_csrf" value="{{token}}" />
         </form>
@@ -77,14 +77,14 @@
                     <div class="audio-container">
                         <audio controls class="custom-audio">
                             <source src="/sounds/audio/{{soundId}}" type="audio/mpeg">
-                            Tu navegador no soporta el elemento de audio.
+                            Your browser does not support the audio element.
                         </audio>
                     </div>
                 </div>
             </div>
             {{/sounds}}
-            {{^sounds}} <!-- If there's no sounds, this message will appear -->
-            <p>No se encontraron sonidos.</p>
+            {{^sounds}} <!-- If there are no sounds, this message will appear -->
+            <p>No sounds found.</p>
             {{/sounds}}
         </div>
 

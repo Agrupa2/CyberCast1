@@ -27,7 +27,7 @@
                 <li><a href="/sounds/download">Download Sound</a></li>
                 <li><a href="/delete-account">Delete Account</a></li>
                 <li><a href="/logout">Logout</a></li>
-                <li><a href="/profile/{{userName}}">Ver perfil</a></li>
+                <li><a href="/profile/{{userName}}">View profile</a></li>
 
                 {{#admin}}
                 <li><a href="/admin/users">Admin Panel</a></li>
@@ -44,14 +44,14 @@
                 {{#uploader}}
                 <div class="avatar-container">
                     {{#profileImageBase64}}
-                    <img src="/users/{{uploader.userId}}/avatar" alt="Perfil de {{username}}" class="profile-avatar">
+                    <img src="/users/{{uploader.userId}}/avatar" alt="Profile of {{username}}" class="profile-avatar">
                     {{/profileImageBase64}}
                     {{^profileImageBase64}}
                     <div class="default-avatar">{{userInitial}}</div>
                     {{/profileImageBase64}}
                 </div>
                 <div class="user-info">
-                    <span class="subido-por">Subido por:</span>
+                    <span class="subido-por">Uploaded by:</span>
                     <div class="username">
                         <a href="/profile/{{username}}">{{username}}</a>
                     </div>
@@ -74,37 +74,37 @@
         <div class="sound-player">
             <audio controls>
                 <source src="/sounds/audio/{{sound.soundId}}" type="audio/mpeg">
-                Tu navegador no soporta audio HTML5.
+                Your browser does not support HTML5 audio.
             </audio>
         </div>
 
         <div class="sound-description">
-            <h3>Descripción</h3>
+            <h3>Description</h3>
             <p>{{sound.description}}</p>
         </div>
 
         {{#canEditSound}}
         <div class="sound-actions">
             <details>
-                <summary>Editar Sonido</summary>
+                <summary>Edit Sound</summary>
                 <form id="editForm" action="/sounds/{{soundId}}/edit" method="post" enctype="multipart/form-data">
                     <input type="hidden" name="_csrf" value="{{token}}" />
 
                     <div class="form-group">
-                        <label>Título:</label>
+                        <label>Title:</label>
                         <input type="text" name="title" value="{{sound.title}}" required>
                     </div>
                     <div class="form-group">
-                        <label>Descripción:</label>
+                        <label>Description:</label>
                         <textarea name="description">{{sound.description}}</textarea>
                     </div>
                     <div class="form-group">
-                        <label>Categorías:</label>
+                        <label>Categories:</label>
                         <div class="categories-checkbox-group">
                             {{#allCategories}}
                             <div class="category-checkbox">
                                 <label>
-                                    <input type="checkbox" name="categories" value="{{name}}" 
+                                    <input type="checkbox" name="categories" value="{{name}}"
                                         {{#selected}}checked{{/selected}}>
                                     {{name}}
                                 </label>
@@ -113,38 +113,38 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>Nuevo archivo de audio (opcional):</label>
+                        <label>New audio file (optional):</label>
                         <input type="file" name="audioFile" accept="audio/*">
                     </div>
                     <div class="form-group">
-                        <label>Nueva imagen (opcional):</label>
+                        <label>New image (optional):</label>
                         <input type="file" name="imageFile" accept="image/*">
                     </div>
-                    <button type="submit">Guardar Cambios</button>
+                    <button type="submit">Save Changes</button>
                 </form>
                 <form action="/sounds/{{soundId}}/delete" method="post"
-                    onsubmit="return confirm('¿Seguro que quieres eliminar este sonido?')">
-                    <button type="submit" class="danger">Eliminar Sonido</button>
+                    onsubmit="return confirm('Are you sure you want to delete this sound?')">
+                    <button type="submit" class="danger">Delete Sound</button>
                     <input type="hidden" name="_csrf" value="{{token}}" />
 
                 </form>
             </details>
         </div>
         {{/canEditSound}}
-        <a class="back-link" href="/sounds">Volver a todos los sonidos</a>
+        <a class="back-link" href="/sounds">Back to all sounds</a>
     </div>
 
     <div class="comments-section">
-        <h2>Comentarios</h2>
+        <h2>Comments</h2>
         {{#username}}
         <div class="comment-form">
             <form action="/sounds/{{soundId}}/comments" method="post" id="comment-form">
-                <!-- Contenedor para el editor Quill -->
+                <!-- Container for the Quill editor -->
                 <div id="editor" style="min-height: 100px;"></div>
-                <!-- Input oculto para enviar el contenido sanitizado -->
+                <!-- Hidden input to send the sanitized content -->
                 <input type="hidden" name="content" id="content">
                 <input type="hidden" name="_csrf" value="{{token}}" />
-                <button type="submit">Publicar</button>
+                <button type="submit">Post</button>
             </form>
         </div>
         {{/username}}
@@ -154,7 +154,7 @@
                 <div class="comment-author">
                     <div class="comment-avatar-container">
                         {{#hasProfilePicture}}
-                        <!-- Usar la URL directa del avatar -->
+                        <!-- Use the direct avatar URL -->
                         <img src="/users/{{user.userId}}/avatar" alt="{{username}}" class="comment-avatar">
                         {{/hasProfilePicture}}
                         {{^hasProfilePicture}}
@@ -176,12 +176,12 @@
                             <form action="/sounds/{{soundId}}/comments/{{commentId}}/edit" method="POST">
                                 <input type="hidden" name="_method" value="PUT">
                                 <textarea name="content">{{content}}</textarea>
-                                <button type="submit">Guardar</button>
+                                <button type="submit">Save</button>
                                 <input type="hidden" name="_csrf" value="{{token}}" />
                             </form>
                             <form action="/sounds/{{soundId}}/comments/{{commentId}}/delete" method="POST">
                                 <input type="hidden" name="_method" value="DELETE">
-                                <button type="submit" class="danger">Eliminar</button>
+                                <button type="submit" class="danger">Delete</button>
                                 <input type="hidden" name="_csrf" value="{{token}}" />
 
                             </form>

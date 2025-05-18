@@ -5,12 +5,11 @@ import java.util.List;
 
 import jakarta.persistence.*;
 
-
 @Entity
 public class Category {
 
     @Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String name;
 
@@ -19,11 +18,11 @@ public class Category {
 
     public Category(String name) {
         this.name = name;
-        this.sounds = new ArrayList<>(); // Eliminar null
+        this.sounds = new ArrayList<>(); // Initialize to avoid null
     }
 
     public Category() {
-        this.sounds = new ArrayList<>(); // Inicializar en constructor vacío
+        this.sounds = new ArrayList<>(); // Initialize in empty constructor
     }
 
     public long getId() {
