@@ -139,9 +139,9 @@
         {{#username}}
         <div class="comment-form">
             <form action="/sounds/{{soundId}}/comments" method="post" id="comment-form">
-                <!-- Contenedor para el editor Quill -->
+                <!-- Quill editor -->
                 <div id="editor" style="min-height: 100px;"></div>
-                <!-- Input oculto para enviar el contenido sanitizado -->
+                <!-- Hidden input to send the sanitized content -->
                 <input type="hidden" name="content" id="content">
                 <input type="hidden" name="_csrf" value="{{token}}" />
                 <button type="submit">Publicar</button>
@@ -154,7 +154,7 @@
                 <div class="comment-author">
                     <div class="comment-avatar-container">
                         {{#hasProfilePicture}}
-                        <!-- Usar la URL directa del avatar -->
+                        <!-- Use the direct URL of the avatar -->
                         <img src="/users/{{user.userId}}/avatar" alt="{{username}}" class="comment-avatar">
                         {{/hasProfilePicture}}
                         {{^hasProfilePicture}}

@@ -34,7 +34,7 @@ public class CategoryRestController {
     }
 
      /**
-     * Obtiene todas las categorías (sin sonidos).
+     * Get all categories.
      */
     @GetMapping
     public ResponseEntity<List<CategoryDTO>> getAll() {
@@ -45,7 +45,7 @@ public class CategoryRestController {
     }
 
     /**
-     * Crea o devuelve una categoría.
+     * Lookup category by name and create it if it doesn't exist.
      */
     @PostMapping
     public ResponseEntity<CategoryDTO> create(@RequestParam String name) {
@@ -56,7 +56,7 @@ public class CategoryRestController {
     }
 
     /**
-     * Busca (o crea) una categoría y devuelve sus datos con sonidos.
+     * Lookup category by id.
      */
     @GetMapping("/{id}")
     public ResponseEntity<CategoryDTO> getById(@PathVariable Long id) {
@@ -72,7 +72,7 @@ public class CategoryRestController {
     }
 
     /**
-     * Busca o crea por nombre.
+     * Lookup category by name and create it if it doesn't exist.
      */
     @GetMapping("/search")
     public ResponseEntity<CategoryDTO> search(@RequestParam String name) {
