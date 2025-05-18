@@ -401,12 +401,15 @@ public class SoundController {
         }
 
         model.addAttribute("sounds", sounds);
+        model.addAttribute("selectedAll", false);
         return "sounds";
     }
 
 
 
-     @GetMapping("/sounds/upload/secret")
+
+    
+    @GetMapping("/sounds/upload/secret")
     public String showUploadSecretSoundForm(Principal principal, Model model) {
         if (principal == null) {
             model.addAttribute("error", "You must be logged in to upload secret sounds.");
