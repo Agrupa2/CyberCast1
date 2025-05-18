@@ -130,7 +130,7 @@ public class DataLoader implements CommandLineRunner {
 
                 soundRepository.saveAll(List.of(sound1, sound2, sound3, sound4));
 
-                // Cerrar los InputStreams
+                // Close the streams
                 if (cr7AudioStream != null) cr7AudioStream.close();
                 if (cr7ImageStream != null) cr7ImageStream.close();
                 if (betisAudioStream != null) betisAudioStream.close();

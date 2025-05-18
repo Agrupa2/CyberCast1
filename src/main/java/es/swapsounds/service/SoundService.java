@@ -48,6 +48,9 @@ public class SoundService {
     private SoundRepository soundRepository;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
 
     public SoundService(@Qualifier("soundMapperImpl") SoundMapper mapper) {
         this.mapper = mapper;
@@ -119,26 +122,26 @@ public class SoundService {
             MultipartFile imageFile,
             User user) throws IOException {
         try {
-            // 1. Calcular duración
+            // 1. Calculate duration
             String duration = calculateDuration(audioFile);
 
-            // 2. Convertir MultipartFile a Blob
+            // 2. Convert MultipartFile to Blob
             Blob audioBlob = new SerialBlob(audioFile.getBytes());
             Blob imageBlob = new SerialBlob(imageFile.getBytes());
 
-            // 3. Crear el objeto Sound
+            // 3. Create a new Sound object
             Sound sound = new Sound(title, description, audioBlob, imageBlob, user.getUserId(), new ArrayList<>(),
                     duration);
             sound.setUploadDate(LocalDateTime.now());
 
-            // 4. Procesar categorías
+            // 4. Process categories
             for (String catName : categoryNames) {
                 Category category = categoryService.findOrCreateCategory(catName);
                 sound.addCategory(category);
                 category.getSounds().add(sound);
             }
 
-            // 5. Guardar el sonido en la base de datos
+            // 5. Store the sound in the database
             Sound savedSound = soundRepository.save(sound);
             this.lastInsertedSoundId = savedSound.getSoundId();
             return savedSound;
@@ -151,14 +154,14 @@ public class SoundService {
     public List<Sound> getFilteredSounds(String query, String category) {
         List<Sound> allSounds = soundRepository.findAll();
         return allSounds.stream().filter(sound -> {
-            // Filtro de categoría
+            // Filter by category
             boolean matchesCategory = true;
             if (!"all".equalsIgnoreCase(category)) {
                 matchesCategory = sound.getCategories() != null &&
                         sound.getCategories().stream()
                                 .anyMatch(cat -> cat.getName().equalsIgnoreCase(category));
             }
-            // Filtro de búsqueda
+            // Filter by query
             boolean matchesQuery = (query == null || query.trim().isEmpty())
                     || sound.getTitle().toLowerCase().contains(query.toLowerCase());
             return matchesCategory && matchesQuery;
@@ -186,7 +189,7 @@ public class SoundService {
         Sound sound = soundRepository.findById(soundId)
                 .orElseThrow(() -> new RuntimeException("Sonido no encontrado"));
 
-        // 1. Limpiar relaciones de categorías anteriores
+        // 1. Clean up old categories
         if (sound.getCategories() != null) {
             for (Category category : sound.getCategories()) {
                 category.getSounds().remove(sound);
@@ -194,23 +197,23 @@ public class SoundService {
             sound.getCategories().clear();
         }
 
-        // 2. Actualizar campos básicos
+        // 2. Upload date the Database
         sound.setTitle(title);
         sound.setDescription(description);
 
-        // 3. Procesar nuevas categorías
+        // 3. Process categories
         for (String catName : categoryNames) {
             Category category = categoryService.findOrCreateCategory(catName);
             sound.addCategory(category);
             category.getSounds().add(sound);
         }
 
-        // 4. Manejar archivos opcionales
+        // 4. Manage audio and image files
         try {
             if (audioFile != null && !audioFile.isEmpty()) {
                 Blob audioBlob = new SerialBlob(audioFile.getBytes());
                 sound.setAudioBlob(audioBlob);
-                // Recalcular la duración si se actualiza el audio
+                // Recalculate duration
                 sound.setDuration(calculateDuration(audioFile));
             }
             if (imageFile != null && !imageFile.isEmpty()) {
@@ -218,7 +221,7 @@ public class SoundService {
                 sound.setImageBlob(imageBlob);
             }
 
-            // 5. Actualizar en la BD
+            // 5. Upload date the Database
             soundRepository.save(sound);
 
         } catch (SQLException e) {
@@ -261,7 +264,7 @@ public class SoundService {
     }
 
     public void updateAudio(Long soundId, MultipartFile audioFile, Long userId) throws IOException {
-        // Validaciones existentes de archivo
+        // Validations
         if (audioFile == null || audioFile.isEmpty()) {
             throw new IllegalArgumentException("El archivo de audio no puede estar vacío");
         }
@@ -274,7 +277,7 @@ public class SoundService {
         Sound sound = soundRepository.findById(soundId)
                 .orElseThrow(() -> new SoundNotFoundException(soundId));
 
-        // Nuevo: Verificar permisos (admin o propietario)
+        // New: Check permissions (admin or sound owner)
         Optional<User> userOpt = userRepository.findById(userId);
         User user = userOpt.get();
 
@@ -283,7 +286,7 @@ public class SoundService {
             throw new UnauthorizedAccessException("No tienes permiso para modificar este sonido");
         }
 
-        // Resto de validaciones y lógica
+        // Other validations and logics
         long maxSize = 10 * 1024 * 1024;
         if (audioFile.getSize() > maxSize) {
             throw new IllegalArgumentException("El archivo excede el tamaño máximo permitido (10MB)");
@@ -305,7 +308,7 @@ public class SoundService {
         Sound sound = soundRepository.findById(soundId)
                 .orElseThrow(() -> new SoundNotFoundException(soundId));
 
-        // Nuevo: Verificar permisos
+        // New: Check permissions
         Optional<User> userOpt = userRepository.findById(userId);
         User user = userOpt.get();
 
@@ -314,7 +317,7 @@ public class SoundService {
             throw new UnauthorizedAccessException("Usuario no autorizado para actualizar este sonido");
         }
 
-        // Resto de validaciones
+        // Other validations
         long maxSize = 5 * 1024 * 1024;
         if (imageFile.getSize() > maxSize) {
             throw new IllegalArgumentException("La imagen excede el tamaño máximo permitido (5MB)");
@@ -329,7 +332,7 @@ public class SoundService {
         Sound sound = soundRepository.findById(id)
                 .orElseThrow(() -> new SoundNotFoundException(id));
 
-        // Nuevo: Verificar permisos
+        // New: Check permissions
         Optional<User> userOpt = userRepository.findById(userId);
         User user = userOpt.get();
 
