@@ -14,9 +14,7 @@ import java.util.Set;
 import es.swapsounds.service.SoundService;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -27,7 +25,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.MultipartFile;
 
 import es.swapsounds.model.Category;
@@ -69,14 +66,12 @@ public class SoundController {
         }
 
         // Obtener sonidos filtrados usando el SoundService
-        List<Sound> filteredSounds = soundService.getFilteredSounds(query, category);
-        model.addAttribute("sounds", filteredSounds);
-        model.addAttribute("query", query);
-        model.addAttribute("category", category);
-
-        Page<Sound> firstPage = soundService.getFilteredSoundsPage(query, category, 0, 8);
+        Page<Sound> firstPage = soundService.getFilteredSoundsPage(query, category, 0, 10);
+        model.addAttribute("sounds", firstPage.getContent());
         model.addAttribute("hasNext", firstPage.hasNext());
         model.addAttribute("currentPage", firstPage.getNumber());
+        model.addAttribute("query", query);
+        model.addAttribute("category", category);
 
         // Obtener categorías para el dropdown
         List<Category> allCategories = categoryService.getAllCategories();
@@ -89,6 +84,7 @@ public class SoundController {
 
         return "sounds";
     }
+
 
     @GetMapping("/sounds/upload")
     public String showUploadForm(Principal principal, Model model) {

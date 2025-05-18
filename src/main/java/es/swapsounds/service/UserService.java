@@ -236,7 +236,7 @@ public class UserService {
         PolicyFactory policy = Sanitizers.FORMATTING.and(Sanitizers.LINKS);
         String cleanConfirmation = policy.sanitize(confirmation);
         // 1. Validar confirmación
-        if (!"ELIMINAR CUENTA".equals(confirmation != null ? confirmation.trim() : "")) {
+        if (!"ELIMINAR CUENTA".equals(cleanConfirmation != null ? cleanConfirmation.trim() : "")) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "You must confirm by typing 'ELIMINAR CUENTA'");

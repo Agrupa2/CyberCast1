@@ -24,11 +24,10 @@
 
                     {{#logged}}
                     <li><a href="/sounds/upload?username={{userName}}">Upload Sound</a></li>
-                    <li><a href="/sounds/upload/secret">Upload Secret Sound</a></li>
                     <li><a href="/sounds/download">Download Sound</a></li>
                     <li><a href="/delete-account">Delete Account</a></li>
                     <li><a href="/logout">Logout</a></li>
-                    <li><a href="/profile/{{userName}}">View profile</a></li>
+                    <li><a href="/profile/{{userName}}">Ver perfil</a></li>
 
                     {{#admin}}
                     <li><a href="/admin/users">Admin Panel</a></li>
@@ -76,7 +75,7 @@
                     </div>
                     <div class="audio-container">
                         <audio class="custom-audio">
-                            <source src="/files/audio/${sound.audioPath}" type="audio/mpeg" />
+                            <source src="/sounds/audio/{{soundId}}" type="audio/mpeg">
                             Your browser does not support the audio element.
                         </audio>
                         <div class="audio-controls">
@@ -99,9 +98,6 @@
             <span class="label">Más resultados</span>
             <span class="loader"></span>
         </button>
-        {{/hasNext}}
-        
-        <script src="/js/sounds.js"></script>
 
 
     </div>
@@ -155,9 +151,7 @@
         </div>
     </footer>
     </div>
-    <script>
 
-    </script>
     <script src="/js/sounds.js"></script>
 </body>
 
