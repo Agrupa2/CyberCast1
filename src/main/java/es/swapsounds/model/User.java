@@ -28,6 +28,8 @@ public class User {
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles;
 
+    private String secretPath;
+
     public User() {
     }
 
@@ -98,5 +100,13 @@ public class User {
 
     public void setSound(Sound sound) {
         this.sounds.add(sound);
+    }
+
+    public String getSecretPath() {
+        return secretPath;
+    }
+
+    public void setSecretPath(String secretPath) {
+        this.secretPath = secretPath;
     }
 }

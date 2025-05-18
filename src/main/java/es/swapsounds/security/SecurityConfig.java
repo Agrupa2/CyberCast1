@@ -67,7 +67,9 @@ public class SecurityConfig {
                         // PRIVATE ENDPOINTS
                         .requestMatchers(HttpMethod.GET, "/api/categories").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/categories").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/categories/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/categories/{id}").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/categories/{id}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/categories/{id}").hasRole("ADMIN")
                         .requestMatchers("/api/sounds/{soundId}/comments").hasRole("USER")
                         .requestMatchers("/api/sounds/{soundId}/comments/{commentId}").hasRole("USER")
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
@@ -88,6 +90,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/sounds/{id}/image").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/sounds/{id}/audio").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/sounds/").hasRole("USER")
+                        .requestMatchers("/api/secret-sounds/**").hasRole("USER")
 
                         // PUBLIC ENDPOINTS
                         .anyRequest().permitAll());
@@ -137,7 +140,7 @@ public class SecurityConfig {
 
                         // Private pages
                         .requestMatchers("/sounds/**").hasRole("USER")
-                        .requestMatchers("/profile/**", "/delete-account").hasRole("USER")
+                        .requestMatchers("/profile/**", "/delete-account", "/secret-sounds/**").hasRole("USER")
                         .requestMatchers("/users/{id}/delete").hasRole("ADMIN")
                         .requestMatchers("/admin/users").hasRole("ADMIN")
                         .anyRequest().authenticated())

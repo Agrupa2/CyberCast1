@@ -1,0 +1,1215 @@
+{
+	"info": {
+		"_postman_id": "37ea9973-dc1b-4887-b7b9-d934293d4d21",
+		"name": "New Collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "44963542",
+		"_collection_link": "https://sergio-2595212.postman.co/workspace/My-Workspace~a7132552-f50f-4ff6-8f88-a3f92f82fd85/collection/44963542-37ea9973-dc1b-4887-b7b9-d934293d4d21?action=share&source=collection_link&creator=44963542"
+	},
+	"item": [
+		{
+			"name": "SwapSoundsAPIRequests",
+			"item": [
+				{
+					"name": "UserRestController",
+					"item": [
+						{
+							"name": "username edition",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:8443/api/users/sofia/username?newUsername=sofiaa",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8443",
+									"path": [
+										"api",
+										"users",
+										"sofia",
+										"username"
+									],
+									"query": [
+										{
+											"key": "newUsername",
+											"value": "sofiaa"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "show users",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var template = `\r",
+											"<canvas id=\"myChart\" height=\"75\"></canvas>\r",
+											"\r",
+											"<script src=\"https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js\"></script> \r",
+											"\r",
+											"<script>\r",
+											"    var ctx = document.getElementById(\"myChart\");\r",
+											"\r",
+											"    var myChart = new Chart(ctx, {\r",
+											"        type: \"bar\",\r",
+											"        data: {\r",
+											"            labels: [],\r",
+											"            datasets: [{\r",
+											"                data: [],\r",
+											"                \r",
+											"                // Change these colours to customize the chart\r",
+											"                backgroundColor: [\"#003f5c\", \"#58508d\", \"#bc5090\", \"#ff6361\", \"#ffa600\"],\r",
+											"            }]\r",
+											"        },\r",
+											"        options: {\r",
+											"            legend: { display: false },\r",
+											"            title: {\r",
+											"                display: true,\r",
+											"                text: 'Count'\r",
+											"            },\r",
+											"            scales: {\r",
+											"                xAxes: [{\r",
+											"                    display: true,\r",
+											"                    scaleLabel: {\r",
+											"                        display: true,\r",
+											"                        labelString: 'Items'\r",
+											"                    }\r",
+											"                }],\r",
+											"                yAxes: [{\r",
+											"                    display: true,\r",
+											"                    scaleLabel: {\r",
+											"                        display: true,\r",
+											"                        labelString: 'Count'\r",
+											"                    }\r",
+											"                }]\r",
+											"            }\r",
+											"        }\r",
+											"\r",
+											"    });\r",
+											"\r",
+											"    // Access the data passed to pm.visualizer.set() from the JavaScript\r",
+											"    // code of the Visualizer template\r",
+											"    pm.getData(function (err, value) {\r",
+											"        myChart.data.datasets[0].data = value.response.map(user => user.id);\r",
+											"        myChart.data.labels = value.response.map(user => user.username);\r",
+											"        myChart.update();\r",
+											"    });\r",
+											"\r",
+											"</script>`;\r",
+											"\r",
+											"function constructVisualizerPayload() {\r",
+											"    var res = pm.response.json();\r",
+											"    \r",
+											"    var visualizerData = {\r",
+											"        \r",
+											"        // Labels take an array of strings\r",
+											"        labels: res.map(user => user.username),\r",
+											"        \r",
+											"        // Data takes an array of numbers\r",
+											"        data: res.map(user => user.id)\r",
+											"    };\r",
+											"\r",
+											"    return {response: visualizerData};\r",
+											"}\r",
+											"\r",
+											"pm.visualizer.set(template, constructVisualizerPayload());"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:8443/api/users",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8443",
+									"path": [
+										"api",
+										"users"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "info user",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var template = `\r",
+											"<style type=\"text/css\">\r",
+											"    .tftable {font-size:14px;color:#333333;width:100%;border-width: 1px;border-color: #87ceeb;border-collapse: collapse;}\r",
+											"    .tftable th {font-size:18px;background-color:#87ceeb;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;text-align:left;}\r",
+											"    .tftable tr {background-color:#ffffff;}\r",
+											"    .tftable td {font-size:14px;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;}\r",
+											"    .tftable tr:hover {background-color:#e0ffff;}\r",
+											"</style>\r",
+											"\r",
+											"<table class=\"tftable\" border=\"1\">\r",
+											"    <tr>\r",
+											"        <th>ID</th>\r",
+											"        <th>Username</th>\r",
+											"        <th>Email</th>\r",
+											"        <th>Roles</th>\r",
+											"    </tr>\r",
+											"    <tr>\r",
+											"        <td>{{response.id}}</td>\r",
+											"        <td>{{response.username}}</td>\r",
+											"        <td>{{response.email}}</td>\r",
+											"        <td>{{response.roles}}</td>\r",
+											"    </tr>\r",
+											"</table>\r",
+											"`;\r",
+											"\r",
+											"function constructVisualizerPayload() {\r",
+											"    return { response: pm.response.json() }\r",
+											"}\r",
+											"\r",
+											"pm.visualizer.set(template, constructVisualizerPayload());"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:8443/api/users/sofia",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8443",
+									"path": [
+										"api",
+										"users",
+										"sofia"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "user signup",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "username",
+											"value": "sergio",
+											"type": "text"
+										},
+										{
+											"key": "email",
+											"value": "sergio@gmail.com",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "sergio123",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "https://localhost:8443/api/auth/signup",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8443",
+									"path": [
+										"api",
+										"auth",
+										"signup"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "avatar edition",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "avatar",
+											"type": "file",
+											"src": "/C:/Users/sergi/Downloads/icons8-s-16.png"
+										}
+									]
+								},
+								"url": {
+									"raw": "https://localhost:8443/api/users/sofia/avatar",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8443",
+									"path": [
+										"api",
+										"users",
+										"sofia",
+										"avatar"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "login user",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\" : \"\",\r\n    \"password\" : \"\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:8443/api/auth/login",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8443",
+									"path": [
+										"api",
+										"auth",
+										"login"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "login admin",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"username\" : \"admin\",\r\n    \"password\" : \"admin\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:8443/api/auth/login",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8443",
+											"path": [
+												"api",
+												"auth",
+												"login"
+											]
+										}
+									},
+									"_postman_previewlanguage": null,
+									"header": null,
+									"cookie": [],
+									"body": null
+								},
+								{
+									"name": "login user",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"username\" : \"\",\r\n    \"password\" : \"\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:8443/api/auth/login",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8443",
+											"path": [
+												"api",
+												"auth",
+												"login"
+											]
+										}
+									},
+									"_postman_previewlanguage": null,
+									"header": null,
+									"cookie": [],
+									"body": null
+								}
+							]
+						},
+						{
+							"name": "logout",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "username",
+											"value": "anaa",
+											"type": "text"
+										},
+										{
+											"key": "user_password",
+											"value": "ana12345",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "https://localhost:8443/api/auth/logout",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8443",
+									"path": [
+										"api",
+										"auth",
+										"logout"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "account deletion",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "confirmation",
+											"value": "ELIMINAR CUENTA",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "https://localhost:8443/api/users/david",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8443",
+									"path": [
+										"api",
+										"users",
+										"david"
+									],
+									"query": [
+										{
+											"key": "",
+											"value": null,
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "refresh",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "username",
+											"value": "sergio",
+											"type": "text"
+										},
+										{
+											"key": "email",
+											"value": "sergio@gmail.com",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "sergio123",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "https://localhost:8443/api/auth/refresh",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8443",
+									"path": [
+										"api",
+										"auth",
+										"refresh"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create user (admin)",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\" : \"adminapicontra2\",\r\n    \"password\" : \"adminapicontra2\",\r\n    \"email\" : \"adminapicontra2@gmail.com\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:8443/api/users/",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8443",
+									"path": [
+										"api",
+										"users",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "CommentRestController",
+					"item": [
+						{
+							"name": "Create a comment",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "content",
+											"value": "comentario api",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "https://localhost:8443/api/sounds/1/comments",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8443",
+									"path": [
+										"api",
+										"sounds",
+										"1",
+										"comments"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get sound comments",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:8443/api/sounds/1/comments",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8443",
+									"path": [
+										"api",
+										"sounds",
+										"1",
+										"comments"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Edición de comentarios",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "content",
+											"value": "editado? admin",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "https://localhost:8443/api/sounds/1/comments/102",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8443",
+									"path": [
+										"api",
+										"sounds",
+										"1",
+										"comments",
+										"102"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Eliminación de comentarios",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "content",
+											"value": "comentario api",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "https://localhost:8443/api/sounds/1/comments/103",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8443",
+									"path": [
+										"api",
+										"sounds",
+										"1",
+										"comments",
+										"103"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "CategoryRestController",
+					"item": [
+						{
+							"name": "Obtain categories",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:8443/api/categories",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8443",
+									"path": [
+										"api",
+										"categories"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create or search category",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var template = `\r",
+											"<style type=\"text/css\">\r",
+											"    .tftable {font-size:14px;color:#333333;width:100%;border-width: 1px;border-color: #87ceeb;border-collapse: collapse;}\r",
+											"    .tftable th {font-size:18px;background-color:#87ceeb;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;text-align:left;}\r",
+											"    .tftable tr {background-color:#ffffff;}\r",
+											"    .tftable td {font-size:14px;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;}\r",
+											"    .tftable tr:hover {background-color:#e0ffff;}\r",
+											"</style>\r",
+											"\r",
+											"<table class=\"tftable\" border=\"1\">\r",
+											"    <tr>\r",
+											"        <th>ID</th>\r",
+											"        <th>Name</th>\r",
+											"    </tr>\r",
+											"    <tr>\r",
+											"        <td>{{response.id}}</td>\r",
+											"        <td>{{response.name}}</td>\r",
+											"    </tr>\r",
+											"</table>\r",
+											"`;\r",
+											"\r",
+											"function constructVisualizerPayload() {\r",
+											"    return {response: pm.response.json()}\r",
+											"}\r",
+											"\r",
+											"pm.visualizer.set(template, constructVisualizerPayload());"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "name",
+											"value": "folklore",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/categories",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"categories"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Create or search category",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "name",
+													"value": "folklore",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "http://localhost:8080/api/categories",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "8080",
+											"path": [
+												"api",
+												"categories"
+											]
+										}
+									},
+									"_postman_previewlanguage": null,
+									"header": null,
+									"cookie": [],
+									"body": null
+								}
+							]
+						},
+						{
+							"name": "get category",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:8443/api/categories/1",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8443",
+									"path": [
+										"api",
+										"categories",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Edit Category",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\" : \"Football\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:8443/api/categories/1",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8443",
+									"path": [
+										"api",
+										"categories",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "New Request",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\" : \"Football\"\r\n}"
+								},
+								"url": {
+									"raw": "https://localhost:8443/api/categories/4",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8443",
+									"path": [
+										"api",
+										"categories",
+										"4"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "SounRestController",
+					"item": [
+						{
+							"name": "Get all Sounds",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:8443/api/sounds",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8443",
+									"path": [
+										"api",
+										"sounds"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get sounds by id",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:8443/api/sounds/2",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8443",
+									"path": [
+										"api",
+										"sounds",
+										"2"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "upload sound",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "title",
+											"value": "sonido",
+											"type": "text"
+										},
+										{
+											"key": "description",
+											"value": "sonidoioo",
+											"type": "text"
+										},
+										{
+											"key": "categories",
+											"value": "AI",
+											"type": "text"
+										},
+										{
+											"key": "imageFile",
+											"type": "file",
+											"src": "/C:/Users/sergi/Downloads/puertas-logicas (1).png"
+										},
+										{
+											"key": "audioFile",
+											"type": "file",
+											"src": "/C:/Users/sergi/Downloads/rat-dance-music.mp3"
+										}
+									]
+								},
+								"url": {
+									"raw": "https://localhost:8443/api/sounds/",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8443",
+									"path": [
+										"api",
+										"sounds",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "modify sound audio",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "audioFile",
+											"type": "file",
+											"src": "/C:/Users/sergi/Downloads/movie_1.mp3"
+										}
+									]
+								},
+								"url": {
+									"raw": "https://localhost:8443/api/sounds/1/audio",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8443",
+									"path": [
+										"api",
+										"sounds",
+										"1",
+										"audio"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "modify sound image",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "imageFile",
+											"type": "file",
+											"src": "/C:/Users/sergi/Downloads/cdcc50f96e0377a623901f724164f0e5.jpg"
+										}
+									]
+								},
+								"url": {
+									"raw": "https://localhost:8443/api/sounds/1/image",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8443",
+									"path": [
+										"api",
+										"sounds",
+										"1",
+										"image"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete sound",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:8443/api/sounds/2",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8443",
+									"path": [
+										"api",
+										"sounds",
+										"2"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "obtain sound audio",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "https://localhost:8443/api/sounds/3/audio",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8443",
+									"path": [
+										"api",
+										"sounds",
+										"3",
+										"audio"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "obtain sound image",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "imageFile",
+											"type": "file",
+											"src": "/C:/Users/sergi/Downloads/puertas-logicas (1).png"
+										}
+									]
+								},
+								"url": {
+									"raw": "https://localhost:8443/api/sounds/3/image",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8443",
+									"path": [
+										"api",
+										"sounds",
+										"3",
+										"image"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "New Request",
+							"request": {
+								"method": "GET",
+								"header": []
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "SecretSoundRestController",
+					"item": [
+						{
+							"name": "Upload secret sound",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/C:/Users/sergi/Downloads/rat-dance-music.mp3"
+										}
+									]
+								},
+								"url": {
+									"raw": "https://localhost:8443/api/secret-sounds/sofia/upload",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8443",
+									"path": [
+										"api",
+										"secret-sounds",
+										"sofia",
+										"upload"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete secret sound",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/C:/Users/sergi/Downloads/movie_1.mp3"
+										}
+									]
+								},
+								"url": {
+									"raw": "https://localhost:8443/api/secret-sounds/sofia",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8443",
+									"path": [
+										"api",
+										"secret-sounds",
+										"sofia"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "download secret sound",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/C:/Users/sergi/Downloads/movie_1.mp3"
+										}
+									]
+								},
+								"url": {
+									"raw": "https://localhost:8443/api/secret-sounds/sofia/download",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8443",
+									"path": [
+										"api",
+										"secret-sounds",
+										"sofia",
+										"download"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	]
+}

@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.security.Principal;
 import java.sql.Blob;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -147,39 +146,6 @@ public class SoundController {
 
         model.addAttribute("success", "Sound uploaded successfully!");
         return "redirect:/sounds/" + soundService.getLastInsertedSoundId();
-    }
-
-    @GetMapping("/sounds/download")
-    public String downloadSounds(
-            @RequestParam(name = "query", required = false) String query,
-            @RequestParam(name = "category", defaultValue = "all") String category,
-            Principal principal,
-            Model model) {
-
-        // Get user from UserService
-        Optional<User> userOpt = userService.getUserFromPrincipal(principal);
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
-            model.addAttribute("username", user.getUsername());
-            model.addAttribute("userId", user.getUserId());
-        }
-
-        // Get filtered sounds using SoundService
-        List<Sound> filteredSounds = soundService.getFilteredSounds(query, category);
-        model.addAttribute("sounds", filteredSounds);
-        model.addAttribute("query", query);
-        model.addAttribute("category", category);
-
-        // Get categories for the dropdown
-        List<Category> allCategories = categoryService.getAllCategories();
-        model.addAttribute("allCategories", allCategories);
-
-        model.addAttribute("selectedAll", "all".equalsIgnoreCase(category));
-        for (Category cat : allCategories) {
-            model.addAttribute("selected" + cat.getName(), category.equalsIgnoreCase(cat.getName()));
-        }
-
-        return "download-sound";
     }
 
     @GetMapping("/sounds/{soundId}")
@@ -402,7 +368,7 @@ public class SoundController {
 
 
     
-    @GetMapping("/sounds/upload/secret")
+/*     @GetMapping("/sounds/upload/secret")
     public String showUploadSecretSoundForm(Principal principal, Model model) {
         if (principal == null) {
             model.addAttribute("error", "You must be logged in to upload secret sounds.");
@@ -421,5 +387,5 @@ public class SoundController {
         model.addAttribute("isSecret", true);
 
         return "upload-secret-sound";
-    }
+    } */
 }
