@@ -22,7 +22,7 @@ public class Sound {
     @Lob
     private Blob audioBlob; // Para almacenar el archivo de audio como BLOB
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL) 
     private List<Comment> comments;
 
     private String duration; // Duración del audio (en formato "min:seg")

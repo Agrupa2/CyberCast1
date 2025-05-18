@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.security.Principal;
 import java.sql.Blob;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -12,6 +13,7 @@ import java.util.Set;
 
 import es.swapsounds.service.SoundService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -358,4 +360,28 @@ public class SoundController {
         }
         return ResponseEntity.notFound().build();
     }
+
+    //Adding a knew / to make dynamic queries work
+
+
+    @GetMapping("/sounds/search")
+    public String searchSounds(Model model,
+        @RequestParam(required = false) String title,
+        @RequestParam(required = false) String category,
+        @RequestParam(required = false) String duration,
+        @RequestParam(required = false) Long userId) {
+
+        List<Sound> sounds;
+
+        if (title == null && category == null && duration == null && userId == null) {
+            sounds = soundService.getAllSounds();
+        } else {
+            sounds = soundService.searchSounds(title, category, duration, userId);
+        }
+
+        model.addAttribute("sounds", sounds);
+        return "sounds";
+    }
+
+
 }

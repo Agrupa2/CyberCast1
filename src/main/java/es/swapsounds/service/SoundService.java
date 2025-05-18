@@ -70,6 +70,10 @@ public class SoundService {
         return soundRepository.findById(id);
     }
 
+    public List<Sound> getSoundsByTitle() {
+        return soundRepository.findSoundByTitle();
+    }
+
     public Sound addSound(Sound sound) {
         Sound savedSound = soundRepository.save(sound);
         this.lastInsertedSoundId = savedSound.getSoundId();
@@ -349,4 +353,16 @@ public class AudioProcessingException extends RuntimeException {
     }
 
     }
+
+    //This method is going to be used for the dynamic queries.
+
+    public List<Sound> searchSounds(String title, String category, String duration, Long userId) {
+        return soundRepository.searchByFilters(
+            title != null ? title.toLowerCase() : null,
+            category != null ? category.toLowerCase() : null,
+            duration,
+            userId
+        );
+    }
+
 }
