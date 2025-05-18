@@ -2,3 +2,156 @@
 
 
 ## Swapsounds
+## 👋 Hola!! 
+
+# 🎧SwapSounds - Comparte y Descarga Sonidos Libres
+
+Bienvenido a *SwapSounds, una plataforma intuitiva y colaborativa donde los usuarios pueden **subir, compartir* y *descargar* sonidos en múltiples formatos. Diseñada con pasión por un equipo de cuatro desarrolladores comprometidos.
+
+---
+## 🗂️ Entidades
+
+| <center>Entidad</center> | <center>Descripción</center>                                                                                                     |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
+| *User*👤                 | Representa a cada usuario de la plataforma. Contiene datos como nombre, email, contraseña y roles.                               |
+| *Sound* 🔊               | Archivo de audio subido por un usuario. Incluye título, descripción, fecha de subida, URL y duración.                            |
+| *Category* 🏷️           | Clasificación temática o tipo de sonido (por ejemplo: naturaleza, efectos, música, etc.). Cada sonido pertenece a una categoría. |
+| *Comment*💬              | Comentarios realizados por los usuarios en cada sonido. Incluyen contenido, autor fecha.                                         |
+
+## 🔗 Relaciones
+
+| <center>Relación</center> | <center>Descripción</center>                         |
+| ------------------------- | ---------------------------------------------------- |
+| `@OneToMany`              | Un usuario puede tener múltiples comentarios.        |
+| `@OneToMany`              | Un usuario puede tener múltiples sonidos.            |
+| `@OneToMany`              | Un sonido puede tener múltiples comentarios.         |
+| `@ManyToMany`             | Múltiples sonidos pertenecen a múltiples categorías. |
+| `@ManyToOne`              | Múltiples comentarios pertenecen a un usuario.       |
+| `@ManyToOne`              | Múltiples comentarios pertenecen a un sonido.        |
+| `@ManyToMany`             | Múltiples categorías pertenecen a múltiples sonidos. |
+
+## 🛡️ Roles 
+
+| <center>Tipo de usuario</center> | <center>Permisos</center>                                                                                                                                                                                                                                                                                                                                                    |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Anonimous                        | Ver y reproducir el contenido de la página web, acceder al panel de login.                                                                                                                                                                                                                                                                                                   |
+| User                             | Ver y reproducir el contenido de la página web, acceder al panel de login. Subir sonidos, descargar sonidos, realizar comentarios y editarlos junto con sus sonidos, además de poder editar su perfil (nombre y foto). También pueden borrar su propia cuenta. Los usuarios pueden ver el número de sonidos y comentarios que tienen .                                       |
+| Admin                            | Ver y reproducir el contenido de la página web, acceder al panel de login. Subir sonidos, descargar sonidos, realizar comentarios y editarlos junto con sus sonidos, además de poder editar su perfil (nombre y foto). Puede ver el número de sonidos y comentarios que tienen los usuarios. Dispone de un panel "Admin Panel" que puede borrar tanto usuarios como sonidos. |
+
+## 📊 Diagrama
+
+![Logo GitHub](https://github.com/DWS-2025/project-grupo-10/blob/main/src/main/resources/static/images/swapsoundsEnBlanco.png)
+
+## 🌟 Características principales
+
+- 📤 *Subida rápida* de archivos de audio (.mp3, .wav, etc.).
+- 📥 *Descarga sin límites* para todos los usuarios.
+- 🔍 Filtros y buscador para encontrar sonidos por nombre, categoría o duración.
+- 🔗 *API REST* para integraciones externas.
+- 🎨 Interfaz simple y rápida gracias a *Mustache* como motor de plantillas.
+
+---
+
+## 💻 Lenguajes de programación
+
+| <center>Lenguaje</center> | <center>Uso principal</center> |
+| ------------------------- | ------------------------------ |
+| ☕ *Java*                  | Backend con Spring Boot.       |
+| 🌐 *HTML*                 | Estructura del frontend.       |
+| 🎨 *CSS*                  | Estilos visuales del frontend. |
+| ⚙️ *JavaScript*           | Interactividad en la interfaz. |
+
+---
+
+## 🛠️ Tecnologías utilizadas
+
+| <center>Categoría</center> | <center>Herramientas / Frameworks</center> |
+| -------------------------- | ------------------------------------------ |
+| 🔧 Backend                 | Spring Boot (Java)                         |
+| 🖼️ Frontend               | Mustache como motor de plantillas          |
+| 🔗 API                     | API REST con controladores Spring          |
+| 💾 Base de datos           | MySQL y/o H2                               |
+| ☁️ Almacenamiento          | Almacenamiento local                       |
+| 🧪 Control de versiones    | Git + GitHub                               |
+
+---
+
+## 👥 Equipo de desarrollo
+
+
+| <center>Nombre</center> | <center>Apellidos</center> | <center>Correo</center>              | <center>GitHub</center> |
+| ----------------------- | -------------------------- | ------------------------------------ | ----------------------- |
+| Sergio                  | Fernández-Dávila Marcos    | se.fernandezdav.2023@alumnos.urjc.es | sefernandezdav2023      |
+| Alejandro               | González Martínez          | a.gonzalezmart.2019@alumnos.urjc.es  | 4lexxxx                 |
+| Miguel Eduardo          | del Pino Sánchez           | me.delpino.2023@alumnos.urjc.es      | myyykyy                 |
+| Carla                   | Gómez Cabanillas           | c.gomez.2023@alumnos.urjc.es         | carlagmezc              |
+
+
+---
+
+##  🏆 Top commits
+
+--------------------
+@sefernandezdav2023 
+--------------------
+1. 
+
+2.
+
+3.
+
+4.
+
+5.
+--------------------
+@4lexxxx
+--------------------
+1. Adding all the functions for deleting sounds from the admin panel **4ce9d39a67099e22caba5c934cd7610f665f017b** && **eb82becc499957ba9c62a89ed1ffd8b78c477efd**
+
+2. Adding the download funcionality for the Sounds **a43fe4d21fed99d0e4b6911aefec1824851ff366**
+
+3. First steps for the DB **20e0b5507370f4519754e42ded29aade0490a7a0**
+
+4. Changing all the stuff to Blob, (the new audioBlob and imageBlob are the old FilePath and imagePath) **6b5240d5d91247d0d6e852cc1687628739d8c849**
+
+5. Changing the Data Loader for the second fase type **bb66468fadec6f09e0d3648f054ec20b20f66b36**
+
+--------------------
+@myyykyy
+--------------------
+
+My task during the practice was mainly focused on the comments and categories sections. Throughout the semester, I have been modifying the files related to these two entities as we progressed through the final part. Finally, towards the end of the practice, I was responsible for implementing dynamic queries for the Sound entity, allowing filtering by title, exact duration, category, and userId (the user who may have uploaded sounds). I also took care of enabling the editing and deleting of categories through the REST API.
+
+1. Creating the Dynamic queries for the entity sound modifiying this files:SoundControler, SoundRepository y SoundService. 
+ **ee74fdfbfc01b508263ed4d140badf7f51f25b19**
+
+2. Creating the CommentRepository and CommentService files. **29d50a8ec96bbbfff0682329ad85f25206d909ac**
+
+3. Crating and configuring CategoryService.  **7d299a112403a039d5df870301dcb2c28a62eaf0**
+
+4. Creating the editing, creation and deletion functions of the comment entity. **2a073ed23c4b5594ae94ee3c9406807115ba6e36**
+
+5. Making the transition from the CommentRepository to the CommentService. **e8dda06104b851f71f38e12e07e63bf7fdf70530**
+
+--------------------
+@carlagmezc
+--------------------
+1. 
+
+2.
+
+3.
+
+4.
+
+5.
+
+--------------------
+## 🚀 Cómo ejecutar el proyecto localmente
+
+```bash
+# Clonar el repositorio
+git clone https://github.com/DWS-2025/project-grupo-10.git
+
+# Ejecutar con Maven
+./mvnw spring-boot:run
