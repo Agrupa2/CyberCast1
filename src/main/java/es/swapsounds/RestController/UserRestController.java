@@ -35,12 +35,10 @@ public class UserRestController {
         this.svc = svc;
     }
 
+
     @GetMapping
-    public ResponseEntity<Page<UserDTO>> list(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size) {
-        Pageable p = PageRequest.of(page, size);
-        Page<UserDTO> dtos = svc.findAllUsersDTO(p);
+    public ResponseEntity<Page<UserDTO>> list(Pageable pageable) {
+        Page<UserDTO> dtos = svc.findAllUsersDTO(pageable);
         return ResponseEntity.ok(dtos);
     }
 
