@@ -29,6 +29,7 @@ import es.swapsounds.model.Category;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
 import es.swapsounds.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import es.swapsounds.service.CategoryService;
 import es.swapsounds.service.CommentService;
 
@@ -374,5 +375,26 @@ public class SoundController {
             }
         }
         return ResponseEntity.notFound().build();
+    }
+
+     @GetMapping("/sounds/upload/secret")
+    public String showUploadSecretSoundForm(Principal principal, Model model) {
+        if (principal == null) {
+            model.addAttribute("error", "You must be logged in to upload secret sounds.");
+            return "login";
+        }
+        String username = principal.getName();
+        Optional<User> userOpt = userService.findUserByUsername(username);
+        if (userOpt.isEmpty()) {
+            model.addAttribute("error", "User not found. Please login again.");
+            return "login";
+        }
+
+        model.addAttribute("username", username);
+        model.addAttribute("userId", userOpt.get().getUserId());
+        model.addAttribute("allCategories", categoryService.getAllCategories());
+        model.addAttribute("isSecret", true);
+
+        return "upload-secret-sound";
     }
 }
