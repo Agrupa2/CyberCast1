@@ -9,7 +9,6 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -54,20 +53,20 @@ public class SecretSoundService {
     public ResponseEntity<Resource> downloadSecretSound(Long userId, Principal principal) {
 
         User targetUser = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("Usuario no encontrado"));
+                .orElseThrow(() -> new NoSuchElementException("User not found"));
 
-        // Obtener usuario actual desde el principal
+        // Obtain principal from actual user
         User currentUser = userRepository.findByUsername(principal.getName())
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no autenticado"));
+                .orElseThrow(() -> new UsernameNotFoundException("User not authenticated"));
 
-        // Verificar si es propietario o admin
+        // Verify if the user is the owner of the sound or an admin
         if (currentUser.getUserId() != targetUser.getUserId() && !currentUser.getRoles().contains("ADMIN")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para acceder a este recurso");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have permission to access this resource");
         }
 
         String secretPath = targetUser.getSecretPath();
         if (secretPath == null) {
-            throw new NoSuchElementException("No existe sonido secreto para este usuario");
+            throw new NoSuchElementException("This user has no secret sound");
         }
 
         Path file = secretBasePath.resolve(secretPath).normalize();
@@ -84,39 +83,39 @@ public class SecretSoundService {
                     .body(resource);
         } catch (MalformedURLException e) {
             throw new ResponseStatusException(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Error al leer el archivo", e);
+                    "Error reading file", e);
         } catch (IOException e) {
             throw new ResponseStatusException(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Error obteniendo tipo de contenido", e);
+                    "Error obtaining content type", e);
         }
     }
 
     public void uploadSecretSound(Long userId, MultipartFile file, Principal principal) throws IOException {
 
         User targetUser = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("Usuario no encontrado"));
+                .orElseThrow(() -> new NoSuchElementException("User not found"));
 
-        // Obtener usuario actual desde el principal
+        // Obtain principal from actual user
         User currentUser = userRepository.findByUsername(principal.getName())
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no autenticado"));
+                .orElseThrow(() -> new UsernameNotFoundException("User not authenticated"));
 
-        // Verificar si es propietario o admin
+        // Verify if the user is the owner of the sound or an admin
         if (currentUser.getUserId() != targetUser.getUserId() && !currentUser.getRoles().contains("ADMIN")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para acceder a este recurso");
-        } 
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have permission to access this resource");
+        }
 
         String original = Paths.get(file.getOriginalFilename()).getFileName().toString();
         if (!original.matches("[a-zA-Z0-9._\\-() ]+\\.mp3")) {
-            throw new IllegalArgumentException("Solo se permiten MP3 y nombre limpio");
+            throw new IllegalArgumentException("Only MPR3 allowed and clean names");
         }
         if (!file.getContentType().startsWith("audio/")) {
-            throw new IllegalArgumentException("Debe ser un audio válido");
+            throw new IllegalArgumentException("Must be a valid audio");
         }
 
         String uuidName = UUID.randomUUID() + "-" + original;
         Path target = secretBasePath.resolve(uuidName).normalize();
         if (!target.startsWith(secretBasePath)) {
-            throw new SecurityException("Ruta inválida detectada");
+            throw new SecurityException("Invalid path detected");
         }
 
         Files.copy(file.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
@@ -128,25 +127,25 @@ public class SecretSoundService {
     public void deleteSecretSound(Long userId, Principal principal) {
 
         User targetUser = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("Usuario no encontrado"));
+                .orElseThrow(() -> new NoSuchElementException("User not found"));
 
-        // Obtener usuario actual desde el principal
+        // Obtain principal from actual user
         User currentUser = userRepository.findByUsername(principal.getName())
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no autenticado"));
+                .orElseThrow(() -> new UsernameNotFoundException("User not authenticated"));
 
-        // Verificar si es propietario o admin
+        // Verify if the user is the owner of the sound or an admin
         if (currentUser.getUserId() != targetUser.getUserId() && !currentUser.getRoles().contains("ADMIN")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para acceder a este recurso");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have permission to access this resource");
         }
 
         String secretPath = targetUser.getSecretPath();
         if (secretPath == null) {
-            throw new NoSuchElementException("No existe sonido secreto para este usuario");
+            throw new NoSuchElementException("This user has no secret sound");
         }
 
         Path file = secretBasePath.resolve(secretPath).normalize();
         if (!file.startsWith(secretBasePath)) {
-            throw new SecurityException("Ruta inválida detectada");
+            throw new SecurityException("Invalid path detected");
         }
 
         try {
@@ -157,11 +156,5 @@ public class SecretSoundService {
 
         targetUser.setSecretPath(null);
         userRepository.save(targetUser);
-    }
-
-    private void authorize(User user, Principal principal) {
-        if (principal == null || !user.getUsername().equals(principal.getName())) {
-            throw new AccessDeniedException("No tienes permiso para esta operación");
-        }
     }
 }

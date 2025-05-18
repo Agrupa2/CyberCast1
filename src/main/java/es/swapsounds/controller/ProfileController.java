@@ -33,7 +33,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @Controller
 public class ProfileController {
@@ -102,7 +101,7 @@ public class ProfileController {
     }
 
     /**
-     * Recibe el POST del formulario de subida de sonido secreto.
+     * Receives the UPLOAD POST request from the form in the profile page.
      */
     @PostMapping("/secret-sounds/upload/{userId}")
     public String uploadSecretSound(@PathVariable Long userId,
@@ -132,7 +131,7 @@ public class ProfileController {
     }
 
     /**
-     * Sirve el sonido secreto para descargar.
+     * Serves the secret sound to download
      */
     @GetMapping("/secret-sounds/download/{userId}")
     public ResponseEntity<Resource> downloadSecretSound(@PathVariable Long userId,
