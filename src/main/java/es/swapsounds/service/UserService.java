@@ -9,6 +9,8 @@ import es.swapsounds.repository.SoundRepository;
 import es.swapsounds.repository.CommentRepository;
 import es.swapsounds.repository.UserRepository;
 
+import org.owasp.html.PolicyFactory;
+import org.owasp.html.Sanitizers;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -18,8 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-
-import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.security.Principal;
@@ -52,13 +52,14 @@ public class UserService {
 
     }
 
-    public Long getUserIdFromSession(HttpSession session) {
-        return (Long) session.getAttribute("userId");
+    public Optional<Long> getUserIdByUsername(String username) {
+        return userRepository.findByUsername(username).map(User::getUserId);
     }
 
-    public Optional<User> getUserFromSession(HttpSession session) {
-        Long userId = getUserIdFromSession(session);
-        return (userId != null) ? userRepository.findById(userId) : Optional.empty();
+    public boolean isAdmin(String username) {
+        return userRepository.findByUsername(username)
+                .map(user -> user.getRoles().contains("ADMIN"))
+                .orElse(false);
     }
 
     public Optional<User> getUserById(Long userId) {
@@ -66,8 +67,12 @@ public class UserService {
     }
 
     public void updateUsername(long userId, String newUsername) {
+
+        PolicyFactory policy = Sanitizers.FORMATTING.and(Sanitizers.LINKS);
+        String cleanUsername = policy.sanitize(newUsername);
+
         userRepository.findById(userId).ifPresent(user -> {
-            user.setUsername(newUsername);
+            user.setUsername(cleanUsername);
             userRepository.save(user);
         });
     }
@@ -91,8 +96,10 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para modificar este usuario");
         }
 
+        PolicyFactory policy = Sanitizers.FORMATTING.and(Sanitizers.LINKS);
+        String cleanUsername = policy.sanitize(newUsername);
         // Actualizar nombre
-        targetUser.setUsername(newUsername.trim());
+        targetUser.setUsername(cleanUsername.trim());
         userRepository.save(targetUser);
     }
 
@@ -112,17 +119,20 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para modificar este usuario");
         }
 
-        // Actualizar avatar
-        try {
-            if (profilePhoto != null && !profilePhoto.isEmpty()) {
-                Blob photoBlob = new SerialBlob(profilePhoto.getBytes());
-                targetUser.setProfilePicture(photoBlob);
-            } else {
-                targetUser.setProfilePicture(null);
+        boolean checkProfilePic = validateProfilePic(profilePhoto);
+
+        if (checkProfilePic) {
+            try {
+                if (profilePhoto != null && !profilePhoto.isEmpty()) {
+                    Blob photoBlob = new SerialBlob(profilePhoto.getBytes());
+                    targetUser.setProfilePicture(photoBlob);
+                } else {
+                    targetUser.setProfilePicture(null);
+                }
+                userRepository.save(targetUser);
+            } catch (SQLException e) {
+                throw new RuntimeException("Error al convertir la imagen a Blob: " + e.getMessage());
             }
-            userRepository.save(targetUser);
-        } catch (SQLException e) {
-            throw new RuntimeException("Error al convertir la imagen a Blob: " + e.getMessage());
         }
     }
 
@@ -145,20 +155,23 @@ public class UserService {
                     "No tienes permisos para modificar este avatar");
         }
 
-        // 4. Actualizar avatar
-        try {
-            Blob blob = null;
-            if (file != null && !file.isEmpty()) {
-                blob = new SerialBlob(file.getBytes());
-            }
-            targetUser.setProfilePicture(blob);
-            userRepository.save(targetUser);
+        boolean checkProfilePic = validateProfilePic(file);
 
-        } catch (SQLException | IOException e) {
-            throw new ResponseStatusException(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Error al actualizar el avatar: " + e.getMessage(),
-                    e);
+        if (checkProfilePic) {
+            try {
+                Blob blob = null;
+                if (file != null && !file.isEmpty()) {
+                    blob = new SerialBlob(file.getBytes());
+                }
+                targetUser.setProfilePicture(blob);
+                userRepository.save(targetUser);
+
+            } catch (SQLException | IOException e) {
+                throw new ResponseStatusException(
+                        HttpStatus.INTERNAL_SERVER_ERROR,
+                        "Error al actualizar el avatar: " + e.getMessage(),
+                        e);
+            }
         }
     }
 
@@ -187,26 +200,42 @@ public class UserService {
 
     @Transactional
     public void deleteUser(long userId) {
-        // 1) Eliminar todos los comentarios que el usuario ha escrito
-        commentRepository.deleteByUserUserId(userId);
 
-        // 2) Para cada sonido que el usuario ha subido:
-        List<Sound> userSounds = soundRepository.findByUserId(userId);
-        for (Sound sound : userSounds) {
-            long sid = sound.getSoundId();
-            // 2a) Borrar comentarios apuntando a ese sonido
-            commentRepository.deleteBySoundId(sid);
-            // 2b) Borrar el sonido
-            soundRepository.deleteById(sid);
+        User currentUser = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED,
+                        "Usuario autenticado no encontrado"));
+        boolean isAdmin = currentUser.getRoles().contains("ADMIN");
+        if (isAdmin) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "No puedes eliminar a un admin");
+        } else {
+            // 1) Eliminar todos los comentarios que el usuario ha escrito
+            commentRepository.deleteByUserUserId(userId);
+
+            // 2) Para cada sonido que el usuario ha subido:
+            List<Sound> userSounds = soundRepository.findByUserId(userId);
+            for (Sound sound : userSounds) {
+                long sid = sound.getSoundId();
+                // 2a) Borrar comentarios apuntando a ese sonido
+                commentRepository.deleteBySoundId(sid);
+                // 2b) Borrar el sonido
+                soundRepository.deleteById(sid);
+            }
+
+            // 3) Borrar al usuario
+            userRepository.deleteById(userId);
         }
 
-        // 3) Borrar al usuario
-        userRepository.deleteById(userId);
     }
 
     public void deleteAccount(Long currentUserId, String targetUsername, String confirmation) {
+
+        PolicyFactory policy = Sanitizers.FORMATTING.and(Sanitizers.LINKS);
+        String cleanConfirmation = policy.sanitize(confirmation);
         // 1. Validar confirmación
-        if (!"ELIMINAR CUENTA".equals(confirmation != null ? confirmation.trim() : "")) {
+        if (!"ELIMINAR CUENTA".equals(cleanConfirmation != null ? cleanConfirmation.trim() : "")) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "Debes confirmar escribiendo 'ELIMINAR CUENTA'");
@@ -226,7 +255,7 @@ public class UserService {
 
         // 4. Verificar permisos (admin o dueño de la cuenta)
         boolean isAdmin = currentUser.getRoles().contains("ADMIN");
-        boolean isOwner = currentUser.getUserId() ==targetUser.getUserId();
+        boolean isOwner = currentUser.getUserId() == targetUser.getUserId();
 
         if (!isAdmin && !isOwner) {
             throw new ResponseStatusException(
@@ -271,17 +300,22 @@ public class UserService {
     }
 
     public UserDTO saveDTO(UserRegistrationDTO dto) {
-        if (userRepository.existsByUsername(dto.username())) {
+        if (userRepository.existsByUsername(dto.getUsername())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "El nombre de usuario ya está en uso");
         }
-        if (userRepository.existsByEmail(dto.email())) {
+        if (userRepository.existsByEmail(dto.getEmail())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "El email ya está registrado");
         }
 
+        PolicyFactory policy = Sanitizers.FORMATTING.and(Sanitizers.LINKS);
+        String cleanUsername = policy.sanitize(dto.getUsername());
+        String cleanEmail = policy.sanitize(dto.getEmail());
+        String cleanPassword = policy.sanitize(dto.getPassword());
+
         User user = new User();
-        user.setUsername(dto.username());
-        user.setEmail(dto.email());
-        user.setEncodedPassword(passwordEncoder.encode(dto.password()));
+        user.setUsername(cleanUsername);
+        user.setEmail(cleanEmail);
+        user.setEncodedPassword(passwordEncoder.encode(cleanPassword));
         user.setRoles(List.of("ROLE_USER"));
 
         return mapper.toDto(userRepository.save(user));
@@ -311,6 +345,26 @@ public class UserService {
     public Long getUserIdFromPrincipal(Principal principal) {
         String username = principal.getName();
         return userRepository.findByUsername(username).map(User::getUserId).orElse(null);
+    }
+
+    public boolean validateProfilePic(MultipartFile imageFile) {
+        // Si no hay ficheros, aceptamos
+        if (imageFile == null || imageFile.isEmpty()) {
+            return true;
+        }
+
+        // Si hay imagen, validarla
+        if (imageFile != null && !imageFile.isEmpty()) {
+            String imageType = imageFile.getContentType();
+            if (imageType == null || !imageType.startsWith("image/")) {
+                throw new IllegalArgumentException("El archivo debe ser una imagen válida.");
+            }
+            if (imageFile.getSize() > 5 * 1024 * 1024) {
+                throw new IllegalArgumentException("La imagen excede el tamaño máximo (5 MB).");
+            }
+        }
+
+        return true;
     }
 
 }

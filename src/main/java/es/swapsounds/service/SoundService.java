@@ -9,10 +9,14 @@ import es.swapsounds.repository.SoundRepository;
 import es.swapsounds.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
 
+import org.owasp.html.HtmlPolicyBuilder;
+import org.owasp.html.PolicyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -49,8 +53,6 @@ public class SoundService {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
 
     public SoundService(@Qualifier("soundMapperImpl") SoundMapper mapper) {
         this.mapper = mapper;
@@ -129,8 +131,15 @@ public class SoundService {
             Blob audioBlob = new SerialBlob(audioFile.getBytes());
             Blob imageBlob = new SerialBlob(imageFile.getBytes());
 
+            // Crear una política que solo permita texto plano (sin etiquetas HTML)
+            PolicyFactory policy = new HtmlPolicyBuilder().toFactory();
+
+            // Sanitizar title y description
+            String safeTitle = policy.sanitize(title);
+            String safeDescription = policy.sanitize(description);
+
             // 3. Create a new Sound object
-            Sound sound = new Sound(title, description, audioBlob, imageBlob, user.getUserId(), new ArrayList<>(),
+            Sound sound = new Sound(safeTitle, safeDescription, audioBlob, imageBlob, user.getUserId(), new ArrayList<>(),
                     duration);
             sound.setUploadDate(LocalDateTime.now());
 
@@ -197,9 +206,16 @@ public class SoundService {
             sound.getCategories().clear();
         }
 
+        // Crear una política que solo permita texto plano (sin etiquetas HTML)
+        PolicyFactory policy = new HtmlPolicyBuilder().toFactory();
+
+        // Sanitizar title y description
+        String safeTitle = policy.sanitize(title);
+        String safeDescription = policy.sanitize(description);
+
         // 2. Upload date the Database
-        sound.setTitle(title);
-        sound.setDescription(description);
+        sound.setTitle(safeTitle);
+        sound.setDescription(safeDescription);
 
         // 3. Process categories
         for (String catName : categoryNames) {
@@ -362,4 +378,48 @@ public class SoundService {
         }
 
     }
+
+    public Page<Sound> getFilteredSoundsPage(
+            String query, String category, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("title"));
+        return soundRepository.findFiltered(query, category, pageable);
+    }
+
+    public boolean canEditSound(Sound sound, Long userId, boolean isAdmin) {
+        return isAdmin || (userId != null && userId.equals(sound.getUserId()));
+    }
+
+    public boolean validateFiles(MultipartFile audioFile, MultipartFile imageFile) {
+    // Si no hay ficheros, aceptamos
+    if ((audioFile == null || audioFile.isEmpty()) &&
+        (imageFile == null || imageFile.isEmpty())) {
+        return true;
+    }
+
+    // Si hay audio, validarlo
+    if (audioFile != null && !audioFile.isEmpty()) {
+        String audioType = audioFile.getContentType();
+        if (audioType == null || !audioType.startsWith("audio/")) {
+            throw new IllegalArgumentException("El archivo debe ser un audio válido.");
+        }
+        if (audioFile.getSize() > 10 * 1024 * 1024) {
+            throw new IllegalArgumentException("El archivo de audio excede el tamaño máximo (10 MB).");
+        }
+    }
+
+    // Si hay imagen, validarla
+    if (imageFile != null && !imageFile.isEmpty()) {
+        String imageType = imageFile.getContentType();
+        if (imageType == null || !imageType.startsWith("image/")) {
+            throw new IllegalArgumentException("El archivo debe ser una imagen válida.");
+        }
+        if (imageFile.getSize() > 5 * 1024 * 1024) {
+            throw new IllegalArgumentException("La imagen excede el tamaño máximo (5 MB).");
+        }
+    }
+
+    return true;
+}
+
+
 }
