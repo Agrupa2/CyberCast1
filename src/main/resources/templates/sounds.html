@@ -40,9 +40,9 @@
             <input type="text" name="query" class="search-bar" placeholder="Searching for sounds..."
                 value="{{#query}}{{query}}{{/query}}">
             <select name="category" class="fold-out" onchange="this.form.submit()">
-                <option value="all" {{#selectedAll}}selected{{/selectedAll}}>All Categories</option>
+                <option value="all" {{{selectedAll}}}>All Categories</option>
                 {{#allCategories}}
-                <option value="{{name}}" {{#selected}}selected{{/selected}}>{{name}}</option>
+                <option value="{{name}}" {{{selectedAll}}}>{{name}}</option>
                 {{/allCategories}}
             </select>
             <button type="submit" hidden></button>
@@ -90,6 +90,19 @@
             <p>No sounds found.</p>
             {{/sounds}}
         </div>
+
+        <!-- Pagination -->
+        {{#hasNext}}
+        <button id="loadMoreBtn"
+                data-page="{{currentPage}}"
+                data-query="{{#query}}{{query}}{{/query}}{{^query}}{{/query}}"
+                data-category="{{category}}">
+            <span class="label">Más resultados</span>
+            <span class="loader"></span>
+        </button>
+        {{/hasNext}}
+        
+        <script src="/js/sounds.js"></script>
 
         <!-- Footer -->
         <footer>

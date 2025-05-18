@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,9 +15,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import es.swapsounds.DTO.CategoryDTO;
-import es.swapsounds.DTO.SoundDTO;
-import es.swapsounds.DTO.SoundMapper;
+import es.swapsounds.dto.CategoryDTO;
+import es.swapsounds.dto.SoundDTO;
+import es.swapsounds.dto.SoundMapper;
 import es.swapsounds.model.Category;
 import es.swapsounds.service.CategoryService;
 
@@ -27,9 +28,9 @@ public class CategoryRestController {
     private final CategoryService categoryService;
     private final SoundMapper soundMapper;
 
-    public CategoryRestController(CategoryService categoryService, SoundMapper soundMapper) {
+    public CategoryRestController(CategoryService categoryService, @Qualifier("soundMapperImpl") SoundMapper mapper) {
         this.categoryService = categoryService;
-        this.soundMapper = soundMapper;
+        this.soundMapper = mapper;
     }
 
      /**

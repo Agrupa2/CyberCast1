@@ -49,13 +49,13 @@ public class AuthService {
      */
     public User registerUser(String username, String email, String password, MultipartFile profilePhoto)
             throws IOException {
-        // Verificar si el nombre de usuario o correo ya está registrado
+        // Verify if the username or email is already in use
         List<User> existingUsers = userRepository.findByUsernameOrEmail(username, email);
         if (!existingUsers.isEmpty()) {
             throw new IllegalArgumentException("El nombre de usuario o correo ya está registrado");
         }
 
-        // Verificar que la contraseña tenga al menos 8 caracteres
+        // Verify if the username is valid
         if (password.length() < 8) {
             throw new IllegalArgumentException("La contraseña debe tener al menos 8 caracteres");
         }
@@ -64,10 +64,10 @@ public class AuthService {
 
         String roles = "USER";
 
-        // Crear el usuario
+        // Create a new user
         User user = new User(username, email, encoded, null, roles);
 
-        // Si se proporciona una foto de perfil, convertirla a Blob
+        // If a profile photo is provided, convert it to a Blob and set it
         if (profilePhoto != null && !profilePhoto.isEmpty()) {
             try {
                 Blob photoBlob = new SerialBlob(profilePhoto.getBytes());
@@ -76,12 +76,12 @@ public class AuthService {
                 throw new IOException("Error al convertir la imagen a Blob: " + e.getMessage());
             }
         } else {
-            // Opcional: asignar una imagen por defecto como Blob si no se proporciona
-            // ninguna
-            // Por ahora, dejaremos profilePicture como null
+            // Optional: Set a default profile picture or leave it as null
+            // nothing to do here
+            // Right now, we are not setting a default profile picture
         }
 
-        // Guardar y devolver el usuario
+        // Store and return the user
         return userRepository.save(user);
     }
 
@@ -111,16 +111,16 @@ public class AuthService {
     public ResponseEntity<AuthResponse> signup(String username, String email, String password,
             MultipartFile profilePhoto, HttpServletResponse response) {
         try {
-            // 1. Registrar al usuario
+            // 1. Register the user
             User user = registerUser(username, email, password, profilePhoto);
 
-            // 2. Autenticar automáticamente al usuario
+            // 2. Authenticate the user
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username,
                     password);
             Authentication auth = authManager.authenticate(authToken);
             SecurityContextHolder.getContext().setAuthentication(auth);
 
-            // 3. Generar respuesta con token
+            // 3. Generate JWT tokens
             LoginRequest loginRequest = new LoginRequest(username, password);
             return userService.login(response, loginRequest); // Reutilizamos la lógica de login
 

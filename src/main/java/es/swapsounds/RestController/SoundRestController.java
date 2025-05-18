@@ -1,6 +1,6 @@
 package es.swapsounds.RestController;
 
-import es.swapsounds.DTO.SoundDTO;
+import es.swapsounds.dto.SoundDTO;
 import es.swapsounds.model.User;
 import es.swapsounds.service.SoundService;
 import es.swapsounds.service.UserService;
@@ -34,14 +34,8 @@ public class SoundRestController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<SoundDTO>> list(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String query,
-            @RequestParam(defaultValue = "all") String category) {
-        
-        Pageable p = PageRequest.of(page, size);
-        Page<SoundDTO> dtos = svc.findAllSoundsDTO(p);
+    public ResponseEntity<Page<SoundDTO>> list(Pageable pageable) {
+        Page<SoundDTO> dtos = svc.findAllSoundsDTO(pageable);
         return ResponseEntity.ok(dtos);
     }
 
