@@ -136,15 +136,17 @@ My task during the practice was mainly focused on the comments and categories se
 --------------------
 @carlagmezc
 --------------------
-1. 
+My work on this project has been divided primarily between the User and Sound categories. Despite joining this working group later, we structured the tasks and worked as a team to learn from each other. I've been in charge of adding functionality, helping with security, adding pagination, structuring the database, working with the API, among other areas. In this final phase, I've worked with Java, HTML, and JavaScript to provide a connection throughout the project. Finally, I've also been in charge of creating the visual diagrams that appear in this document. 
 
-2.
+1. Adding different policies, sanitizers and security, as well as fixing some bugs we had previously. **45c39ceccf621e998b68f15bf2f9b2d483e59f71** 
 
-3.
+2. Improve security in "SecurityConfig" because the previously created code caused problems with sounds when compiling; and improve functionality. **e01894cbafd01c94efd1316bbeb9e8420ab8c031** 
 
-4.
+3. Add pagination functionality, with reload button and other settings **e586b33f84b3e5986cdd50a4df14f951f0e97ab2** 
 
-5.
+4. Include web pagination, with javascript, html and the Services **6bf7c3e41acbf233979e3994081ec80341d0c344** (165 commits)
+
+5. Add functionality to the UserService and AuthService **9952324bd2e105e1baebce3c015a006e413bd6fc**
 
 --------------------
 ## 🚀 Cómo ejecutar el proyecto localmente
