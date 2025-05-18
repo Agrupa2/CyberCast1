@@ -5,13 +5,12 @@ import java.io.InputStream;
 import java.security.Principal;
 import java.sql.Blob;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import es.swapsounds.service.SoundService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -51,10 +50,12 @@ public class SoundController {
     public String showSounds(
             @RequestParam(name = "query", required = false) String query,
             @RequestParam(name = "category", defaultValue = "all") String category,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
             Principal principal,
-            Model model) {
+            Model model,
+            HttpServletRequest request) {
 
-        // Obtener usuario desde el UserService
         Optional<User> userOpt = userService.getUserFromPrincipal(principal);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
@@ -62,13 +63,15 @@ public class SoundController {
             model.addAttribute("userId", user.getUserId());
         }
 
-        // Obtener sonidos filtrados usando el SoundService
-        List<Sound> filteredSounds = soundService.getFilteredSounds(query, category);
-        model.addAttribute("sounds", filteredSounds);
-        model.addAttribute("query", query);
-        model.addAttribute("category", category);
+        Page<Sound> soundPage = soundService.getFilteredSoundsPage(query, category, PageRequest.of(page, size));
+        boolean hasNext = soundPage.getNumber() + 1 < soundPage.getTotalPages();
+        model.addAttribute("hasNext", true);
+        model.addAttribute("sounds", soundPage.getContent());
+        model.addAttribute("currentPage", soundPage.getNumber());
+        model.addAttribute("totalPages", soundPage.getTotalPages());
+        model.addAttribute("query", query != null ? query : "");
+        model.addAttribute("category", category != null ? category : "");
 
-        // Obtener categorías para el dropdown
         List<Category> allCategories = categoryService.getAllCategories();
         model.addAttribute("allCategories", allCategories);
 
@@ -77,6 +80,10 @@ public class SoundController {
             model.addAttribute("selected" + cat.getName(), category.equalsIgnoreCase(cat.getName()));
         }
 
+        // Si la petición es AJAX, devuelve solo el fragmento
+        if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
+            return "sounds :: soundCards";
+        }
         return "sounds";
     }
 
@@ -358,4 +365,6 @@ public class SoundController {
         }
         return ResponseEntity.notFound().build();
     }
+
+
 }

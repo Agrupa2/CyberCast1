@@ -48,6 +48,7 @@
             <input type="hidden" name="_csrf" value="{{token}}" />
         </form>
 
+
         <!-- Sound Grid -->
         <div class="sound-grid" id="soundsContainer">
             {{#sounds}}
@@ -90,18 +91,16 @@
             {{/sounds}}
         </div>
 
-        <!-- Pagination -->
-        {{#hasNext}}
-        <button id="loadMoreBtn"
-                data-page="{{currentPage}}"
-                data-query="{{#query}}{{query}}{{/query}}{{^query}}{{/query}}"
-                data-category="{{category}}">
-            <span class="label">Más resultados</span>
-            <span class="loader"></span>
+        <button
+                id="loadMoreBtn"
+                class="white-box-btn"
+                data-page="0"
+                data-size="10"
+                data-query="{{query}}"
+                data-category="{{#selectedCategory}}{{selectedCategory}}{{/selectedCategory}}{{^selectedCategory}}all{{/selectedCategory}}"
+        >
+            Cargar más
         </button>
-        {{/hasNext}}
-        
-        <script src="/js/sounds.js"></script>
 
         <!-- Footer -->
         <footer>
@@ -150,6 +149,7 @@
                     <a href="#">Terms and conditions</a>
                 </div>
             </div>
+
         </footer>
     </div>
 
@@ -189,6 +189,12 @@
             }
         });
     </script>
+    <script src="/js/sounds.js"></script>
+    <div id="overlaySpinner" class="hidden">
+        <div class="spinner"></div>
+        Cargando...
+    </div>
+
 </body>
 
 </html>

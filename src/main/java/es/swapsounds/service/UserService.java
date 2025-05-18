@@ -9,6 +9,7 @@ import es.swapsounds.repository.SoundRepository;
 import es.swapsounds.repository.CommentRepository;
 import es.swapsounds.repository.UserRepository;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -42,7 +43,7 @@ public class UserService {
     private final UserMapper mapper;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, SoundRepository soundRepository, UserMapper mapper,
+    public UserService(UserRepository userRepository, SoundRepository soundRepository, @Qualifier("userMapperImpl") UserMapper mapper,
             CommentRepository CommentRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.soundRepository = soundRepository;
