@@ -16,6 +16,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!audio || !playPauseBtn || !progressBar || !progress) return;
 
         playPauseBtn.addEventListener('click', () => {
+            // Pausa todos los demás audios
+            document.querySelectorAll('audio').forEach(a => {
+                if (a !== audio) {
+                    a.pause();
+                    a.currentTime = 0;
+                    const btn = a.closest('.sound-card')?.querySelector('.play-pause-btn');
+                    if (btn) btn.textContent = '▶️';
+                }
+            });
             if (audio.paused) {
                 audio.play();
                 playPauseBtn.textContent = '⏸️';
@@ -23,6 +32,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 audio.pause();
                 playPauseBtn.textContent = '▶️';
             }
+        });
+
+        audio.addEventListener('ended', () => {
+            playPauseBtn.textContent = '▶️';
         });
 
         audio.addEventListener('timeupdate', () => {
@@ -81,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="audio-container">
                         <audio class="custom-audio">
-                            <source src="/sounds/audio/${s.soundId}" type="audio/mpeg">
+                            <source src="/api/sounds/${s.soundId}/audio" type="audio/mpeg">
                             Your browser does not support the audio element.
                         </audio>
                         <div class="audio-controls">
@@ -97,12 +110,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 });
 
-                // Actualiza el data-page al nuevo valor
-                loadMoreBtn.dataset.page = nextPage; // 'number' es la página actual en Spring
-
-                // Oculta el botón si no hay más páginas
-                const hasNext = !data.last; // 'last' es true si es la última página
-                loadMoreBtn.style.display = hasNext ? 'inline-block' : 'none';
+                loadMoreBtn.dataset.page = data.currentPage;
+                const hasMore = data.currentPage + 1 < data.totalPages;
+                loadMoreBtn.style.display = hasMore ? "inline-block" : "none";
             })
             .catch(err => {
                 console.error('Error al cargar más sonidos:', err);
