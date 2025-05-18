@@ -1,7 +1,7 @@
 package es.swapsounds.service;
 
-import es.swapsounds.DTO.SoundDTO;
-import es.swapsounds.DTO.SoundMapper;
+import es.swapsounds.dto.SoundDTO;
+import es.swapsounds.dto.SoundMapper;
 import es.swapsounds.model.Category;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
@@ -9,6 +9,7 @@ import es.swapsounds.repository.SoundRepository;
 import jakarta.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,8 @@ import java.sql.SQLException;
 
 @Service
 public class SoundService {
+
+    private final SoundMapper mapper;
     @Autowired
     private CategoryService categoryService;
 
@@ -44,7 +47,9 @@ public class SoundService {
     private SoundRepository soundRepository;
 
     @Autowired
-    private SoundMapper mapper;
+    public SoundService(@Qualifier("soundMapperImpl") SoundMapper mapper) {
+        this.mapper = mapper;
+    }
 
     private Long lastInsertedSoundId;
 

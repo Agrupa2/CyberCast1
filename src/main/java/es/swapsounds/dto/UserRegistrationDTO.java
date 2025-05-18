@@ -1,4 +1,4 @@
-package es.swapsounds.DTO;
+package es.swapsounds.dto;
 
 public record UserRegistrationDTO(
         String username,

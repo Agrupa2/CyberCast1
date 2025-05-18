@@ -1,6 +1,6 @@
 package es.swapsounds.RestController;
 
-import es.swapsounds.DTO.SoundDTO;
+import es.swapsounds.dto.SoundDTO;
 import es.swapsounds.model.User;
 import es.swapsounds.service.SoundService;
 import es.swapsounds.service.UserService;
