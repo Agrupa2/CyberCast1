@@ -28,6 +28,7 @@ import es.swapsounds.model.Category;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
 import es.swapsounds.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import es.swapsounds.service.CategoryService;
 import es.swapsounds.service.CommentService;
 
@@ -50,12 +51,10 @@ public class SoundController {
     public String showSounds(
             @RequestParam(name = "query", required = false) String query,
             @RequestParam(name = "category", defaultValue = "all") String category,
-            @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "10") int size,
             Principal principal,
-            Model model,
-            HttpServletRequest request) {
+            Model model) {
 
+        // Obtener usuario desde el UserService
         Optional<User> userOpt = userService.getUserFromPrincipal(principal);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
@@ -63,15 +62,15 @@ public class SoundController {
             model.addAttribute("userId", user.getUserId());
         }
 
-        Page<Sound> soundPage = soundService.getFilteredSoundsPage(query, category, PageRequest.of(page, size));
-        boolean hasNext = soundPage.getNumber() + 1 < soundPage.getTotalPages();
-        model.addAttribute("hasNext", true);
-        model.addAttribute("sounds", soundPage.getContent());
-        model.addAttribute("currentPage", soundPage.getNumber());
-        model.addAttribute("totalPages", soundPage.getTotalPages());
-        model.addAttribute("query", query != null ? query : "");
-        model.addAttribute("category", category != null ? category : "");
+        // Obtener sonidos filtrados usando el SoundService
+        Page<Sound> firstPage = soundService.getFilteredSoundsPage(query, category, 0, 10);
+        model.addAttribute("sounds", firstPage.getContent());
+        model.addAttribute("hasNext", firstPage.hasNext());
+        model.addAttribute("currentPage", firstPage.getNumber());
+        model.addAttribute("query", query);
+        model.addAttribute("category", category);
 
+        // Obtener categorías para el dropdown
         List<Category> allCategories = categoryService.getAllCategories();
         model.addAttribute("allCategories", allCategories);
 
@@ -80,10 +79,6 @@ public class SoundController {
             model.addAttribute("selected" + cat.getName(), category.equalsIgnoreCase(cat.getName()));
         }
 
-        // Si la petición es AJAX, devuelve solo el fragmento
-        if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
-            return "sounds :: soundCards";
-        }
         return "sounds";
     }
 

@@ -1,6 +1,7 @@
 package es.swapsounds.RestController;
 
 import es.swapsounds.dto.SoundDTO;
+import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
 import es.swapsounds.service.SoundService;
 import es.swapsounds.service.UserService;
@@ -14,9 +15,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.sql.rowset.serial.SerialException;
 import java.sql.SQLException;
@@ -35,10 +38,27 @@ public class SoundRestController {
 
 
     @GetMapping
-    public ResponseEntity<Page<SoundDTO>> list(Pageable pageable) {
-        Page<SoundDTO> dtos = svc.findAllSoundsDTO(pageable);
-        return ResponseEntity.ok(dtos);
+    public ResponseEntity<Map<String, Object>> page(
+            @RequestParam(required = false) String query,
+            @RequestParam(defaultValue = "all") String category,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<Sound> soundPage = svc.getFilteredSoundsPage(query, category, page, size);
+
+        // Opcional: mapear a DTO si no quieres exponer toda la entidad
+        List<SoundDTO> dtoList = soundPage.getContent().stream()
+            .map(SoundDTO::new)
+            .collect(Collectors.toList());
+
+        Map<String,Object> resp = new HashMap<>();
+        resp.put("sounds", dtoList);
+        resp.put("currentPage", soundPage.getNumber());
+        resp.put("totalPages", soundPage.getTotalPages());
+        resp.put("hasNext", soundPage.hasNext());
+        return ResponseEntity.ok(resp);
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<SoundDTO> get(@PathVariable Long id) {
