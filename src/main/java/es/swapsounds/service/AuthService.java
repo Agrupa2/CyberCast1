@@ -78,9 +78,8 @@ public class AuthService {
 
         // Create a new user
         User user = new User(safeUsername, safeEmail, encoded, null, roles);
-
-        // If a profile photo is provided, convert it to a Blob and set it
-        if (profilePhoto != null && !profilePhoto.isEmpty()) {
+        if(isPicValid){
+            if (profilePhoto != null && !profilePhoto.isEmpty()) {
             try {
                 Blob photoBlob = new SerialBlob(profilePhoto.getBytes());
                 user.setProfilePicture(photoBlob);
@@ -92,6 +91,8 @@ public class AuthService {
             // nothing to do here
             // Right now, we are not setting a default profile picture
         }
+        }
+        
 
         // Store and return the user
         return userRepository.save(user);
@@ -124,7 +125,7 @@ public class AuthService {
             MultipartFile profilePhoto, HttpServletResponse response) {
         try {
             // 1. Register the user
-            User user = registerUser(username, email, password, profilePhoto);
+            registerUser(username, email, password, profilePhoto);
 
             // 2. Authenticate the user
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username,

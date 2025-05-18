@@ -1,8 +1,8 @@
 package es.swapsounds.service;
 
-import es.swapsounds.DTO.CategoryDTO;
-import es.swapsounds.DTO.CategoryMapper;
-import es.swapsounds.DTO.CategorySimpleDTO;
+import es.swapsounds.dto.CategoryDTO;
+import es.swapsounds.dto.CategoryMapper;
+import es.swapsounds.dto.CategorySimpleDTO;
 import es.swapsounds.model.Category;
 import es.swapsounds.model.Sound;
 import es.swapsounds.repository.CategoryRepository;

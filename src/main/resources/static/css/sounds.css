@@ -337,59 +337,101 @@ footer {
 .hidden {
   display: none;
 }
+
+/* Botón “Más resultados” */ 
 #loadMoreBtn {
-  display: block !important;
-  background: #007bff !important;
-  color: #fff !important;
-  border: 1px solid #007bff !important;
-  margin: 20px auto !important;
-  padding: 10px 30px !important;
-  font-size: 1.2em !important;
-  cursor: pointer !important;
-  z-index: 1000 !important;
+  position: relative;
+  display: block;
+  margin: 20px auto;
+  padding: 0.6em 1.2em;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
-.white-box-btn {
-  background: #fff;
-  color: #222;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 12px 28px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-  font-size: 1rem;
-  cursor: pointer;
-  transition: box-shadow 0.2s;
+/* Estado hover */
+#loadMoreBtn:hover:not(:disabled) {
+  background-color: #0056b3;
 }
-.white-box-btn:hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+
+/* Disabled */
+#loadMoreBtn:disabled {
+  background-color: #9ec5fe;
+  cursor: not-allowed;
+}
+
+/* Spinner (oculto por defecto) */
+#loadMoreBtn .loader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1em;
+  height: 1em;
+  margin: -0.5em 0 0 -0.5em;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  display: none;
+}
+
+/* Cuando el botón tiene la clase loading: muestra spinner e oculta el texto */
+#loadMoreBtn.loading .loader {
+  display: inline-block !important;
+}
+
+#loadMoreBtn.loading .label {
+  visibility: hidden;
+}
+
+/* Animación */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 #overlaySpinner {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(255,255,255,0.7);
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  /* semitransparente */
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  z-index: 2000;
 }
-#overlaySpinner.hidden { display: none; }
-.spinner {
-  border: 4px solid #ccc;
-  border-top: 4px solid #333;
+
+/* Spinner circular */
+#overlaySpinner .spinner {
+  width: 3rem;
+  height: 3rem;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  animation: spin 1s linear infinite;
-  margin-right: 10px;
+  animation: spin 0.8s linear infinite;
 }
+
+/* Ocultar mediante clase */
+.hidden {
+  display: none !important;
+}
+
+/* Animación */
 @keyframes spin {
-  100% { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
-#loadMoreBtn:hover {
-  background: #f0f0f0 !important;
-  color: #000 !important;
-}
+
 
 .link-heading {
   font-size: var(--font-size-medium);

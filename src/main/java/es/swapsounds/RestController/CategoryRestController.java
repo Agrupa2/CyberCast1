@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import es.swapsounds.DTO.CategoryDTO;
-import es.swapsounds.DTO.CategorySimpleDTO;
-import es.swapsounds.DTO.SoundDTO;
-import es.swapsounds.DTO.SoundMapper;
+import es.swapsounds.dto.CategoryDTO;
+import es.swapsounds.dto.CategorySimpleDTO;
+import es.swapsounds.dto.SoundDTO;
+import es.swapsounds.dto.SoundMapper;
 import es.swapsounds.model.Category;
 import es.swapsounds.service.CategoryService;
 

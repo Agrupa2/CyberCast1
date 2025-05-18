@@ -1,8 +1,8 @@
 package es.swapsounds.service;
 
-import es.swapsounds.DTO.UserDTO;
-import es.swapsounds.DTO.UserMapper;
-import es.swapsounds.DTO.UserRegistrationDTO;
+import es.swapsounds.dto.UserDTO;
+import es.swapsounds.dto.UserMapper;
+import es.swapsounds.dto.UserRegistrationDTO;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
 import es.swapsounds.repository.CommentRepository;
@@ -97,8 +97,10 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to modify this user");
         }
 
+        PolicyFactory policy = Sanitizers.FORMATTING.and(Sanitizers.LINKS);
+        String cleanUsername = policy.sanitize(newUsername);
         // Actualizar nombre
-        targetUser.setUsername(newUsername.trim());
+        targetUser.setUsername(cleanUsername.trim());
         userRepository.save(targetUser);
     }
 
@@ -118,7 +120,9 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to modify this user");
         }
 
-        // Actualizar avatar
+        boolean checkProfilePic = validateProfilePic(profilePhoto);
+
+        if (checkProfilePic) {
         try {
             if (profilePhoto != null && !profilePhoto.isEmpty()) {
                 Blob photoBlob = new SerialBlob(profilePhoto.getBytes());
@@ -129,6 +133,7 @@ public class UserService {
             userRepository.save(targetUser);
         } catch (SQLException e) {
             throw new RuntimeException("Error al convertir la imagen a Blob: " + e.getMessage());
+            }
         }
     }
 
@@ -151,7 +156,9 @@ public class UserService {
                     "You do not have permission to modify this avatar");
         }
 
-        // 4. Actualizar avatar
+        boolean checkProfilePic = validateProfilePic(file);
+
+        if (checkProfilePic) {
         try {
             Blob blob = null;
             if (file != null && !file.isEmpty()) {
@@ -165,6 +172,7 @@ public class UserService {
                     HttpStatus.INTERNAL_SERVER_ERROR,
                     "Error al actualizar el avatar: " + e.getMessage(),
                     e);
+            }
         }
     }
 
@@ -193,6 +201,17 @@ public class UserService {
 
     @Transactional
     public void deleteUser(long userId) {
+
+        User currentUser = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED,
+                        "Usuario autenticado no encontrado"));
+        boolean isAdmin = currentUser.getRoles().contains("ADMIN");
+        if (isAdmin) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "No puedes eliminar a un admin");
+        } else {
         // 1) Eliminar todos los comentarios que el usuario ha escrito
         commentRepository.deleteByUserUserId(userId);
 
@@ -208,11 +227,16 @@ public class UserService {
 
         // 3) Borrar al usuario
         userRepository.deleteById(userId);
+        }
+
     }
 
     public void deleteAccount(Long currentUserId, String targetUsername, String confirmation) {
+
+        PolicyFactory policy = Sanitizers.FORMATTING.and(Sanitizers.LINKS);
+        String cleanConfirmation = policy.sanitize(confirmation);
         // 1. Validar confirmación
-        if (!"ELIMINAR CUENTA".equals(confirmation != null ? confirmation.trim() : "")) {
+        if (!"ELIMINAR CUENTA".equals(cleanConfirmation != null ? cleanConfirmation.trim() : "")) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "You must confirm by typing 'ELIMINAR CUENTA'");

@@ -1,4 +1,4 @@
-package es.swapsounds.DTO;
+package es.swapsounds.dto;
 
 public record CommentSimpleDTO(
                 long commentId,

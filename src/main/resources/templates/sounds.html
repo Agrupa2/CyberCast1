@@ -9,6 +9,9 @@
 </head>
 
 <body>
+    <div id="overlaySpinner" class="hidden">
+        <div class="spinner"></div>
+    </div>
     <div class="container">
         <!-- Navbar -->
         <nav class="navbar">
@@ -21,11 +24,10 @@
 
                     {{#logged}}
                     <li><a href="/sounds/upload?username={{userName}}">Upload Sound</a></li>
-                    <li><a href="/sounds/upload/secret">Upload Secret Sound</a></li>
                     <li><a href="/sounds/download">Download Sound</a></li>
                     <li><a href="/delete-account">Delete Account</a></li>
                     <li><a href="/logout">Logout</a></li>
-                    <li><a href="/profile/{{userName}}">View profile</a></li>
+                    <li><a href="/profile/{{userName}}">Ver perfil</a></li>
 
                     {{#admin}}
                     <li><a href="/admin/users">Admin Panel</a></li>
@@ -40,15 +42,14 @@
             <input type="text" name="query" class="search-bar" placeholder="Searching for sounds..."
                 value="{{#query}}{{query}}{{/query}}">
             <select name="category" class="fold-out" onchange="this.form.submit()">
-                <option value="all" {{{selectedAll}}}>All Categories</option>
+                <option value="all" {{#selectedAll}}selected{{/selectedAll}}>All Categories</option>
                 {{#allCategories}}
-                <option value="{{name}}" {{{selectedAll}}}>{{name}}</option>
+                <option value="{{name}}" {{#selected}}selected{{/selected}}>{{name}}</option>
                 {{/allCategories}}
             </select>
             <button type="submit" hidden></button>
             <input type="hidden" name="_csrf" value="{{token}}" />
         </form>
-
 
         <!-- Sound Grid -->
         <div class="sound-grid" id="soundsContainer">
@@ -91,90 +92,67 @@
             <p>No sounds found.</p>
             {{/sounds}}
         </div>
-
-        <!-- Pagination -->
-        {{#hasNext}}
-        <button id="loadMoreBtn"
-                data-page="{{currentPage}}"
-                data-query="{{#query}}{{query}}{{/query}}{{^query}}{{/query}}"
-                data-category="{{category}}">
+        <button id="loadMoreBtn" data-page="{{currentPage}}" {{#query}}data-query="{{query}}" {{/query}}
+            {{^query}}data-query="" {{/query}} data-category="{{category}}" {{^hasNext}}style="display:none;"
+            {{/hasNext}}>
             <span class="label">Más resultados</span>
             <span class="loader"></span>
         </button>
-        {{/hasNext}}
-        
-        <script src="/js/sounds.js"></script>
 
-        <!-- Footer -->
-        <footer>
-            <div class="footer-content">
-                <div class="footer-brand">
-                    <div class="logo">SwapSounds</div>
-                    <p class="slogan">Experience the future of sounds</p>
-                    <div class="social-link">
-                        <a href="#"><ion-icon name="logo-facebook"></ion-icon></a>
-                        <a href="#"><ion-icon name="logo-twitter"></ion-icon></a>
-                        <a href="#"><ion-icon name="logo-instagram"></ion-icon></a>
-                        <a href="#"><ion-icon name="logo-tiktok"></ion-icon></a>
-                        <a href="#"><ion-icon name="logo-youtube"></ion-icon></a>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-copyright">
-                <div class="copyright">
-                    <p>© Copyright 2025 SwapSounds</p>
-                </div>
-                <div class="wrapper">
-                    <a href="#">Privacy policy</a>
-                    <a href="#">Terms and conditions</a>
-                </div>
-            </div>
 
-        </footer>
     </div>
 
-    <script>
-        document.querySelectorAll('.sound-card').forEach(card => {
-            const audio = card.querySelector('audio');
-            const playPauseBtn = card.querySelector('.play-pause-btn');
-            const progressBar = card.querySelector('.progress-bar');
-            const progress = card.querySelector('.progress');
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="logo">SwapSounds</div>
+                <p class="slogan">Experience the future of sounds</p>
+                <div class="social-link">
+                    <a href="#"><ion-icon name="logo-facebook"></ion-icon></a>
+                    <a href="#"><ion-icon name="logo-twitter"></ion-icon></a>
+                    <a href="#"><ion-icon name="logo-instagram"></ion-icon></a>
+                    <a href="#"><ion-icon name="logo-tiktok"></ion-icon></a>
+                    <a href="#"><ion-icon name="logo-youtube"></ion-icon></a>
+                </div>
+            </div>
+            <div class="footer-links">
+                <ul>
+                    <h4 class="link-heading">SwapSounds</h4>
+                    <li class="link-item"><a href="#">About us</a></li>
+                    <li class="link-item"><a href="#">My profile</a></li>
+                    <li class="link-item"><a href="#">Pricing plans</a></li>
+                    <li class="link-item"><a href="#">Contacts</a></li>
+                </ul>
+                <ul>
+                    <h4 class="link-heading">Browse</h4>
+                    <li class="link-item"><a href="#">Categories</a></li>
+                    <li class="link-item"><a href="#">Production Sounds</a></li>
+                    <li class="link-item"><a href="#">Free-to-use</a></li>
+                    <li class="link-item"><a href="#">Favourites</a></li>
+                </ul>
+                <ul>
+                    <h4 class="link-heading">Help</h4>
+                    <li class="link-item"><a href="#">Account & Billing</a></li>
+                    <li class="link-item"><a href="#">Plans & Pricing</a></li>
+                    <li class="link-item"><a href="#">Supported Devices</a></li>
+                    <li class="link-item"><a href="#">Accessibility</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-copyright">
+            <div class="copyright">
+                <p>© Copyright 2025 SwapSounds</p>
+            </div>
+            <div class="wrapper">
+                <a href="#">Privacy policy</a>
+                <a href="#">Terms and conditions</a>
+            </div>
+        </div>
+    </footer>
+    </div>
 
-            playPauseBtn.addEventListener('click', () => {
-                if (audio.paused) {
-                    audio.play();
-                    playPauseBtn.textContent = '⏸️';
-                } else {
-                    audio.pause();
-                    playPauseBtn.textContent = '▶️';
-                }
-            });
-
-            audio.addEventListener('timeupdate', () => {
-                const percent = (audio.currentTime / audio.duration) * 100;
-                progress.style.width = percent + '%';
-            });
-
-            progressBar.addEventListener('click', (e) => {
-                const rect = progressBar.getBoundingClientRect();
-                const clickX = e.clientX - rect.left;
-                const percent = (clickX / rect.width);
-                audio.currentTime = percent * audio.duration;
-            });
-        });
-
-        document.addEventListener('contextmenu', function (e) {
-            if (e.target.tagName === 'AUDIO') {
-                e.preventDefault();
-            }
-        });
-    </script>
     <script src="/js/sounds.js"></script>
-    <div id="overlaySpinner" class="hidden">
-        <div class="spinner"></div>
-        Cargando...
-    </div>
-
 </body>
 
 </html>

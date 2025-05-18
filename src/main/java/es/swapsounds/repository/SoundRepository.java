@@ -1,6 +1,5 @@
 package es.swapsounds.repository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -17,6 +16,19 @@ import org.springframework.stereotype.Repository;
 public interface SoundRepository extends JpaRepository<Sound, Long>, JpaSpecificationExecutor<Sound> {
     List<Sound> findByUserId(long userId);
 
+    @Query("""
+               SELECT DISTINCT s
+                 FROM Sound s
+            LEFT JOIN s.categories c
+                WHERE (:query IS NULL
+                       OR LOWER(s.title) LIKE LOWER(CONCAT('%', :query, '%')))
+                  AND (:category = 'all'
+                       OR c.name = :category)
+               """)
+    Page<Sound> findFiltered(
+            @Param("query") String query,
+            @Param("category") String category,
+            Pageable pageable);
     //Next section is for dynamic queries.
 
     @Query("SELECT DISTINCT s FROM Sound s ORDER BY s.title ASC")
@@ -42,3 +54,5 @@ public interface SoundRepository extends JpaRepository<Sound, Long>, JpaSpecific
     Page <Sound> findByTitleContainingIgnoreCase(String title, Pageable pageable);
     Page<Sound> findByTitleContainingIgnoreCaseAndCategories_NameIgnoreCase(String title, String category, Pageable pageable);
 }
+
+
