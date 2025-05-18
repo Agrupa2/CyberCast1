@@ -1,6 +1,5 @@
 package es.swapsounds.configuration;
 
-
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,34 +16,35 @@ public class CustomErrorController implements ErrorController {
 
     @GetMapping("/error")
     public String handleError(Model model, HttpServletRequest request) {
-        // Obtener detalles del error
+        // Get error details
         Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
         String errorMessage = (String) request.getAttribute("javax.servlet.error.message");
         Throwable throwable = (Throwable) request.getAttribute("javax.servlet.error.exception");
         String requestUri = (String) request.getAttribute("javax.servlet.error.request_uri");
 
-        // Usar valores predeterminados si no hay código de estado
+        // Use default values if there is no status code
         int code = statusCode != null ? statusCode : HttpStatus.INTERNAL_SERVER_ERROR.value();
         String errorName = ErrorMessages.getErrorName(code);
         String friendlyMessage = ErrorMessages.getErrorMessage(code);
 
-        // Si hay un mensaje de error o excepción, personalizar el mensaje (sin exponer detalles)
+        // If there is an error message or exception, customize the message (without
+        // exposing details)
         if (errorMessage != null && !errorMessage.isEmpty()) {
-            friendlyMessage = code == HttpStatus.NOT_FOUND.value() ? "Recurso no encontrado" : friendlyMessage;
+            friendlyMessage = code == HttpStatus.NOT_FOUND.value() ? "Resource not found" : friendlyMessage;
         } else if (throwable != null) {
-            friendlyMessage = code == HttpStatus.NOT_FOUND.value() ? "Recurso no encontrado" : "Error interno del servidor";
+            friendlyMessage = code == HttpStatus.NOT_FOUND.value() ? "Resource not found" : "Internal server error";
         }
 
-        // Registrar detalles del error para depuración
+        // Log error details for debugging
         logger.error("Error occurred: status={}, uri={}, message={}, exception={}",
                 code, requestUri, errorMessage, throwable != null ? throwable.getMessage() : "none");
 
-        // Añadir atributos al modelo
+        // Add attributes to the model
         model.addAttribute("status", code);
         model.addAttribute("error", errorName);
         model.addAttribute("message", friendlyMessage);
         model.addAttribute("path", requestUri != null ? requestUri : "N/A");
 
-        return "error"; // Renderiza error.html
+        return "error"; // Render error.html
     }
 }

@@ -36,7 +36,7 @@ public class UserController {
       return "delete-account";
    }
 
-   // Procesar eliminación
+   // Process account deletion
    @PostMapping("/delete-account")
    public String processDelete(
          @RequestParam String confirmation,
@@ -49,7 +49,7 @@ public class UserController {
          return "redirect:/login";
 
       if (!"ELIMINAR CUENTA".equals(confirmation.trim())) {
-         ra.addFlashAttribute("error", "Debes escribir exactamente 'ELIMINAR CUENTA'");
+         ra.addFlashAttribute("error", "You must type exactly 'ELIMINAR CUENTA'");
          return "redirect:/delete-account";
       }
 
@@ -59,7 +59,7 @@ public class UserController {
       userService.deleteUser(userId);
       new SecurityContextLogoutHandler().logout(request, response, null);
 
-      ra.addFlashAttribute("success", "¡Cuenta eliminada permanentemente!");
+      ra.addFlashAttribute("success", "Account permanently deleted!");
       return "redirect:/";
    }
 

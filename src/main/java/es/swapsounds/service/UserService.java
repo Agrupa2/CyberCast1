@@ -1,8 +1,8 @@
 package es.swapsounds.service;
 
-import es.swapsounds.dto.UserDTO;
-import es.swapsounds.dto.UserMapper;
-import es.swapsounds.dto.UserRegistrationDTO;
+import es.swapsounds.DTO.UserDTO;
+import es.swapsounds.DTO.UserMapper;
+import es.swapsounds.DTO.UserRegistrationDTO;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
 import es.swapsounds.repository.SoundRepository;
@@ -74,45 +74,45 @@ public class UserService {
 
     public void changeUsername(Long sessionUserId, String pathUsername, String newUsername) {
         if (newUsername == null || newUsername.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre no puede estar vacío");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Name cannot be empty");
         }
 
-        // Obtener el usuario que realiza la acción (sesión)
+        // Get the user performing the action (session)
         User sessionUser = userRepository.findById(sessionUserId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No autenticado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated"));
 
-        // Obtener el usuario objetivo (a modificar)
+        // Get the target user (to modify)
         User targetUser = userRepository.findByUsername(pathUsername)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        // Verificar permisos: admin o dueño del perfil
+        // Check permissions: admin or profile owner
         boolean isAdmin = sessionUser.getRoles().contains("ADMIN");
         if (!isAdmin && sessionUser.getUserId() != targetUser.getUserId()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para modificar este usuario");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to modify this user");
         }
 
-        // Actualizar nombre
+        // Update name
         targetUser.setUsername(newUsername.trim());
         userRepository.save(targetUser);
     }
 
     public void updateProfilePicture(long sessionUserId, long targetUserId, MultipartFile profilePhoto)
             throws IOException {
-        // Obtener el usuario que realiza la acción (sesión)
+        // Get the user performing the action (session)
         User sessionUser = userRepository.findById(sessionUserId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No autenticado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated"));
 
-        // Obtener el usuario objetivo (a modificar)
+        // Get the target user (to modify)
         User targetUser = userRepository.findById(targetUserId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        // Verificar permisos: admin o dueño del perfil
+        // Check permissions: admin or profile owner
         boolean isAdmin = sessionUser.getRoles().contains("ADMIN");
         if (!isAdmin && sessionUser.getUserId() != targetUser.getUserId()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para modificar este usuario");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to modify this user");
         }
 
-        // Actualizar avatar
+        // Update avatar
         try {
             if (profilePhoto != null && !profilePhoto.isEmpty()) {
                 Blob photoBlob = new SerialBlob(profilePhoto.getBytes());
@@ -122,30 +122,30 @@ public class UserService {
             }
             userRepository.save(targetUser);
         } catch (SQLException e) {
-            throw new RuntimeException("Error al convertir la imagen a Blob: " + e.getMessage());
+            throw new RuntimeException("Error converting image to Blob: " + e.getMessage());
         }
     }
 
     public void updateAvatar(Long currentUserId, String targetUsername, MultipartFile file) {
-        // 1. Validar usuario actual
+        // 1. Validate current user
         User currentUser = userRepository.findById(currentUserId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario no autenticado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authenticated"));
 
-        // 2. Obtener usuario objetivo
+        // 2. Get target user
         User targetUser = userRepository.findByUsername(targetUsername)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario objetivo no encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Target user not found"));
 
-        // 3. Verificar permisos (admin o dueño del perfil)
+        // 3. Check permissions (admin or profile owner)
         boolean isAdmin = currentUser.getRoles().contains("ADMIN");
         boolean isOwner = currentUser.getUserId() == targetUser.getUserId();
 
         if (!isAdmin && !isOwner) {
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN,
-                    "No tienes permisos para modificar este avatar");
+                    "You do not have permission to modify this avatar");
         }
 
-        // 4. Actualizar avatar
+        // 4. Update avatar
         try {
             Blob blob = null;
             if (file != null && !file.isEmpty()) {
@@ -157,7 +157,7 @@ public class UserService {
         } catch (SQLException | IOException e) {
             throw new ResponseStatusException(
                     HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Error al actualizar el avatar: " + e.getMessage(),
+                    "Error updating avatar: " + e.getMessage(),
                     e);
         }
     }
@@ -187,63 +187,63 @@ public class UserService {
 
     @Transactional
     public void deleteUser(long userId) {
-        // 1) Eliminar todos los comentarios que el usuario ha escrito
+        // 1) Delete all comments written by the user
         commentRepository.deleteByUserUserId(userId);
 
-        // 2) Para cada sonido que el usuario ha subido:
+        // 2) For each sound uploaded by the user:
         List<Sound> userSounds = soundRepository.findByUserId(userId);
         for (Sound sound : userSounds) {
             long sid = sound.getSoundId();
-            // 2a) Borrar comentarios apuntando a ese sonido
+            // 2a) Delete comments pointing to that sound
             commentRepository.deleteBySoundId(sid);
-            // 2b) Borrar el sonido
+            // 2b) Delete the sound
             soundRepository.deleteById(sid);
         }
 
-        // 3) Borrar al usuario
+        // 3) Delete the user
         userRepository.deleteById(userId);
     }
 
     public void deleteAccount(Long currentUserId, String targetUsername, String confirmation) {
-        // 1. Validar confirmación
+        // 1. Validate confirmation
         if (!"ELIMINAR CUENTA".equals(confirmation != null ? confirmation.trim() : "")) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
-                    "Debes confirmar escribiendo 'ELIMINAR CUENTA'");
+                    "You must confirm by typing 'ELIMINAR CUENTA'");
         }
 
-        // 2. Obtener usuario actual (quien realiza la acción)
+        // 2. Get current user (who performs the action)
         User currentUser = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.UNAUTHORIZED,
-                        "Usuario autenticado no encontrado"));
+                        "Authenticated user not found"));
 
-        // 3. Obtener usuario objetivo (a eliminar)
+        // 3. Get target user (to delete)
         User targetUser = userRepository.findByUsername(targetUsername)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
-                        "Usuario objetivo no encontrado"));
+                        "Target user not found"));
 
-        // 4. Verificar permisos (admin o dueño de la cuenta)
+        // 4. Check permissions (admin or account owner)
         boolean isAdmin = currentUser.getRoles().contains("ADMIN");
-        boolean isOwner = currentUser.getUserId() ==targetUser.getUserId();
+        boolean isOwner = currentUser.getUserId() == targetUser.getUserId();
 
         if (!isAdmin && !isOwner) {
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN,
-                    "No tienes permisos para eliminar esta cuenta");
+                    "You do not have permission to delete this account");
         }
 
-        // 5. Eliminar recursos relacionados
+        // 5. Delete related resources
         soundRepository.deleteAll(soundRepository.findByUserId(targetUser.getUserId()));
 
-        // 6. Eliminar usuario objetivo (no el usuario actual)
+        // 6. Delete target user (not the current user)
         userRepository.deleteById(targetUser.getUserId());
     }
 
     public Map<String, Object> getProfileInfo(User user) {
         Map<String, Object> info = new HashMap<>();
-        String profileImageBase64 = null; // Cambia a null en lugar de ""
+        String profileImageBase64 = null; // Change to null instead of ""
         String userInitial = null;
         boolean hasProfilePicture = false;
 
@@ -254,7 +254,7 @@ public class UserService {
                 profileImageBase64 = "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(imageBytes);
                 hasProfilePicture = true;
             } catch (SQLException e) {
-                System.err.println("Error al convertir el Blob a Base64: " + e.getMessage());
+                System.err.println("Error converting Blob to Base64: " + e.getMessage());
             }
         }
 

@@ -44,26 +44,25 @@ public class AuthController {
             HttpServletRequest request,
             RedirectAttributes redirectAttributes) {
         try {
-            // 1) registrar
+            // 1) register user
             User user = authService.registerUser(username, email, user_password, profile_photo);
 
-            // 2) autenticar automáticamente
+            // 2) automatically authenticate
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username,
                     user_password);
             Authentication auth = authManager.authenticate(authToken);
             SecurityContextHolder.getContext().setAuthentication(auth);
 
-            // 3) crear sesión (para que session.getAttribute("userId") siga funcionando si
-            // lo necesitas)
+            // 3) create session (so session.getAttribute("userId") keeps working if needed)
             request.getSession().setAttribute("userId", user.getUserId());
 
-            redirectAttributes.addFlashAttribute("success", "¡Registro exitoso!");
+            redirectAttributes.addFlashAttribute("success", "Registration successful!");
             return "redirect:/login";
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/signup";
         } catch (IOException e) {
-            redirectAttributes.addFlashAttribute("error", "Error al subir la imagen de perfil");
+            redirectAttributes.addFlashAttribute("error", "Error uploading profile image");
             return "redirect:/signup";
         }
     }

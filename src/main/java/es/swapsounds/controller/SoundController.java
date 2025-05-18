@@ -55,7 +55,7 @@ public class SoundController {
             Principal principal,
             Model model) {
 
-        // Obtener usuario desde el UserService
+        // Get user from UserService
         Optional<User> userOpt = userService.getUserFromPrincipal(principal);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
@@ -63,13 +63,13 @@ public class SoundController {
             model.addAttribute("userId", user.getUserId());
         }
 
-        // Obtener sonidos filtrados usando el SoundService
+        // Get filtered sounds using SoundService
         List<Sound> filteredSounds = soundService.getFilteredSounds(query, category);
         model.addAttribute("sounds", filteredSounds);
         model.addAttribute("query", query);
         model.addAttribute("category", category);
 
-        // Obtener categorías para el dropdown
+        // Get categories for the dropdown
         List<Category> allCategories = categoryService.getAllCategories();
         model.addAttribute("allCategories", allCategories);
 
@@ -85,26 +85,26 @@ public class SoundController {
     public String showUploadForm(Principal principal, Model model) {
 
         String username = (principal != null) ? principal.getName() : null;
-        System.out.println("Accediendo a /sounds/upload con username: " + username);
+        System.out.println("Accessing /sounds/upload with username: " + username);
         if (username == null) {
             model.addAttribute("error", "You must be logged in to upload sounds.");
             return "login";
         }
 
-        // Obtener todas las categorías existentes
+        // Get all existing categories
         List<Category> allCategories = categoryService.getAllCategories();
 
-        // Añadir al modelo
+        // Add to model
         model.addAttribute("allCategories", allCategories);
 
         Optional<User> user = userService.findUserByUsername(username);
         if (user.isPresent()) {
             model.addAttribute("userId", user.get().getUserId());
             model.addAttribute("username", username);
-            System.out.println("Usuario encontrado: " + username + ", userId: " + user.get().getUserId());
+            System.out.println("User found: " + username + ", userId: " + user.get().getUserId());
             return "upload-sound";
         } else {
-            System.out.println("Usuario no encontrado para username: " + username);
+            System.out.println("User not found for username: " + username);
             model.addAttribute("error", "User not found. Please login again.");
             return "login";
         }
@@ -122,21 +122,21 @@ public class SoundController {
             Model model) throws IOException {
 
         if (principal == null) {
-            model.addAttribute("error", "Debes iniciar sesión para subir sonidos.");
+            model.addAttribute("error", "You must be logged in to upload sounds.");
             return "redirect:/login";
         }
         Long userId = userService.findUserByUsername(principal.getName()).get().getUserId();
         Optional<User> user = userService.findUserById(userId);
         User uploader = user.get();
         if (!user.isPresent()) {
-            model.addAttribute("error", "Usuario no encontrado.");
+            model.addAttribute("error", "User not found.");
             principal = null;
             return "redirect:/login";
         }
 
         soundService.createSound(title, description, categories, audioFile, imageFile, uploader);
 
-        model.addAttribute("success", "¡Sonido subido con éxito!");
+        model.addAttribute("success", "Sound uploaded successfully!");
         return "redirect:/sounds/" + soundService.getLastInsertedSoundId();
     }
 
@@ -147,7 +147,7 @@ public class SoundController {
             Principal principal,
             Model model) {
 
-        // Obtener usuario desde el UserService
+        // Get user from UserService
         Optional<User> userOpt = userService.getUserFromPrincipal(principal);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
@@ -155,13 +155,13 @@ public class SoundController {
             model.addAttribute("userId", user.getUserId());
         }
 
-        // Obtener sonidos filtrados usando el SoundService
+        // Get filtered sounds using SoundService
         List<Sound> filteredSounds = soundService.getFilteredSounds(query, category);
         model.addAttribute("sounds", filteredSounds);
         model.addAttribute("query", query);
         model.addAttribute("category", category);
 
-        // Obtener categorías para el dropdown
+        // Get categories for the dropdown
         List<Category> allCategories = categoryService.getAllCategories();
         model.addAttribute("allCategories", allCategories);
 
@@ -174,8 +174,9 @@ public class SoundController {
     }
 
     @GetMapping("/sounds/{soundId}")
-    public String soundDetails(@PathVariable long soundId, Principal principal, Model model, HttpServletRequest request) {
-        // Manejar usuario autenticado o no
+    public String soundDetails(@PathVariable long soundId, Principal principal, Model model,
+            HttpServletRequest request) {
+        // Handle authenticated or unauthenticated user
         String username = principal != null ? principal.getName() : null;
         Long userId = null;
         boolean isAdmin = false;
@@ -187,18 +188,18 @@ public class SoundController {
                 // Check if the user has the ADMIN role
                 isAdmin = request.isUserInRole("ADMIN");
             } else {
-                throw new IllegalArgumentException("Usuario no encontrado");
+                throw new IllegalArgumentException("User not found");
             }
         }
 
-        // Buscar el sonido
+        // Find the sound
         Sound sound = soundService.findSoundById(soundId)
-                .orElseThrow(() -> new IllegalArgumentException("Recurso no encontrado"));
+                .orElseThrow(() -> new IllegalArgumentException("Resource not found"));
 
-        // Añadir sonido al modelo
+        // Add sound to model
         model.addAttribute("sound", sound);
 
-        // Obtener información del uploader
+        // Get uploader information
         Optional<User> uploaderOpt = userService.findUserById(sound.getUserId());
         if (uploaderOpt.isPresent()) {
             User uploader = uploaderOpt.get();
@@ -210,7 +211,7 @@ public class SoundController {
             model.addAttribute("uploader", null);
         }
 
-        // Obtener comentarios con información de permisos para edición/eliminación
+        // Get comments with permission info for edit/delete
         List<Map<String, Object>> commentsWithImages = commentService.getCommentsWithImagesBySoundId(soundId, userId);
         // Add isOwner or isAdmin flag to each comment
         for (Map<String, Object> comment : commentsWithImages) {
@@ -220,14 +221,13 @@ public class SoundController {
         }
         model.addAttribute("comments", commentsWithImages);
 
-        // Obtener categorías
+        // Get categories
         List<Category> allCategories = categoryService.getAllCategories();
         model.addAttribute("allCategories", allCategories);
         Set<String> selectedCategories = soundService.getSelectedCategoryNames(sound);
         model.addAttribute("selectedCategories", selectedCategories);
 
-        // Determinar si el usuario puede editar/eliminar el sonido (propietario o
-        // admin)
+        // Determine if the user can edit/delete the sound (owner or admin)
         boolean canEditSound = (userId != null && userId.equals(sound.getUserId())) || isAdmin;
         model.addAttribute("canEditSound", canEditSound);
         model.addAttribute("username", username);
@@ -246,13 +246,13 @@ public class SoundController {
             Principal principal,
             Model model) throws IOException {
         if (principal == null) {
-            throw new IllegalArgumentException("Debes iniciar sesión para editar un sonido");
+            throw new IllegalArgumentException("You must be logged in to edit a sound");
         }
 
         String username = principal.getName();
         Optional<User> userOpt = userService.findUserByUsername(username);
         if (userOpt.isEmpty()) {
-            throw new IllegalArgumentException("Usuario no encontrado");
+            throw new IllegalArgumentException("User not found");
         }
         Long userId = userOpt.get().getUserId();
         boolean isAdmin = SecurityContextHolder.getContext().getAuthentication()
@@ -260,22 +260,22 @@ public class SoundController {
 
         Optional<Sound> originalSound = soundService.findSoundById(soundId);
         if (originalSound.isEmpty()) {
-            throw new IllegalArgumentException("Recurso no encontrado");
+            throw new IllegalArgumentException("Resource not found");
         }
 
         if (!userId.equals(originalSound.get().getUserId()) && !isAdmin) {
-            throw new IllegalArgumentException("No tienes permisos para editar este sonido");
+            throw new IllegalArgumentException("You do not have permission to edit this sound");
         }
 
         try {
             soundService.editSound(soundId, title, description, categories, audioFile, imageFile, username);
             return "redirect:/sounds/" + soundId;
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Datos inválidos para actualizar el sonido");
+            throw new IllegalArgumentException("Invalid data to update the sound");
         } catch (IOException e) {
-            throw new IllegalArgumentException("Error al procesar los archivos");
+            throw new IllegalArgumentException("Error processing files");
         } catch (Exception e) {
-            throw new IllegalArgumentException("Error al actualizar el sonido");
+            throw new IllegalArgumentException("Error updating the sound");
         }
     }
 
@@ -285,13 +285,13 @@ public class SoundController {
             Principal principal,
             Model model) {
         if (principal == null) {
-            throw new IllegalArgumentException("Debes iniciar sesión para eliminar un sonido");
+            throw new IllegalArgumentException("You must be logged in to delete a sound");
         }
 
         String username = principal.getName();
         Optional<User> userOpt = userService.findUserByUsername(username);
         if (userOpt.isEmpty()) {
-            throw new IllegalArgumentException("Usuario no encontrado");
+            throw new IllegalArgumentException("User not found");
         }
         Long userId = userOpt.get().getUserId();
         boolean isAdmin = SecurityContextHolder.getContext().getAuthentication()
@@ -299,12 +299,12 @@ public class SoundController {
 
         Optional<Sound> soundOptional = soundService.findSoundById(soundId);
         if (soundOptional.isEmpty()) {
-            throw new IllegalArgumentException("Recurso no encontrado");
+            throw new IllegalArgumentException("Resource not found");
         }
         Sound sound = soundOptional.get();
 
         if (!userId.equals(sound.getUserId()) && !isAdmin) {
-            throw new IllegalArgumentException("No tienes permisos para eliminar este sonido");
+            throw new IllegalArgumentException("You do not have permission to delete this sound");
         }
 
         try {
@@ -312,7 +312,7 @@ public class SoundController {
             soundService.deleteSound(soundId);
             return "redirect:/sounds";
         } catch (Exception e) {
-            throw new IllegalArgumentException("Error al eliminar el sonido");
+            throw new IllegalArgumentException("Error deleting the sound");
         }
     }
 
@@ -327,8 +327,7 @@ public class SoundController {
                     InputStream inputStream = audioBlob.getBinaryStream();
                     byte[] audioBytes = inputStream.readAllBytes();
                     return ResponseEntity.ok()
-                            .contentType(MediaType.parseMediaType("audio/mpeg")) // Ajusta el tipo de medio si es
-                                                                                 // diferente
+                            .contentType(MediaType.parseMediaType("audio/mpeg")) // Adjust media type if different
                             .body(audioBytes);
                 }
             } catch (SQLException | IOException e) {
@@ -349,8 +348,7 @@ public class SoundController {
                     InputStream inputStream = imageBlob.getBinaryStream();
                     byte[] imageBytes = inputStream.readAllBytes();
                     return ResponseEntity.ok()
-                            .contentType(MediaType.IMAGE_JPEG) // Ajusta el tipo de medio si es diferente (image/png,
-                                                               // etc.)
+                            .contentType(MediaType.IMAGE_JPEG) // Adjust media type if different (image/png, etc.)
                             .body(imageBytes);
                 }
             } catch (SQLException | IOException e) {
@@ -363,13 +361,13 @@ public class SoundController {
     @GetMapping("/sounds/upload/secret")
     public String showUploadSecretSoundForm(Principal principal, Model model) {
         if (principal == null) {
-            model.addAttribute("error", "Debes iniciar sesión para subir sonidos secretos.");
+            model.addAttribute("error", "You must be logged in to upload secret sounds.");
             return "login";
         }
         String username = principal.getName();
         Optional<User> userOpt = userService.findUserByUsername(username);
         if (userOpt.isEmpty()) {
-            model.addAttribute("error", "Usuario no encontrado. Por favor inicia sesión nuevamente.");
+            model.addAttribute("error", "User not found. Please login again.");
             return "login";
         }
 
@@ -378,9 +376,6 @@ public class SoundController {
         model.addAttribute("allCategories", categoryService.getAllCategories());
         model.addAttribute("isSecret", true);
 
-        return "upload-secret-sound";  
+        return "upload-secret-sound";
     }
 }
-
-
-

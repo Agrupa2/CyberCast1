@@ -10,7 +10,7 @@ import jakarta.persistence.*;
 public class User {
 
     @Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long userId;
     private String username;
     private String email;
@@ -26,7 +26,7 @@ public class User {
     private List<Sound> sounds;
 
     @ElementCollection(fetch = FetchType.EAGER)
-	private List<String> roles;
+    private List<String> roles;
 
     public User() {
     }
@@ -40,14 +40,14 @@ public class User {
     }
 
     public List<String> getRoles() {
-		return roles;
-	}
+        return roles;
+    }
 
-	public void setRoles(List<String> roles) {
-		this.roles = roles;
-	}
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
+    }
 
-    // Otros getters y setters
+    // Other getters and setters
     public String getUsername() {
         return username;
     }
@@ -59,17 +59,18 @@ public class User {
     public String getEmail() {
         return email;
     }
+
     public void setEmail(String email) {
         this.email = email;
     }
 
     public String getEncodedPassword() {
-		return encodedPassword;
-	}
+        return encodedPassword;
+    }
 
-	public void setEncodedPassword(String encodedPassword) {
-		this.encodedPassword = encodedPassword;
-	}
+    public void setEncodedPassword(String encodedPassword) {
+        this.encodedPassword = encodedPassword;
+    }
 
     public Blob getProfilePicture() {
         return profilePicture;

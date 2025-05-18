@@ -62,7 +62,7 @@ public class ProfileController {
             String loggedUsername = principal.getName();
             isOwner = loggedUsername.equals(profileUser.getUsername());
 
-            // Verificar si el usuario actual es ADMIN
+            // Check if the current user is ADMIN
             Optional<User> currentUserOpt = userService.findUserByUsername(loggedUsername);
             if (currentUserOpt.isPresent()) {
                 isAdmin = SecurityContextHolder.getContext().getAuthentication()
@@ -77,13 +77,13 @@ public class ProfileController {
         model.addAttribute("userInitial", profileInfo.get("userInitial"));
         model.addAttribute("hasProfilePicture", profileInfo.get("hasProfilePicture"));
         model.addAttribute("comments", userComments);
-        model.addAttribute("username", profileUser.getUsername()); // este es el perfil visitado
+        model.addAttribute("username", profileUser.getUsername()); // this is the visited profile
         model.addAttribute("profileUser", profileUser);
         model.addAttribute("isOwner", isOwner);
         model.addAttribute("sounds", userSounds);
-        model.addAttribute("user", profileUser); // redundante si ya tienes profileUser
-        model.addAttribute("isAllowedToEdit", isOwner || isAdmin); // Añadir esta línea
-        model.addAttribute("isAdmin", isAdmin); // Opcional: si necesitas usar isAdmin en la vista
+        model.addAttribute("user", profileUser); // redundant if you already have profileUser
+        model.addAttribute("isAllowedToEdit", isOwner || isAdmin); // Add this line
+        model.addAttribute("isAdmin", isAdmin); // Optional: if you need to use isAdmin in the view
 
         return "profile";
     }
@@ -91,7 +91,7 @@ public class ProfileController {
     @PostMapping("/profile/update-username")
     public String updateUsername(
             @RequestParam String newUsername,
-            @RequestParam Long targetUserId, // ID del usuario a editar
+            @RequestParam Long targetUserId, // ID of the user to edit
             Principal principal,
             RedirectAttributes redirectAttributes) {
 
@@ -101,25 +101,25 @@ public class ProfileController {
         boolean isAdmin = SecurityContextHolder.getContext().getAuthentication()
                 .getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
 
-        // Obtener usuario actual
+        // Get current user
         User currentUser = userService.findUserByUsername(principal.getName())
-                .orElseThrow(() -> new IllegalStateException("Usuario no encontrado"));
+                .orElseThrow(() -> new IllegalStateException("User not found"));
 
-        // Verificar permisos: admin o dueño del perfil
+        // Check permissions: admin or profile owner
         boolean isAllowed = currentUser.getUserId() == targetUserId
                 || isAdmin;
 
         if (!isAllowed) {
-            redirectAttributes.addFlashAttribute("error", "No autorizado");
+            redirectAttributes.addFlashAttribute("error", "Not authorized");
             return "redirect:/sounds";
         }
 
-        // Actualizar nombre de usuario
+        // Update username
         try {
             userService.updateUsername(targetUserId, newUsername.trim());
-            redirectAttributes.addFlashAttribute("success", "Nombre actualizado");
+            redirectAttributes.addFlashAttribute("success", "Username updated");
 
-            // Actualizar SecurityContext si el usuario editó su propio nombre
+            // Update SecurityContext if the user edited their own username
             if (currentUser.getUserId() == targetUserId) {
                 UserDetails updatedUserDetails = userDetailsService.loadUserByUsername(newUsername.trim());
                 UsernamePasswordAuthenticationToken newAuth = new UsernamePasswordAuthenticationToken(
@@ -130,17 +130,17 @@ public class ProfileController {
             redirectAttributes.addFlashAttribute("error", "Error: " + e.getMessage());
         }
 
-        // Redirigir al perfil actualizado
+        // Redirect to the updated profile
         String newProfileUsername = userService.findUserById(targetUserId)
                 .map(User::getUsername)
-                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
         return "redirect:/profile/" + newProfileUsername;
     }
 
     @PostMapping("/profile/update-avatar")
     public String updateAvatar(
             @RequestParam("avatar") MultipartFile file,
-            @RequestParam Long targetUserId, // ID del usuario a editar
+            @RequestParam Long targetUserId, // ID of the user to edit
             Principal principal,
             RedirectAttributes redirectAttributes) {
 
@@ -150,33 +150,33 @@ public class ProfileController {
         boolean isAdmin = SecurityContextHolder.getContext().getAuthentication()
                 .getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
 
-        // Obtener usuario actual
+        // Get current user
         User currentUser = userService.findUserByUsername(principal.getName())
-                .orElseThrow(() -> new IllegalStateException("Usuario no encontrado"));
+                .orElseThrow(() -> new IllegalStateException("User not found"));
 
-        // Verificar permisos: admin o dueño del perfil
+        // Check permissions: admin or profile owner
         boolean isAllowed = currentUser.getUserId() == targetUserId
                 || isAdmin;
 
         if (!isAllowed) {
-            redirectAttributes.addFlashAttribute("error", "No autorizado");
+            redirectAttributes.addFlashAttribute("error", "Not authorized");
             return "redirect:/sounds";
         }
 
         Long sessionUserId = currentUser.getUserId();
 
-        // Actualizar avatar
+        // Update avatar
         try {
             userService.updateProfilePicture(sessionUserId, targetUserId, file);
-            redirectAttributes.addFlashAttribute("success", "Avatar actualizado");
+            redirectAttributes.addFlashAttribute("success", "Avatar updated");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Error: " + e.getMessage());
         }
 
-        // Redirigir al perfil del usuario editado
+        // Redirect to the edited user's profile
         String targetUsername = userService.findUserById(targetUserId)
                 .map(User::getUsername)
-                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
         return "redirect:/profile/" + targetUsername;
     }
 
@@ -207,12 +207,12 @@ public class ProfileController {
                     try (InputStream in = picBlob.getBinaryStream()) {
                         byte[] img = in.readAllBytes();
                         return ResponseEntity.ok()
-                                .contentType(MediaType.IMAGE_JPEG) // o MediaType.IMAGE_PNG si fuera PNG
+                                .contentType(MediaType.IMAGE_JPEG) // or MediaType.IMAGE_PNG if it is PNG
                                 .body(img);
                     }
                 }
             } catch (SQLException | IOException e) {
-                // Loguea el error si quieres
+                // Log the error if you want
                 e.printStackTrace();
             }
         }

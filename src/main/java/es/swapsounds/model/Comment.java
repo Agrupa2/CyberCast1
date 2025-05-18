@@ -5,23 +5,22 @@ import java.time.format.DateTimeFormatter;
 
 import jakarta.persistence.*;
 
-
 @Entity
 public class Comment {
-    
+
     @Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long commentId; // comment identification
 
     @ManyToOne
-    private User user; // user uploader of the comment
+    private User user; // user who uploaded the comment
 
     private String content; // comment content
 
     @ManyToOne
-    private Sound sound; // sound to which the comment is related
+    private Sound sound; // sound related to the comment
 
-    private LocalDateTime created; // comment upload date
+    private LocalDateTime created; // comment creation date
     private LocalDateTime modified; // comment modification date
     private long soundId;
     private String soundTitle;

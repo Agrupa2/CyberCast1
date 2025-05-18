@@ -1,7 +1,7 @@
 package es.swapsounds.service;
 
-import es.swapsounds.dto.SoundDTO;
-import es.swapsounds.dto.SoundMapper;
+import es.swapsounds.DTO.SoundDTO;
+import es.swapsounds.DTO.SoundMapper;
 import es.swapsounds.model.Category;
 import es.swapsounds.model.Sound;
 import es.swapsounds.model.User;
@@ -338,7 +338,7 @@ public class SoundService {
 
         boolean isAdmin = user.getRoles().contains("ADMIN");
         if (!isAdmin && sound.getUserId() != userId) {
-            throw new UnauthorizedAccessException("Usuario no autorizado para eliminar este sonido");
+            throw new UnauthorizedAccessException("User not authorized to delete this sound");
         }
 
         soundRepository.delete(sound);
@@ -346,7 +346,7 @@ public class SoundService {
 
     public class SoundNotFoundException extends RuntimeException {
         public SoundNotFoundException(Long soundId) {
-            super("Spundido no encontrado con ID: " + soundId);
+            super("Sound not found with ID: " + soundId);
         }
     }
 

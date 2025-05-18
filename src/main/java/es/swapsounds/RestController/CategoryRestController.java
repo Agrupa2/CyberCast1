@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import es.swapsounds.dto.CategoryDTO;
-import es.swapsounds.dto.SoundDTO;
-import es.swapsounds.dto.SoundMapper;
+import es.swapsounds.DTO.CategoryDTO;
+import es.swapsounds.DTO.SoundDTO;
+import es.swapsounds.DTO.SoundMapper;
 import es.swapsounds.model.Category;
 import es.swapsounds.service.CategoryService;
 
@@ -33,8 +33,8 @@ public class CategoryRestController {
         this.soundMapper = mapper;
     }
 
-     /**
-     * Obtiene todas las categorías (sin sonidos).
+    /**
+     * Gets all categories (without sounds).
      */
     @GetMapping
     public ResponseEntity<List<CategoryDTO>> getAll() {
@@ -45,7 +45,7 @@ public class CategoryRestController {
     }
 
     /**
-     * Crea o devuelve una categoría.
+     * Creates or returns a category.
      */
     @PostMapping
     public ResponseEntity<CategoryDTO> create(@RequestParam String name) {
@@ -56,14 +56,14 @@ public class CategoryRestController {
     }
 
     /**
-     * Busca (o crea) una categoría y devuelve sus datos con sonidos.
+     * Finds (or creates) a category and returns its data with sounds.
      */
     @GetMapping("/{id}")
     public ResponseEntity<CategoryDTO> getById(@PathVariable Long id) {
         Category cat = categoryService.getCategoryById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
-                        "Categoría no encontrada"));
+                        "Category not found"));
         List<SoundDTO> sounds = cat.getSounds().stream()
                 .map(soundMapper::toDTO)
                 .collect(Collectors.toList());
@@ -72,7 +72,7 @@ public class CategoryRestController {
     }
 
     /**
-     * Busca o crea por nombre.
+     * Finds or creates by name.
      */
     @GetMapping("/search")
     public ResponseEntity<CategoryDTO> search(@RequestParam String name) {

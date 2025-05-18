@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import es.swapsounds.dto.UserDTO;
-import es.swapsounds.dto.UserRegistrationDTO;
+import es.swapsounds.DTO.UserDTO;
+import es.swapsounds.DTO.UserRegistrationDTO;
 import es.swapsounds.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -35,13 +35,18 @@ public class UserRestController {
         this.svc = svc;
     }
 
-
+    /**
+     * Returns a paginated list of all users.
+     */
     @GetMapping
     public ResponseEntity<Page<UserDTO>> list(Pageable pageable) {
         Page<UserDTO> dtos = svc.findAllUsersDTO(pageable);
         return ResponseEntity.ok(dtos);
     }
 
+    /**
+     * Creates a new user.
+     */
     @PostMapping("/")
     public ResponseEntity<UserDTO> createUser(@RequestBody UserRegistrationDTO dto) {
         UserDTO created = svc.saveDTO(dto);
@@ -49,12 +54,18 @@ public class UserRestController {
         return ResponseEntity.created(location).body(created);
     }
 
+    /**
+     * Returns a user by username.
+     */
     @GetMapping("/{username}")
     public ResponseEntity<UserDTO> get(@PathVariable String username) {
         UserDTO dto = svc.findByUsernameDTO(username);
         return ResponseEntity.ok(dto);
     }
 
+    /**
+     * Updates the username of a user.
+     */
     @PostMapping("/{username}/username")
     public ResponseEntity<Map<String, String>> updateUsername(
             @PathVariable String username,
@@ -64,9 +75,12 @@ public class UserRestController {
         Long id = svc.getUserIdFromPrincipal(request.getUserPrincipal());
         svc.changeUsername(id, username, newUsername);
         request.setAttribute("username", newUsername.trim());
-        return ResponseEntity.ok(Map.of("success", "Nombre actualizado"));
+        return ResponseEntity.ok(Map.of("success", "Username updated"));
     }
 
+    /**
+     * Updates the avatar of a user.
+     */
     @PostMapping("/{username}/avatar")
     public ResponseEntity<Map<String, String>> updateAvatar(
             @PathVariable String username,
@@ -74,9 +88,12 @@ public class UserRestController {
             HttpServletRequest request) throws IOException {
         Long id = svc.getUserIdFromPrincipal(request.getUserPrincipal());
         svc.updateAvatar(id, username, avatar);
-        return ResponseEntity.ok(Map.of("success", "Avatar actualizado"));
+        return ResponseEntity.ok(Map.of("success", "Avatar updated"));
     }
 
+    /**
+     * Deletes a user account.
+     */
     @DeleteMapping("/{username}")
     public ResponseEntity<Map<String, String>> delete(
             @PathVariable String username,
@@ -85,6 +102,6 @@ public class UserRestController {
         Long id = svc.getUserIdFromPrincipal(request.getUserPrincipal());
         svc.deleteAccount(id, username, confirmation);
         request.getSession().invalidate();
-        return ResponseEntity.ok(Map.of("success", "Cuenta eliminada"));
+        return ResponseEntity.ok(Map.of("success", "Account deleted"));
     }
 }

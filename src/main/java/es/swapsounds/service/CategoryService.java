@@ -30,10 +30,10 @@ public class CategoryService {
     @Transactional
     public Category findOrCreateCategory(String name) {
         return categoryRepository.findByNameIgnoreCase(name.trim())
-            .orElseGet(() -> {
-                Category newCategory = new Category(name.trim());
-                return categoryRepository.save(newCategory);
-            });
+                .orElseGet(() -> {
+                    Category newCategory = new Category(name.trim());
+                    return categoryRepository.save(newCategory);
+                });
     }
 
     @Transactional
@@ -41,8 +41,7 @@ public class CategoryService {
         return categoryRepository.findAll();
     }
 
-
     public Optional<Category> getCategoryById(Long id) {
         return categoryRepository.findById(id);
     }
-} 
+}
