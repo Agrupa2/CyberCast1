@@ -15,6 +15,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 
 import com.mpatric.mp3agic.InvalidDataException;
 import com.mpatric.mp3agic.Mp3File;
@@ -54,6 +57,16 @@ public class SoundService {
 
     public SoundService(@Qualifier("soundMapperImpl") SoundMapper mapper) {
         this.mapper = mapper;
+    }
+
+    public Page<Sound> getFilteredSoundsPage(String query, String category, Pageable pageable) {
+        if (category != null && !"all".equalsIgnoreCase(category)) {
+            return soundRepository.findByTitleContainingIgnoreCaseAndCategories_NameIgnoreCase(
+                    query == null ? "" : query, category, pageable);
+        } else {
+            return soundRepository.findByTitleContainingIgnoreCase(
+                    query == null ? "" : query, pageable);
+        }
     }
 
     private Long lastInsertedSoundId;
