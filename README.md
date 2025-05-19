@@ -94,15 +94,18 @@ Bienvenido a *SwapSounds, una plataforma intuitiva y colaborativa donde los usua
 --------------------
 @sefernandezdav2023 
 --------------------
-1. 
+1. Securizing api requests by filtering by role and checking the session user with principal. <a href="https://github.com/DWS-2025/project-grupo-10/commit/e076255b5636240f261eaa2b59f5fcd781750fd0">e076255</a>
 
-2.
+2. Modifying the old logic that allowed users to login and signup, now using spring security settings and password encrypting for saving in the database.<a href="https://github.com/DWS-2025/project-grupo-10/commit/d034df446b981575ca8508ba705259569a97f1de">d034df4</a> 
 
-3.
+3. Implementing some sanitization on all the files and Strings submitted by users with owasp sanitization and file validation. <a href="https://github.com/DWS-2025/project-grupo-10/commit/33acbf7c8335d2074c6427ae5208d8d59e2fe322">33acbf7</a>
 
-4.
+4. New admin panel where users with role Admin are able to check all the sounds and users currently in the database and registered, the panel includes the deletion of the elements on a direct link. <a href="https://github.com/DWS-2025/project-grupo-10/commit/b20dff474d86c79ad15f6f94d4c9eed80551e8cf">b20dff4</a>
 
-5.
+5. Adding the local disc file inclusion to the web page, users logged are able to upload to the web a sound which won't be visible for the rest, it will be keeped locally and it's available for download. Security features included on it's addition. <a href="https://github.com/DWS-2025/project-grupo-10/commit/5a0c2df3ce0aaa8862158b7a3b0f0994ccca2d0e">5a0c2df</a>
+
+<p>The file I have worked more on has been the SecurityConfig.java one, adding rules to access different resources.</p>
+
 --------------------
 @4lexxxx
 --------------------
