@@ -58,8 +58,8 @@ public class UserRestController {
      * Returns a user by username.
      */
     @GetMapping("/{username}")
-    public ResponseEntity<UserDTO> get(@PathVariable String username) {
-        UserDTO dto = svc.findByUsernameDTO(username);
+    public ResponseEntity<UserDTO> get(@PathVariable String username, HttpServletRequest request) {
+        UserDTO dto = svc.findByUsernameDTO(username, request.getUserPrincipal());
         return ResponseEntity.ok(dto);
     }
 
