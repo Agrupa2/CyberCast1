@@ -222,6 +222,7 @@ public class CommentService {
             commentData.put("userInitial", userService.getProfileInfo(commentUser).get("userInitial"));
             commentData.put("soundId", soundId);
             commentData.put("username", commentUser.getUsername());
+            commentData.put("userId", commentUser.getUserId());
 
             commentsWithImages.add(commentData);
         }

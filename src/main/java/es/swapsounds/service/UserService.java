@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.method.P;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -43,7 +44,8 @@ public class UserService {
     private final UserMapper mapper;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, SoundRepository soundRepository, @Qualifier("userMapperImpl") UserMapper mapper,
+    public UserService(UserRepository userRepository, SoundRepository soundRepository,
+            @Qualifier("userMapperImpl") UserMapper mapper,
             CommentRepository CommentRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.soundRepository = soundRepository;
@@ -123,16 +125,16 @@ public class UserService {
         boolean checkProfilePic = validateProfilePic(profilePhoto);
 
         if (checkProfilePic) {
-        try {
-            if (profilePhoto != null && !profilePhoto.isEmpty()) {
-                Blob photoBlob = new SerialBlob(profilePhoto.getBytes());
-                targetUser.setProfilePicture(photoBlob);
-            } else {
-                targetUser.setProfilePicture(null);
-            }
-            userRepository.save(targetUser);
-        } catch (SQLException e) {
-            throw new RuntimeException("Error al convertir la imagen a Blob: " + e.getMessage());
+            try {
+                if (profilePhoto != null && !profilePhoto.isEmpty()) {
+                    Blob photoBlob = new SerialBlob(profilePhoto.getBytes());
+                    targetUser.setProfilePicture(photoBlob);
+                } else {
+                    targetUser.setProfilePicture(null);
+                }
+                userRepository.save(targetUser);
+            } catch (SQLException e) {
+                throw new RuntimeException("Error al convertir la imagen a Blob: " + e.getMessage());
             }
         }
     }
@@ -159,19 +161,19 @@ public class UserService {
         boolean checkProfilePic = validateProfilePic(file);
 
         if (checkProfilePic) {
-        try {
-            Blob blob = null;
-            if (file != null && !file.isEmpty()) {
-                blob = new SerialBlob(file.getBytes());
-            }
-            targetUser.setProfilePicture(blob);
-            userRepository.save(targetUser);
+            try {
+                Blob blob = null;
+                if (file != null && !file.isEmpty()) {
+                    blob = new SerialBlob(file.getBytes());
+                }
+                targetUser.setProfilePicture(blob);
+                userRepository.save(targetUser);
 
-        } catch (SQLException | IOException e) {
-            throw new ResponseStatusException(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Error al actualizar el avatar: " + e.getMessage(),
-                    e);
+            } catch (SQLException | IOException e) {
+                throw new ResponseStatusException(
+                        HttpStatus.INTERNAL_SERVER_ERROR,
+                        "Error al actualizar el avatar: " + e.getMessage(),
+                        e);
             }
         }
     }
@@ -180,10 +182,16 @@ public class UserService {
         return userRepository.findByUsername(username);
     }
 
-    public UserDTO findByUsernameDTO(String username) {
+    public UserDTO findByUsernameDTO(String username, Principal principal) {
         User u = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
-        return mapper.toDto(u);
+
+        if (principal.getName().equals(u.getUsername()) || isAdmin(principal.getName())) {
+            return mapper.toDto(u);
+        }else {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para ver este perfil");
+        }
+
     }
 
     public List<User> getAllUsers() {
@@ -212,21 +220,21 @@ public class UserService {
                     HttpStatus.FORBIDDEN,
                     "No puedes eliminar a un admin");
         } else {
-        // 1) Eliminar todos los comentarios que el usuario ha escrito
-        commentRepository.deleteByUserUserId(userId);
+            // 1) Eliminar todos los comentarios que el usuario ha escrito
+            commentRepository.deleteByUserUserId(userId);
 
-        // 2) Para cada sonido que el usuario ha subido:
-        List<Sound> userSounds = soundRepository.findByUserId(userId);
-        for (Sound sound : userSounds) {
-            long sid = sound.getSoundId();
-            // 2a) Borrar comentarios apuntando a ese sonido
-            commentRepository.deleteBySoundId(sid);
-            // 2b) Borrar el sonido
-            soundRepository.deleteById(sid);
-        }
+            // 2) Para cada sonido que el usuario ha subido:
+            List<Sound> userSounds = soundRepository.findByUserId(userId);
+            for (Sound sound : userSounds) {
+                long sid = sound.getSoundId();
+                // 2a) Borrar comentarios apuntando a ese sonido
+                commentRepository.deleteBySoundId(sid);
+                // 2b) Borrar el sonido
+                soundRepository.deleteById(sid);
+            }
 
-        // 3) Borrar al usuario
-        userRepository.deleteById(userId);
+            // 3) Borrar al usuario
+            userRepository.deleteById(userId);
         }
 
     }
@@ -264,7 +272,7 @@ public class UserService {
                     "You do not have permission to delete this account");
         }
 
-        if(targetUser.getRoles().contains("ADMIN")) {
+        if (targetUser.getRoles().contains("ADMIN")) {
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN,
                     "No puedes eliminar a un admin");
