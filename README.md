@@ -40,6 +40,7 @@ Bienvenido a *SwapSounds, una plataforma intuitiva y colaborativa donde los usua
 
 ## 📊 Diagrama
 
+![Logo GitHub](https://github.com/DWS-2025/project-grupo-10/blob/main/src/main/resources/static/images/packageDiagrama.png)
 ![Logo GitHub](https://github.com/DWS-2025/project-grupo-10/blob/main/src/main/resources/static/images/swapsoundsEnBlanco.png)
 
 ## 🌟 Características principales
