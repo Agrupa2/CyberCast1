@@ -15,7 +15,7 @@
     <nav class="navbar">
         <div class="navbar-container">
             <div class="logo">
-                <a href="/sounds">Sound Library</a>
+                <a href="/sounds">Podcast Library</a>
             </div>
             <ul class="nav-links">
                 {{^logged}}
@@ -23,9 +23,9 @@
                 {{/logged}}
 
                 {{#logged}}
-                <li><a href="/sounds/upload?username={{userName}}">Upload Sound</a></li>
-                <li><a href="/delete-account">Delete Account</a></li>
-                <li><a href="/logout">Logout</a></li>
+                <li><a href="/sounds/upload?username={{userName}}">Upload Podcast</a></li>
+                <!--<li><a href="/delete-account">Delete Account</a></li> 
+                <li><a href="/logout">Logout</a></li>  -->
                 <li><a href="/profile/{{userName}}">View profile</a></li>
 
                 {{#admin}}
@@ -81,7 +81,7 @@
             <h3>Description</h3>
             <p>{{sound.description}}</p>
         </div>
-
+        <!--
         {{#canEditSound}}
         <div class="sound-actions">
             <details>
@@ -130,7 +130,8 @@
             </details>
         </div>
         {{/canEditSound}}
-        <a class="back-link" href="/sounds">Back to all sounds</a>
+    -->
+        <a class="back-link" href="/sounds">Back to all podcasts</a>
     </div>
 
     <div class="comments-section">

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sound Library</title>
+    <title>Podcast Library</title>
     <link rel="stylesheet" href="/css/sounds.css">
 </head>
 
@@ -16,16 +16,16 @@
         <!-- Navbar -->
         <nav class="navbar">
             <div class="navbar-container">
-                <div class="logo">Sound Library</div>
+                <div class="logo">Podcast Library</div>
                 <ul class="nav-links">
                     {{^logged}}
                     <li><a href="/login">Login</a></li>
                     {{/logged}}
 
                     {{#logged}}
-                    <li><a href="/sounds/upload?username={{userName}}">Upload Sound</a></li>
-                    <li><a href="/delete-account">Delete Account</a></li>
-                    <li><a href="/logout">Logout</a></li>
+                    <li><a href="/sounds/upload?username={{userName}}">Upload Podcast</a></li>
+                    <!--<li><a href="/delete-account">Delete Account</a></li> 
+                <li><a href="/logout">Logout</a></li>  -->
                     <li><a href="/profile/{{userName}}">Ver perfil</a></li>
 
                     {{#admin}}
@@ -35,10 +35,10 @@
                 </ul>
             </div>
         </nav>
-
+        
         <!-- Search Bar -->
-        <form action="/sounds" method="GET" class="search-container">
-            <input type="text" name="query" class="search-bar" placeholder="Searching for sounds..."
+        <!-- <form action="/sounds" method="GET" class="search-container">
+            <input type="text" name="query" class="search-bar" placeholder="Searching for podcasts..."
                 value="{{#query}}{{query}}{{/query}}">
             <select name="category" class="fold-out" onchange="this.form.submit()">
                 <option value="all" {{#selectedAll}}selected{{/selectedAll}}>All Categories</option>
@@ -48,8 +48,8 @@
             </select>
             <button type="submit" hidden></button>
             <input type="hidden" name="_csrf" value="{{token}}" />
-        </form>
-
+        </form> -->
+        
         <!-- Sound Grid -->
         <div class="sound-grid" id="soundsContainer">
             {{#sounds}}
@@ -88,7 +88,7 @@
             </div>
             {{/sounds}}
             {{^sounds}}
-            <p>No sounds found.</p>
+            <p>No podcasts found.</p>
             {{/sounds}}
         </div>
         <button id="loadMoreBtn" data-page="{{currentPage}}" {{#query}}data-query="{{query}}" {{/query}}
@@ -105,8 +105,8 @@
     <footer>
         <div class="footer-content">
             <div class="footer-brand">
-                <div class="logo">SwapSounds</div>
-                <p class="slogan">Experience the future of sounds</p>
+                <div class="logo">CyberCast</div>
+                <p class="slogan">Experience the future of podcasts</p>
                 <div class="social-link">
                     <a href="#"><ion-icon name="logo-facebook"></ion-icon></a>
                     <a href="#"><ion-icon name="logo-twitter"></ion-icon></a>
@@ -117,7 +117,7 @@
             </div>
             <div class="footer-links">
                 <ul>
-                    <h4 class="link-heading">SwapSounds</h4>
+                    <h4 class="link-heading">CyberCast</h4>
                     <li class="link-item"><a href="#">About us</a></li>
                     <li class="link-item"><a href="#">My profile</a></li>
                     <li class="link-item"><a href="#">Pricing plans</a></li>
@@ -126,7 +126,7 @@
                 <ul>
                     <h4 class="link-heading">Browse</h4>
                     <li class="link-item"><a href="#">Categories</a></li>
-                    <li class="link-item"><a href="#">Production Sounds</a></li>
+                    <li class="link-item"><a href="#">Production Podcasts</a></li>
                     <li class="link-item"><a href="#">Free-to-use</a></li>
                     <li class="link-item"><a href="#">Favourites</a></li>
                 </ul>
@@ -141,7 +141,7 @@
         </div>
         <div class="footer-copyright">
             <div class="copyright">
-                <p>© Copyright 2025 SwapSounds</p>
+                <p>© Copyright 2025 CyberCast</p>
             </div>
             <div class="wrapper">
                 <a href="#">Privacy policy</a>

@@ -12,7 +12,7 @@
     <nav class="navbar">
         <div class="navbar-container">
             <div class="logo">
-                <a href="/sounds">Sound Library</a>
+                <a href="/sounds">Podcast Library</a>
             </div>
             <ul class="nav-links">
                 {{^logged}}
@@ -20,11 +20,10 @@
                 {{/logged}}
 
                 {{#logged}}
-                <li><a href="/sounds/upload?username={{userName}}">Upload Sound</a></li>
-                <li><a href="/delete-account">Delete Account</a></li>
-                <li><a href="/logout">Logout</a></li>
+                <li><a href="/sounds/upload?username={{userName}}">Upload Podcast</a></li>
+                <!--<li><a href="/delete-account">Delete Account</a></li> 
+                <li><a href="/logout">Logout</a></li>  -->
                 <li><a href="/profile/{{userName}}">View profile</a></li>
-
                 {{#admin}}
                 <li><a href="/admin/users">Admin Panel</a></li>
                 {{/admin}}
@@ -43,11 +42,11 @@
                 <div class="default-avatar">{{userInitial}}</div>
                 {{/hasProfilePicture}}
             </div>
+        <!--
             {{#isAllowedToEdit}}
             <div class="profile-actions">
                 <details class="profile-dropdown">
                     <summary class="dropdown-toggle">
-                        <!-- Icon or text to open the dropdown -->
                         <i class="fas fa-ellipsis-v"></i>
                     </summary>
                     <div class="dropdown-content">
@@ -74,17 +73,19 @@
                 </details>
             </div>
             {{/isAllowedToEdit}}
+            -->
             <div class="profile-info">
                 <h1>{{user.username}}</h1>
                 <div class="stats">
                     <div class="stat-item">
                         <div class="stat-value">{{sounds.size}}</div>
-                        <div class="stat-label">Sounds</div>
+                        <div class="stat-label">Podcasts</div>
                     </div>
-                    <div class="stat-item">
+                    <!--<div class="stat-item">
                         <div class="stat-value">0</div>
                         <div class="stat-label">Followers</div>
                     </div>
+                -->
                     <div class="stat-item">
                         <div class="stat-value">{{comments.size}}</div>
                         <div class="stat-label">Comments</div>
@@ -94,8 +95,8 @@
         </div>
         <div class="sounds-list">
             <h2>
-                {{#isOwner}}Your uploaded sounds{{/isOwner}}
-                {{^isOwner}}Sounds by {{user.username}}{{/isOwner}}
+                {{#isOwner}}Your uploaded podcasts{{/isOwner}}
+                {{^isOwner}}Podcasts by {{user.username}}{{/isOwner}}
             </h2>
             {{#sounds}}
             <div class="sound-item">
@@ -114,6 +115,7 @@
                 </div>
                 <div class="sound-actions">
                     <a href="/sounds/{{soundId}}" class="btn">View</a>
+                    <!--
                     {{#isOwner}}
                     <form action="/sounds/{{soundId}}/delete" method="POST">
                         <button type="submit" class="btn btn-danger"
@@ -122,21 +124,23 @@
 
                     </form>
                     {{/isOwner}}
+                    -->
                 </div>
             </div>
             {{/sounds}}
             {{^sounds}}
             <div class="empty-state">
                 {{#isOwner}}
-                <p>You haven't uploaded any sounds yet</p>
-                <a href="/sounds/upload" class="btn">Upload your first sound</a>
+                <p>You haven't uploaded any podcasts yet</p>
+                <a href="/sounds/upload" class="btn">Upload your first podcast</a>
                 {{/isOwner}}
                 {{^isOwner}}
-                <p>{{user.username}} hasn't uploaded any sounds yet</p>
+                <p>{{user.username}} hasn't uploaded any podcast yet</p>
                 {{/isOwner}}
             </div>
             {{/sounds}}
         </div>
+        <!--
         {{#hasPrivileges}}
         <div class="secret-sound-section glass-bg">
             <div class="secret-sound-container">
@@ -183,6 +187,7 @@
             </div>
         </div>
         {{/hasPrivileges}}
+        -->
         <div class="comments-section">
             <h2>
                 {{#isOwner}}Your comments{{/isOwner}}
@@ -194,6 +199,7 @@
                     <p>{{{content}}}</p>
                     <small class="comment-date">{{created}} on <a href="/sounds/{{soundId}}">{{soundTitle}}</a></small>
                 </div>
+                <!--
                 {{#isOwner}}
                 <div class="comment-actions">
                     <form action="/sounds/{{soundId}}/comments/{{commentId}}/delete" method="POST">
@@ -204,6 +210,7 @@
                     </form>
                 </div>
                 {{/isOwner}}
+                -->
             </div>
             {{/comments}}
             {{^comments}}

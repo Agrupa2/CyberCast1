@@ -12,10 +12,10 @@
     <!-- Navbar igual que en profile -->
     <nav class="navbar">
         <div class="navbar-container">
-            <div class="logo"><a href="/sounds">Sound Library</a></div>
+            <div class="logo"><a href="/sounds">Podcast Library</a></div>
             <ul class="nav-links">
                 {{#username}}
-                <li><a href="/sounds/upload?username={{username}}">Upload Sound</a></li>
+                <li><a href="/sounds/upload?username={{username}}">Upload Podcast</a></li>
                 <li><a href="/logout">Logout</a></li>
                 <li><a href="/admin/users">Admin Panel</a></li>
                 {{/username}}
@@ -95,7 +95,7 @@
         </div>
 
         <div class="sounds-list" style="margin-top: 3rem;">
-            <h2>Uploaded sounds</h2>
+            <h2>Uploaded podcasts</h2>
 
             {{#sounds}}
             <div class="sound-item" style="grid-template-columns: 60px 2fr 2fr 100px;">
@@ -133,7 +133,7 @@
 
             {{^sounds}}
             <div class="empty-state">
-                <p>No uploaded sounds</p>
+                <p>No uploaded podcasts</p>
             </div>
             {{/sounds}}
         </div>

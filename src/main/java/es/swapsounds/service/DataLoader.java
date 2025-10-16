@@ -40,8 +40,8 @@ public class DataLoader implements CommandLineRunner {
     public void run(String... args) {
         if (userRepository.count() == 0 && soundRepository.count() == 0) {
 
-            Category football = categoryService.findOrCreateCategory("Football");
-            Category meme = categoryService.findOrCreateCategory("Meme");
+            Category pentesting = categoryService.findOrCreateCategory("Pentesting");
+            Category sql = categoryService.findOrCreateCategory("SQL");
             Category ai = categoryService.findOrCreateCategory("AI");
 
             User user1 = new User("sofia", "sofia@example.com", passwordEncoder.encode("sofia123"), null);
@@ -108,7 +108,7 @@ public class DataLoader implements CommandLineRunner {
                 sound1.setDuration("3:15");
                 sound1.setUploadDate(LocalDateTime.now());
                 sound1.setUserId(user1.getUserId()); // Assuming User has getUserId()
-                sound1.setCategories(Arrays.asList(football));
+                sound1.setCategories(Arrays.asList(pentesting));
 
                 Sound sound2 = new Sound();
                 sound2.setTitle("Betis");
@@ -118,7 +118,7 @@ public class DataLoader implements CommandLineRunner {
                 sound2.setDuration("5:00");
                 sound2.setUploadDate(LocalDateTime.now());
                 sound2.setUserId(user2.getUserId()); // Assuming User has getUserId()
-                sound2.setCategories(Arrays.asList(football));
+                sound2.setCategories(Arrays.asList(pentesting));
 
                 Sound sound3 = new Sound();
                 sound3.setTitle("El Diablo que malditos tenis");
@@ -128,7 +128,7 @@ public class DataLoader implements CommandLineRunner {
                 sound3.setDuration("3:00");
                 sound3.setUploadDate(LocalDateTime.now());
                 sound3.setUserId(user2.getUserId()); // Assuming User has getUserId()
-                sound3.setCategories(Arrays.asList(meme));
+                sound3.setCategories(Arrays.asList(sql));
 
                 Sound sound4 = new Sound();
                 sound4.setTitle("El señor de la noche");
@@ -138,7 +138,7 @@ public class DataLoader implements CommandLineRunner {
                 sound4.setDuration("3:00");
                 sound4.setUploadDate(LocalDateTime.now());
                 sound4.setUserId(user1.getUserId()); // Assuming User has getUserId()
-                sound4.setCategories(Arrays.asList(meme, ai));
+                sound4.setCategories(Arrays.asList(sql, ai));
 
                 soundRepository.saveAll(List.of(sound1, sound2, sound3, sound4));
 

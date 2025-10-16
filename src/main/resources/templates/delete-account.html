@@ -3,20 +3,20 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Delete Account - SwapSounds</title>
+    <title>Delete Account - CyberCast</title>
     <link rel="stylesheet" href="/css/delete-account.css">
 </head>
 
 <body>
     <nav class="navbar">
         <div class="navbar-container">
-            <div class="logo">Sound Library</div>
+            <div class="logo">Podcast Library</div>
             <ul class="nav-links">
                 {{^username}} <!-- Shows this if there is no user logged in -->
                 <li><a href="/login">Login</a></li>
                 {{/username}}
                 {{#username}} <!-- If a user is logged in, show these options -->
-                <li><a href="/sounds/upload?username={{username}}">Upload Sound</a></li>
+                <li><a href="/sounds/upload?username={{username}}">Upload Podcast</a></li>
                 <li><a href="/logout">Logout</a></li>
                 {{/username}}
             </ul>
@@ -29,7 +29,7 @@
         <div class="warning-content">
             <p>Hello <strong>{{username}}</strong>, this action will:</p>
             <ul>
-                <li>❌ Delete all your uploaded sounds</li>
+                <li>❌ Delete all your uploaded podcasts</li>
                 <li>❌ Remove your profile image</li>
                 <li>❌ Permanently delete your account</li>
             </ul>
