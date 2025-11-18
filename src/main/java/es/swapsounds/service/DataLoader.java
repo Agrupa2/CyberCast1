@@ -70,17 +70,17 @@ public class DataLoader implements CommandLineRunner {
             try {
                 // Load files from classpath and convert them to Blob
                 InputStream cr7AudioStream = getClass().getResourceAsStream("/static/audio/CR7.mp3");
-                InputStream cr7ImageStream = getClass().getResourceAsStream("/static/images/CR7.jpg");
+                InputStream cr7ImageStream = getClass().getResourceAsStream("/static/images/podcast1.jpeg");
                 InputStream betisAudioStream = getClass().getResourceAsStream("/static/audio/betis.mp3");
-                InputStream betisImageStream = getClass().getResourceAsStream("/static/images/betis.png");
+                InputStream betisImageStream = getClass().getResourceAsStream("/static/images/podcast2.jpeg");
                 InputStream diabloAudioStream = getClass()
                         .getResourceAsStream("/static/audio/el-diablo-que-malditos-tenis.mp3");
                 InputStream diabloImageStream = getClass()
-                        .getResourceAsStream("/static/images/el-diablo-que-malditos-tenis.png");
+                        .getResourceAsStream("/static/images/podcast3.jpeg");
                 InputStream senorNocheAudioStream = getClass()
                         .getResourceAsStream("/static/audio/ElSenorDeLaNoche.mp3");
                 InputStream senorNocheImageStream = getClass()
-                        .getResourceAsStream("/static/images/ElSenorDeLaNoche.jpg");
+                        .getResourceAsStream("/static/images/podcast4.jpeg");
 
                 Blob cr7AudioBlob = (cr7AudioStream != null) ? new SerialBlob(cr7AudioStream.readAllBytes()) : null;
                 Blob cr7ImageBlob = (cr7ImageStream != null) ? new SerialBlob(cr7ImageStream.readAllBytes()) : null;
@@ -101,41 +101,41 @@ public class DataLoader implements CommandLineRunner {
 
                 // Create sounds and associate them with users and categories
                 Sound sound1 = new Sound();
-                sound1.setTitle("CR7");
-                sound1.setDescription("CR7 leaves the Simpsons");
+                sound1.setTitle("Entre Firewalls y Cerebros");
+                sound1.setDescription("Ciberseguridad y comportamiento humano");
                 sound1.setAudioBlob(cr7AudioBlob); // Save Blob
                 sound1.setImageBlob(cr7ImageBlob); // Save Blob
-                sound1.setDuration("3:15");
+                sound1.setDuration("2:29:15");
                 sound1.setUploadDate(LocalDateTime.now());
                 sound1.setUserId(user1.getUserId()); // Assuming User has getUserId()
                 sound1.setCategories(Arrays.asList(pentesting));
 
                 Sound sound2 = new Sound();
-                sound2.setTitle("Betis");
-                sound2.setDescription("Betis anthem");
+                sound2.setTitle("Sombras del Ciberespacio");
+                sound2.setDescription("Amenazas, ataques y ciberdelincuencia");
                 sound2.setAudioBlob(betisAudioBlob); // Save Blob
                 sound2.setImageBlob(betisImageBlob); // Save Blob
-                sound2.setDuration("5:00");
+                sound2.setDuration("35:24");
                 sound2.setUploadDate(LocalDateTime.now());
                 sound2.setUserId(user2.getUserId()); // Assuming User has getUserId()
                 sound2.setCategories(Arrays.asList(pentesting));
 
                 Sound sound3 = new Sound();
-                sound3.setTitle("El Diablo que malditos tenis");
-                sound3.setDescription("Celebration over some awesome sneakers");
+                sound3.setTitle("Bits Seguros");
+                sound3.setDescription("Tecnología, defensa y buenas prácticas");
                 sound3.setAudioBlob(diabloAudioBlob); // Save Blob
                 sound3.setImageBlob(diabloImageBlob); // Save Blob
-                sound3.setDuration("3:00");
+                sound3.setDuration("57:58");
                 sound3.setUploadDate(LocalDateTime.now());
                 sound3.setUserId(user2.getUserId()); // Assuming User has getUserId()
                 sound3.setCategories(Arrays.asList(sql));
 
                 Sound sound4 = new Sound();
-                sound4.setTitle("El señor de la noche");
-                sound4.setDescription("The lord of the night, goat");
+                sound4.setTitle("Privacidad al Día");
+                sound4.setDescription("Leyes, derechos digitales y ética en la red");
                 sound4.setAudioBlob(senorNocheAudioBlob); // Save Blob
                 sound4.setImageBlob(senorNocheImageBlob); // Save Blob
-                sound4.setDuration("3:00");
+                sound4.setDuration("1:15:34");
                 sound4.setUploadDate(LocalDateTime.now());
                 sound4.setUserId(user1.getUserId()); // Assuming User has getUserId()
                 sound4.setCategories(Arrays.asList(sql, ai));
