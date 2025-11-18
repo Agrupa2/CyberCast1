@@ -81,11 +81,10 @@
             <h3>Description</h3>
             <p>{{sound.description}}</p>
         </div>
-        <!--
         {{#canEditSound}}
         <div class="sound-actions">
             <details>
-                <summary>Edit Sound</summary>
+                <summary>Edit Podcast</summary>
                 <form id="editForm" action="/sounds/{{soundId}}/edit" method="post" enctype="multipart/form-data">
                     <input type="hidden" name="_csrf" value="{{token}}" />
 
@@ -122,15 +121,14 @@
                     <button type="submit">Save Changes</button>
                 </form>
                 <form action="/sounds/{{soundId}}/delete" method="post"
-                    onsubmit="return confirm('Are you sure you want to delete this sound?')">
-                    <button type="submit" class="danger">Delete Sound</button>
+                    onsubmit="return confirm('Are you sure you want to delete this podcast?')">
+                    <button type="submit" class="danger">Delete Podcast</button>
                     <input type="hidden" name="_csrf" value="{{token}}" />
 
                 </form>
             </details>
         </div>
         {{/canEditSound}}
-    -->
         <a class="back-link" href="/sounds">Back to all podcasts</a>
     </div>
 
