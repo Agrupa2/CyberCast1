@@ -21,8 +21,8 @@
 
                 {{#logged}}
                 <li><a href="/sounds/upload?username={{userName}}">Upload Podcast</a></li>
-                <!--<li><a href="/delete-account">Delete Account</a></li> 
-                <li><a href="/logout">Logout</a></li>  -->
+                <li><a href="/delete-account">Delete Account</a></li> 
+                <li><a href="/logout">Logout</a></li>
                 <li><a href="/profile/{{userName}}">View profile</a></li>
                 {{#admin}}
                 <li><a href="/admin/users">Admin Panel</a></li>
@@ -42,7 +42,7 @@
                 <div class="default-avatar">{{userInitial}}</div>
                 {{/hasProfilePicture}}
             </div>
-        <!--
+        
             {{#isAllowedToEdit}}
             <div class="profile-actions">
                 <details class="profile-dropdown">
@@ -73,7 +73,7 @@
                 </details>
             </div>
             {{/isAllowedToEdit}}
-            -->
+            
             <div class="profile-info">
                 <h1>{{user.username}}</h1>
                 <div class="stats">
@@ -81,11 +81,11 @@
                         <div class="stat-value">{{sounds.size}}</div>
                         <div class="stat-label">Podcasts</div>
                     </div>
-                    <!--<div class="stat-item">
+                    <div class="stat-item">
                         <div class="stat-value">0</div>
                         <div class="stat-label">Followers</div>
                     </div>
-                -->
+                
                     <div class="stat-item">
                         <div class="stat-value">{{comments.size}}</div>
                         <div class="stat-label">Comments</div>
@@ -138,15 +138,15 @@
             </div>
             {{/sounds}}
         </div>
-        <!--
+        
         {{#hasPrivileges}}
         <div class="secret-sound-section glass-bg">
             <div class="secret-sound-container">
                 {{#isOwner}}
-                <h2 class="section-title">Your Secret Sound</h2>
+                <h2 class="section-title">Your Private Podcast</h2>
                 {{/isOwner}}
                 {{^isOwner}}
-                <h2 class="section-title">Secret Sound of {{user.username}}</h2>
+                <h2 class="section-title">Secret Podcast of {{user.username}}</h2>
                 {{/isOwner}}
 
                 {{#profileUser.secretPath}}
@@ -157,14 +157,14 @@
                     </audio>
                     <div class="action-buttons">
                         <a href="/secret-sounds/download/{{profileUser.userId}}" class="btn download-btn">
-                            Download Secret Sound
+                            Download Secret Podcast
                         </a>
 
                         {{#hasPrivileges}}
                         <form action="/secret-sounds/delete/{{profileUser.userId}}" method="post" class="delete-form">
                             <input type="hidden" name="_csrf" value="{{token}}">
                             <button type="submit" class="btn btn-danger">
-                                Delete Secret Sound
+                                Delete Secret Podcast
                             </button>
                         </form>
                         {{/hasPrivileges}}
@@ -179,13 +179,13 @@
                         <input type="file" name="secretFile" accept="audio/*" required class="custom-file-input">
                     </div>
                     <input type="hidden" name="_csrf" value="{{token}}">
-                    <button type="submit" class="btn upload-btn">Upload Secret Sound</button>
+                    <button type="submit" class="btn upload-btn">Upload Private Podcast</button>
                 </form>
                 {{/profileUser.secretPath}}
             </div>
         </div>
         {{/hasPrivileges}}
-        -->
+        
         <div class="comments-section">
             <h2>
                 {{#isOwner}}Your comments{{/isOwner}}
